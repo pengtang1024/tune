@@ -51,6 +51,8 @@ Future<void> showEqualizerEditorPanel(
   required VoidCallback onReset,
   required String? Function(String name) onSavePreset,
   required ValueChanged<String> onDeletePreset,
+  required ValueChanged<double> onBandWidthChanged,
+  required ValueChanged<double?> onPreampChanged,
 }) async {
   await showCompactSheet<void>(
     context,
@@ -63,6 +65,8 @@ Future<void> showEqualizerEditorPanel(
       onReset: onReset,
       onSavePreset: onSavePreset,
       onDeletePreset: onDeletePreset,
+      onBandWidthChanged: onBandWidthChanged,
+      onPreampChanged: onPreampChanged,
     ),
   );
 }
@@ -201,6 +205,8 @@ class EqualizerEditorSheet extends StatefulWidget {
     required this.onReset,
     required this.onSavePreset,
     required this.onDeletePreset,
+    required this.onBandWidthChanged,
+    required this.onPreampChanged,
   });
 
   /// The settings the panel opens with.
@@ -224,6 +230,12 @@ class EqualizerEditorSheet extends StatefulWidget {
 
   final ValueChanged<String> onDeletePreset;
 
+  /// How much of the spectrum one band moves, in octaves.
+  final ValueChanged<double> onBandWidthChanged;
+
+  /// The preamp set by hand, or null to follow the loudest boost.
+  final ValueChanged<double?> onPreampChanged;
+
   @override
   State<EqualizerEditorSheet> createState() => _EqualizerEditorSheetState();
 }
@@ -245,8 +257,11 @@ class _EqualizerEditorSheetState extends State<EqualizerEditorSheet> {
   }
 
   void _setGain(int band, double gain) {
-    setState(() => _settings = _settings.withGain(band, gain));
-    widget.onGainChanged(band, gain);
+    // The model snaps a typed tenth onto the half-decibel step; reporting the
+    // snapped value keeps the controller on exactly what the panel drew.
+    final snapped = EqualizerSettings.clampGain(gain);
+    setState(() => _settings = _settings.withGain(band, snapped));
+    widget.onGainChanged(band, snapped);
   }
 
   void _applyPreset(String presetId) {
@@ -274,6 +289,40 @@ class _EqualizerEditorSheetState extends State<EqualizerEditorSheet> {
     setState(() {
       _settings = _settings.saveCurrentAsPreset(trimmed, id: presetId);
     });
+  }
+
+  void _setBandWidth(double width) {
+    setState(() => _settings = _settings.copyWith(bandWidth: width));
+    widget.onBandWidthChanged(_settings.bandWidth);
+  }
+
+  void _setPreampManual(bool manual) {
+    final value = manual ? _settings.preampDb : null;
+    setState(
+      () => _settings = manual
+          ? _settings.copyWith(preampOverrideDb: value)
+          : _settings.copyWith(useAutoPreamp: true),
+    );
+    widget.onPreampChanged(value);
+  }
+
+  void _setPreamp(double decibels) {
+    setState(() => _settings = _settings.copyWith(preampOverrideDb: decibels));
+    widget.onPreampChanged(_settings.preampDb);
+  }
+
+  /// Asks for a gain in decibels: a slider reaches a half decibel, typing
+  /// reaches the tenth the reader hears but cannot drag to.
+  Future<void> _editGain(int band) async {
+    final value = await showDialog<double>(
+      context: context,
+      builder: (context) => _GainInputDialog(
+        frequency: _formatFrequency(EqualizerSettings.bands[band].frequency),
+        initial: _settings.gainAt(band),
+      ),
+    );
+    if (!mounted || value == null) return;
+    _setGain(band, value);
   }
 
   void _deletePreset(String presetId) {
@@ -326,6 +375,26 @@ class _EqualizerEditorSheetState extends State<EqualizerEditorSheet> {
             onDeleted: widget.available ? _deletePreset : null,
           ),
           const SizedBox(height: CompactTokens.space16),
+          _BandWidthPicker(
+            width: _settings.bandWidth,
+            onSelected: widget.available ? _setBandWidth : null,
+          ),
+          const SizedBox(height: CompactTokens.space8),
+          SettingsSwitchRow(
+            title: context.loc.equalizerPreamp,
+            description: _settings.preampOverrideDb == null
+                ? context.loc.equalizerPreampAuto
+                : context.loc.equalizerPreampManual,
+            value: _settings.preampOverrideDb != null,
+            onChanged: widget.available ? _setPreampManual : _ignoreSwitch,
+          ),
+          if (_settings.preampOverrideDb != null)
+            _PreampSlider(
+              decibels: _settings.preampDb,
+              enabled: widget.available,
+              onChanged: _setPreamp,
+            ),
+          const SizedBox(height: CompactTokens.space16),
           SizedBox(
             height: _bandHeight,
             child: Row(
@@ -338,6 +407,7 @@ class _EqualizerEditorSheetState extends State<EqualizerEditorSheet> {
                       gain: _settings.gainAt(band.index),
                       enabled: widget.available,
                       onChanged: (gain) => _setGain(band.index, gain),
+                      onGainTap: () => _editGain(band.index),
                     ),
                   ),
               ],
@@ -517,6 +587,209 @@ class _PresetChips extends StatelessWidget {
   }
 }
 
+/// The width of every band, widest first.
+///
+/// One octave is the layout the ten centres were chosen for. Narrower widths
+/// turn a band into a notch that leaves its neighbours alone, which is how a
+/// hum or a whistle gets cut without dulling the music around it.
+class _BandWidthPicker extends StatelessWidget {
+  const _BandWidthPicker({required this.width, required this.onSelected});
+
+  final double width;
+
+  /// Null when the platform has no equalizer.
+  final ValueChanged<double>? onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSelected = this.onSelected;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.loc.equalizerBandWidth,
+          style: theme.textTheme.labelLarge,
+        ),
+        const SizedBox(height: CompactTokens.space4),
+        Text(
+          context.loc.equalizerBandWidthHint,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: CompactTokens.space8),
+        Wrap(
+          spacing: CompactTokens.space6,
+          runSpacing: CompactTokens.space6,
+          children: [
+            for (var i = 0; i < EqualizerSettings.bandWidths.length; i++)
+              ChoiceChip(
+                key: ValueKey<String>('equalizer-width-$i'),
+                label: Text(
+                  _widthLabel(context, EqualizerSettings.bandWidths[i]),
+                ),
+                selected: EqualizerSettings.bandWidths[i] == width,
+                onSelected: onSelected == null
+                    ? null
+                    : (_) => onSelected(EqualizerSettings.bandWidths[i]),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// A width in octaves as the panel names it.
+String _widthLabel(BuildContext context, double octaves) {
+  final loc = context.loc;
+  if (octaves >= 1) return loc.equalizerWidthOne;
+  if (octaves > 0.5) return loc.equalizerWidthTwoThirds;
+  if (octaves >= 0.5) return loc.equalizerWidthHalf;
+  return loc.equalizerWidthThird;
+}
+
+/// The preamp, once the reader took it off the loudest boost.
+class _PreampSlider extends StatelessWidget {
+  const _PreampSlider({
+    required this.decibels,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  final double decibels;
+
+  final bool enabled;
+
+  final ValueChanged<double> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final value = decibels.clamp(
+      EqualizerSettings.minPreampDb,
+      EqualizerSettings.maxPreampDb,
+    );
+
+    return Row(
+      children: [
+        Expanded(
+          child: Slider(
+            key: const ValueKey<String>('equalizer-preamp'),
+            value: value,
+            min: EqualizerSettings.minPreampDb,
+            max: EqualizerSettings.maxPreampDb,
+            divisions:
+                (EqualizerSettings.maxPreampDb - EqualizerSettings.minPreampDb)
+                    .round(),
+            label: context.loc.equalizerGainDb(_formatGain(decibels)),
+            onChanged: enabled ? onChanged : null,
+          ),
+        ),
+        SizedBox(
+          width: 44,
+          child: Text(
+            context.loc.equalizerGainDb(_formatGain(decibels)),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Asks for a gain in decibels.
+///
+/// The slider moves in halves; typing reaches a tenth. The model snaps what
+/// comes back to its own step, so a typo lands on the nearest half instead of
+/// putting the filter graph on a value the panel cannot draw.
+class _GainInputDialog extends StatefulWidget {
+  const _GainInputDialog({required this.frequency, required this.initial});
+
+  final String frequency;
+
+  final double initial;
+
+  @override
+  State<_GainInputDialog> createState() => _GainInputDialogState();
+}
+
+class _GainInputDialogState extends State<_GainInputDialog> {
+  late final TextEditingController _controller = TextEditingController(
+    text: _formatGain(widget.initial),
+  );
+  String? _error;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final parsed = double.tryParse(_controller.text.trim().replaceAll(',', '.'));
+    if (parsed == null) {
+      setState(() => _error = context.loc.equalizerGainDialogHint);
+      return;
+    }
+    if (parsed < EqualizerSettings.minGain ||
+        parsed > EqualizerSettings.maxGain) {
+      setState(() => _error = context.loc.equalizerGainDialogHint);
+      return;
+    }
+    Navigator.of(context).pop(parsed);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(context.loc.equalizerGainDialogTitle),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(context.loc.equalizerFrequencyHz(widget.frequency)),
+          const SizedBox(height: CompactTokens.space8),
+          TextField(
+            key: const ValueKey<String>('equalizer-gain-input'),
+            controller: _controller,
+            autofocus: true,
+            keyboardType: const TextInputType.numberWithOptions(
+              signed: true,
+              decimal: true,
+            ),
+            textInputAction: TextInputAction.done,
+            decoration: InputDecoration(
+              labelText: context.loc.equalizerGainDialogTitle,
+              helperText: context.loc.equalizerGainDialogHint,
+              errorText: _error,
+              border: const OutlineInputBorder(),
+              isDense: true,
+            ),
+            onSubmitted: (_) => _submit(),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(context.loc.cancel),
+        ),
+        FilledButton(
+          key: const ValueKey<String>('equalizer-gain-input-save'),
+          onPressed: _submit,
+          child: Text(context.loc.save),
+        ),
+      ],
+    );
+  }
+}
+
 /// Asks the reader for the name a curve is kept under.
 ///
 /// An input error, or the back of the sheet, answers with null: no name, no
@@ -585,6 +858,7 @@ class _BandSlider extends StatelessWidget {
     required this.gain,
     required this.enabled,
     required this.onChanged,
+    required this.onGainTap,
   });
 
   final EqualizerBand band;
@@ -594,6 +868,10 @@ class _BandSlider extends StatelessWidget {
   final bool enabled;
 
   final ValueChanged<double> onChanged;
+
+  /// Opens the field where a gain can be typed: halves are what the slider
+  /// gives, a tenth is what the reader sometimes wants.
+  final VoidCallback onGainTap;
 
   @override
   Widget build(BuildContext context) {
@@ -609,10 +887,21 @@ class _BandSlider extends StatelessWidget {
       value: context.loc.equalizerGainDb(value),
       child: Column(
         children: [
-          Text(
-            context.loc.equalizerGainDb(value),
-            style: labelStyle,
-            maxLines: 1,
+          InkWell(
+            key: ValueKey<String>('equalizer-gain-${band.index}'),
+            onTap: enabled ? onGainTap : null,
+            borderRadius: BorderRadius.circular(CompactTokens.radius4),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: CompactTokens.space4,
+                vertical: 2,
+              ),
+              child: Text(
+                context.loc.equalizerGainDb(value),
+                style: labelStyle,
+                maxLines: 1,
+              ),
+            ),
           ),
           Expanded(
             child: RotatedBox(
@@ -647,8 +936,12 @@ class _BandSlider extends StatelessWidget {
 
 /// A gain as the panel spells it: a sign on the boosts, none on the cuts.
 String _formatGain(double gain) {
-  final rounded = gain.round();
-  return rounded > 0 ? '+$rounded' : '$rounded';
+  final snapped = (gain * 10).round() / 10;
+  if (snapped == 0) return '0';
+  final text = snapped == snapped.roundToDouble()
+      ? snapped.toStringAsFixed(0)
+      : snapped.toStringAsFixed(1);
+  return snapped > 0 ? '+$text' : text;
 }
 
 /// A centre frequency without the fractional part the model keeps for the

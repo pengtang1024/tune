@@ -7,11 +7,17 @@ import 'package:tune/domain/models/equalizer_settings.dart';
 /// 图串写错不会抛异常，只会安静地不生效，所以这里按整串断言：预放、频率、
 /// 滤波类型、增益全部要对得上，不能用 isNotNull 放过。
 void main() {
-  EqualizerSettings curve({bool enabled = true, required List<double> gains}) =>
-      EqualizerSettings(
-        enabled: enabled,
-        gains: EqualizerSettings.normalizeGains(gains),
-      );
+  EqualizerSettings curve({
+    bool enabled = true,
+    required List<double> gains,
+    double bandWidth = EqualizerSettings.defaultBandWidth,
+    double? preampOverrideDb,
+  }) => EqualizerSettings(
+    enabled: enabled,
+    gains: EqualizerSettings.normalizeGains(gains),
+    bandWidth: bandWidth,
+    preampOverrideDb: preampOverrideDb,
+  );
 
   group('清空的条件', () {
     test('关闭时返回 null，哪怕曲线不是平的', () {
@@ -127,4 +133,67 @@ void main() {
       expect(frequencies.last, 16000);
     });
   });
+
+  group('宽度与预放', () {
+    test('宽半倍频程时每段都写 width=0.5', () {
+      final af = MpvEqualizerFilter.build(
+        curve(gains: <double>[3, 0, 0, 0, 0, 0, 0, 0, 0, 0], bandWidth: 0.5),
+      );
+
+      expect(af, contains('width_type=o:width=0.5:g=3'));
+      expect(af, isNot(contains('width=1:')));
+    });
+
+    test('三分之二倍频程写成 0.667，而不是循环小数', () {
+      final af = MpvEqualizerFilter.build(
+        curve(gains: <double>[0, 0, 0, 0, 0, 0, 0, 0, 0, 2], bandWidth: 2 / 3),
+      );
+
+      expect(af, contains('width=0.667:g=2'));
+    });
+
+    test('三分之一倍频程写成 0.333', () {
+      final af = MpvEqualizerFilter.build(
+        curve(gains: <double>[1, 0, 0, 0, 0, 0, 0, 0, 0, 0], bandWidth: 1 / 3),
+      );
+
+      expect(af, contains('width=0.333:g=1'));
+    });
+
+    test('半格增益按小数写进图串，预放也带小数', () {
+      final af = MpvEqualizerFilter.build(
+        curve(gains: <double>[0, 0, 0, 1.5, 0, 0, 0, 0, 0, 0]),
+      );
+
+      expect(
+        af,
+        'lavfi=[volume=-1.5dB,equalizer=f=250:width_type=o:width=1:g=1.5]',
+      );
+    });
+
+    test('手动预放覆盖自动值，曲线本身不变', () {
+      final af = MpvEqualizerFilter.build(
+        curve(
+          gains: <double>[6, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          preampOverrideDb: -9,
+        ),
+      );
+
+      expect(af, startsWith('lavfi=[volume=-9dB,'));
+      expect(af, contains('g=6]'));
+      expect(af, isNot(contains('volume=-6dB')));
+    });
+
+    test('手动预放 -24 dB 也照写，不会被夹回自动值', () {
+      final af = MpvEqualizerFilter.build(
+        curve(
+          gains: <double>[0, 0, 0, 0, 0, 0, 0, 0, 0, -2],
+          preampOverrideDb: -24,
+        ),
+      );
+
+      expect(af, 'lavfi=[volume=-24dB,equalizer=f=16000:width_type=o:width=1:g=-2]');
+    });
+  });
 }
+

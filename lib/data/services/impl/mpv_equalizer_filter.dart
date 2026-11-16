@@ -25,7 +25,8 @@ class MpvEqualizerFilter {
       if (gain == 0) continue;
       final frequency = EqualizerSettings.frequencies[i];
       filters.add(
-        'equalizer=f=${_hz(frequency)}:width_type=o:width=1:g=${_db(gain)}',
+        'equalizer=f=${_hz(frequency)}'
+        ':width_type=o:width=${_octaves(settings.bandWidth)}:g=${_db(gain)}',
       );
     }
     if (filters.isEmpty) return null;
@@ -39,4 +40,13 @@ class MpvEqualizerFilter {
 
   static String _hz(double value) =>
       value == value.roundToDouble() ? value.toInt().toString() : value.toString();
+
+  /// A band width in octaves, rounded to a thousandth: two thirds of an octave
+  /// is written 0.667, not the repeating decimal the division produces.
+  static String _octaves(double value) {
+    final rounded = (value * 1000).round() / 1000;
+    return rounded == rounded.roundToDouble()
+        ? rounded.toInt().toString()
+        : rounded.toString();
+  }
 }

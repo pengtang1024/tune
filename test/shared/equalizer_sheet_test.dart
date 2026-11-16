@@ -4,6 +4,7 @@ import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/domain/models/equalizer_settings.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/equalizer_sheet.dart';
+import 'package:tune/shared/ui/settings_switch_row.dart';
 
 /// Guards the two equalizer panels.
 ///
@@ -102,6 +103,8 @@ void main() {
     VoidCallback? onReset,
     String? Function(String name)? onSavePreset,
     ValueChanged<String>? onDeletePreset,
+    ValueChanged<double>? onBandWidthChanged,
+    ValueChanged<double?>? onPreampChanged,
   }) {
     return pumpPanel(
       tester,
@@ -115,6 +118,8 @@ void main() {
         onReset: onReset ?? () {},
         onSavePreset: onSavePreset ?? (name) => 'user-test',
         onDeletePreset: onDeletePreset ?? (presetId) {},
+        onBandWidthChanged: onBandWidthChanged ?? (width) {},
+        onPreampChanged: onPreampChanged ?? (decibels) {},
       ),
     );
   }
@@ -211,7 +216,9 @@ void main() {
     expect(find.text('均衡器'), findsOneWidget);
     expect(find.text('重置'), findsOneWidget);
     expect(find.text('提升的频段会用等量预放抵消，避免削波'), findsOneWidget);
-    expect(find.byType(ChoiceChip), findsNWidgets(12));
+    // Twelve curves and four widths; the preamp slider only appears once the
+    // reader takes the preamp off the automatic setting.
+    expect(find.byType(ChoiceChip), findsNWidgets(16));
     expect(find.byType(Slider), findsNWidgets(10));
 
     for (final label in <String>[...quickLabels, ...editorOnlyLabels]) {
@@ -287,7 +294,7 @@ void main() {
     );
 
     final chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip));
-    expect(chips.length, 12);
+    expect(chips.length, 16);
     expect(
       chips.every((chip) => chip.onSelected == null),
       isTrue,
@@ -345,7 +352,7 @@ void main() {
     );
     expect(
       find.byType(ChoiceChip),
-      findsNWidgets(12),
+      findsNWidgets(16),
       reason: 'the built-in curves stay where they are',
     );
   });
@@ -406,4 +413,142 @@ void main() {
       reason: 'the chip leaves the row with the curve',
     );
   });
+
+  testWidgets('a band slider steps in halves of a decibel', (tester) async {
+    await openEditorPanel(tester);
+
+    final band = tester.widget<Slider>(
+      find.byKey(const ValueKey<String>('equalizer-band-0')),
+    );
+
+    expect(
+      band.divisions,
+      48,
+      reason: '24 dB over a half-decibel step is 48 positions',
+    );
+  });
+
+  testWidgets('a narrower band width is reported and lit', (tester) async {
+    final widths = <double>[];
+    await openEditorPanel(tester, onBandWidthChanged: widths.add);
+
+    expect(find.text('频段宽度'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey<String>('equalizer-width-2')));
+    await tester.pumpAndSettle();
+
+    expect(widths, <double>[0.5], reason: 'half an octave is the third chip');
+    final lit = tester.widget<ChoiceChip>(
+      find.byKey(const ValueKey<String>('equalizer-width-2')),
+    );
+    expect(lit.selected, isTrue);
+  });
+
+  testWidgets('the preamp goes manual and its slider stays below zero', (
+    tester,
+  ) async {
+    final preamps = <double?>[];
+    await openEditorPanel(
+      tester,
+      settings: const EqualizerSettings(
+        enabled: true,
+        gains: <double>[6, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      ),
+      onPreampChanged: preamps.add,
+    );
+
+    expect(find.text('预放'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey<String>('equalizer-preamp')),
+      findsNothing,
+      reason: 'an automatic preamp needs no slider',
+    );
+
+    await tester.tap(
+      find.descendant(
+        of: find.ancestor(
+          of: find.text('预放'),
+          matching: find.byType(SettingsSwitchRow),
+        ),
+        matching: find.byType(Switch),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      preamps.first,
+      -6,
+      reason: 'turning the preamp manual starts from the boost it was following',
+    );
+
+    final slider = find.byKey(const ValueKey<String>('equalizer-preamp'));
+    expect(slider, findsOneWidget);
+    await tester.drag(slider, const Offset(-60, 0));
+    await tester.pumpAndSettle();
+
+    expect(preamps.last, lessThan(0));
+    expect(
+      preamps.last,
+      isNot(preamps.first),
+      reason: 'the drag moves the value it started from',
+    );
+  });
+
+  testWidgets('a gain typed in the dialog reaches the band', (tester) async {
+    final changes = <(int, double)>[];
+    await openEditorPanel(
+      tester,
+      onGainChanged: (band, gain) => changes.add((band, gain)),
+    );
+
+    await tester.tap(find.byKey(const ValueKey<String>('equalizer-gain-3')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byType(AlertDialog),
+      findsOneWidget,
+      reason: 'the band opens a field of its own',
+    );
+    expect(find.text('设置增益'), findsNWidgets(2), reason: 'title and field label');
+
+    await tester.enterText(
+      find.byKey(const ValueKey<String>('equalizer-gain-input')),
+      '3.7',
+    );
+    await tester.tap(
+      find.byKey(const ValueKey<String>('equalizer-gain-input-save')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      changes,
+      <(int, double)>[(3, 3.5)],
+      reason: 'a tenth typed by hand lands on the half-decibel step',
+    );
+  });
+
+  testWidgets('a gain that is not a number keeps the dialog open', (
+    tester,
+  ) async {
+    final changes = <(int, double)>[];
+    await openEditorPanel(
+      tester,
+      onGainChanged: (band, gain) => changes.add((band, gain)),
+    );
+
+    await tester.tap(find.byKey(const ValueKey<String>('equalizer-gain-3')));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey<String>('equalizer-gain-input')),
+      'loud',
+    );
+    await tester.tap(
+      find.byKey(const ValueKey<String>('equalizer-gain-input-save')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(changes, isEmpty, reason: 'a value that cannot be read is not sent');
+  });
 }
+

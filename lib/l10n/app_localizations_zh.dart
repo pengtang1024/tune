@@ -4545,6 +4545,42 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equalizerUnavailable => '这个平台的播放后端不支持均衡器';
 
   @override
+  String get equalizerBandWidth => '频段宽度';
+
+  @override
+  String get equalizerBandWidthHint => '越窄，一个频段影响的频率范围越小';
+
+  @override
+  String get equalizerWidthOne => '1 倍频程';
+
+  @override
+  String get equalizerWidthTwoThirds => '2/3 倍频程';
+
+  @override
+  String get equalizerWidthHalf => '1/2 倍频程';
+
+  @override
+  String get equalizerWidthThird => '1/3 倍频程';
+
+  @override
+  String get equalizerPreamp => '预放';
+
+  @override
+  String get equalizerPreampAuto => '跟随最大增益';
+
+  @override
+  String get equalizerPreampManual => '手动';
+
+  @override
+  String get equalizerPreampHint => '手动调低一点，音量大时更少削波';
+
+  @override
+  String get equalizerGainDialogTitle => '设置增益';
+
+  @override
+  String get equalizerGainDialogHint => '以 0.5 dB 为一步';
+
+  @override
   String get settingsEqualizerAction => '均衡器';
 
   @override
@@ -9093,6 +9129,42 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get equalizerUnavailable => '这个平台的播放后端不支持均衡器';
+
+  @override
+  String get equalizerBandWidth => '频段宽度';
+
+  @override
+  String get equalizerBandWidthHint => '越窄，一个频段影响的频率范围越小';
+
+  @override
+  String get equalizerWidthOne => '1 倍频程';
+
+  @override
+  String get equalizerWidthTwoThirds => '2/3 倍频程';
+
+  @override
+  String get equalizerWidthHalf => '1/2 倍频程';
+
+  @override
+  String get equalizerWidthThird => '1/3 倍频程';
+
+  @override
+  String get equalizerPreamp => '预放';
+
+  @override
+  String get equalizerPreampAuto => '跟随最大增益';
+
+  @override
+  String get equalizerPreampManual => '手动';
+
+  @override
+  String get equalizerPreampHint => '手动调低一点，音量大时更少削波';
+
+  @override
+  String get equalizerGainDialogTitle => '设置增益';
+
+  @override
+  String get equalizerGainDialogHint => '以 0.5 dB 为一步';
 
   @override
   String get settingsEqualizerAction => '均衡器';
@@ -13644,6 +13716,42 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get equalizerUnavailable => '這個平台的播放後端不支援等化器';
+
+  @override
+  String get equalizerBandWidth => '頻段寬度';
+
+  @override
+  String get equalizerBandWidthHint => '越窄，一個頻段影響的頻率範圍越小';
+
+  @override
+  String get equalizerWidthOne => '1 倍頻程';
+
+  @override
+  String get equalizerWidthTwoThirds => '2/3 倍頻程';
+
+  @override
+  String get equalizerWidthHalf => '1/2 倍頻程';
+
+  @override
+  String get equalizerWidthThird => '1/3 倍頻程';
+
+  @override
+  String get equalizerPreamp => '預放';
+
+  @override
+  String get equalizerPreampAuto => '跟隨最大增益';
+
+  @override
+  String get equalizerPreampManual => '手動';
+
+  @override
+  String get equalizerPreampHint => '手動調低一點，音量大時更少削波';
+
+  @override
+  String get equalizerGainDialogTitle => '設定增益';
+
+  @override
+  String get equalizerGainDialogHint => '以 0.5 dB 為一步';
 
   @override
   String get settingsEqualizerAction => '等化器';

@@ -8435,6 +8435,78 @@ abstract class AppLocalizations {
   /// **'这个平台的播放后端不支持均衡器'**
   String get equalizerUnavailable;
 
+  /// No description provided for @equalizerBandWidth.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'频段宽度'**
+  String get equalizerBandWidth;
+
+  /// No description provided for @equalizerBandWidthHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'越窄，一个频段影响的频率范围越小'**
+  String get equalizerBandWidthHint;
+
+  /// No description provided for @equalizerWidthOne.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'1 倍频程'**
+  String get equalizerWidthOne;
+
+  /// No description provided for @equalizerWidthTwoThirds.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'2/3 倍频程'**
+  String get equalizerWidthTwoThirds;
+
+  /// No description provided for @equalizerWidthHalf.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'1/2 倍频程'**
+  String get equalizerWidthHalf;
+
+  /// No description provided for @equalizerWidthThird.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'1/3 倍频程'**
+  String get equalizerWidthThird;
+
+  /// No description provided for @equalizerPreamp.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'预放'**
+  String get equalizerPreamp;
+
+  /// No description provided for @equalizerPreampAuto.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'跟随最大增益'**
+  String get equalizerPreampAuto;
+
+  /// No description provided for @equalizerPreampManual.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'手动'**
+  String get equalizerPreampManual;
+
+  /// No description provided for @equalizerPreampHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'手动调低一点，音量大时更少削波'**
+  String get equalizerPreampHint;
+
+  /// No description provided for @equalizerGainDialogTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'设置增益'**
+  String get equalizerGainDialogTitle;
+
+  /// No description provided for @equalizerGainDialogHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'以 0.5 dB 为一步'**
+  String get equalizerGainDialogHint;
+
   /// No description provided for @settingsEqualizerAction.
   ///
   /// In zh_CN, this message translates to:

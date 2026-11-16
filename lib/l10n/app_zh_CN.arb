@@ -2204,6 +2204,18 @@
     }
   },
   "equalizerUnavailable": "这个平台的播放后端不支持均衡器",
+  "equalizerBandWidth": "频段宽度",
+  "equalizerBandWidthHint": "越窄，一个频段影响的频率范围越小",
+  "equalizerWidthOne": "1 倍频程",
+  "equalizerWidthTwoThirds": "2/3 倍频程",
+  "equalizerWidthHalf": "1/2 倍频程",
+  "equalizerWidthThird": "1/3 倍频程",
+  "equalizerPreamp": "预放",
+  "equalizerPreampAuto": "跟随最大增益",
+  "equalizerPreampManual": "手动",
+  "equalizerPreampHint": "手动调低一点，音量大时更少削波",
+  "equalizerGainDialogTitle": "设置增益",
+  "equalizerGainDialogHint": "以 0.5 dB 为一步",
   "settingsEqualizerAction": "均衡器",
   "settingsEqualizerActionHint": "全部预设与十段滑杆",
   "playerEqualizer": "均衡器"
