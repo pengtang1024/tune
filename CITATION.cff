@@ -1,15 +1,15 @@
 cff-version: 1.2.0
 message: "如果本软件对你的工作有帮助，请按以下信息引用。"
 title: "Tune"
-abstract: "一款紧凑的本地与在线音乐播放器，使用 Flutter 开发，主要面向 Linux 桌面。支持本地音乐库扫描与分类浏览、30 种音源类型（Subsonic 兼容服务、Ampache、Koel、Emby、Plex、Jellyfin、播客、网络电台等）、播放队列与恢复、本地 AI 歌词与翻译组件、音乐发现，以及桌面集成（MPRIS、托盘、默认播放器）。"
+abstract: "一款紧凑的本地与在线音乐播放器，使用 Flutter 开发，主要面向 Linux 桌面。支持本地音乐库扫描与分类浏览、30 种音源类型（Subsonic 兼容服务、Ampache、Koel、Emby、Plex、Jellyfin、播客、网络电台等）、播放队列与恢复、本地 AI 歌词与翻译组件、十段均衡器、音乐发现，以及桌面集成（MPRIS、托盘、默认播放器）。"
 type: software
 authors:
   - name: "pengtang1024"
     website: "https://github.com/pengtang1024"
 repository-code: "https://github.com/pengtang1024/tune"
 url: "https://github.com/pengtang1024/tune"
-version: "1.32.0"
-date-released: "2026-11-14"
+version: "1.37.0"
+date-released: "2026-11-16"
 license: MIT
 keywords:
   - flutter
