@@ -1,6 +1,6 @@
 # 音乐均衡器
 
-> 状态：设计（已实施） · 适用版本 1.37.0 · 最后核对 2026-11-16
+> 状态：设计（已实施） · 适用版本 1.37.3 · 最后核对 2026-11-16
 >
 > 2026-11-16 立项。回答「桌面播放器怎么加 10 段均衡器：界面、状态与音频后端各归谁」。
 > `AGENTS.md` §4 曾把均衡器列为 v1 之外；读者 2026-11-16 明确要求增加，这一版按本方案实施，§4 那一行随之改成「已实施」。
@@ -47,7 +47,7 @@
 | 处理位置 | libmpv 的 `af` 滤镜链 | 后端现成，零新依赖，不动 Dart 音频线程 |
 | 状态所有者 | `EqualizerController`（`features/player/application`） | 与播放域同层；设置页只读它，不存第二份 |
 | 持久化 | 偏好键 `audio_equalizer_v1`（JSON） | 一个偏好一个文件；不入库，无迁移 |
-| 界面 | `EqualizerSheet` 一个组件，三个入口 | 控件只有一套，入口不复制状态 |
+| 界面 | 快捷面板 + 完整编辑器两个面板，共用一份状态 | 播放器旁边放不下十个滑块；控件不复制状态 |
 | 默认值 | 关闭、平坦（全 0） | 不改变现有听感 |
 | 平台 | Linux 验收，Windows 同码路径 | 后端能力由运行时探测决定，不写进平台能力表 |
 
@@ -100,7 +100,7 @@ set_property af "" → success（清空）
 {"version": 1, "enabled": true, "gains": [4, 3, 1, -1, -2, 0, 2, 4, 4, 3]}
 ```
 
-首版预设曲线（代码常量 `EqualizerPresets`；改曲线不改 schema）：
+预设曲线（代码常量 `EqualizerPresets`；改曲线不改 schema）。1.37.3 起 12 组，`quick` 是快捷面板给的那四组：
 
 ```json
 {
@@ -109,11 +109,17 @@ set_property af "" → success（清空）
   "rock":       [4, 3, 2, 1, 0, -1, 1, 2, 3, 4],
   "jazz":       [3, 2, -1, -1, 1, 2, 2, 1, 2, 3],
   "classical":  [2, 1, 0, 0, 0, 0, -1, -2, -3, -4],
+  "acoustic":   [4, 3, 2, 1, 1, 1, 1, 2, 2, 2],
   "bass":       [6, 5, 4, 2, 0, 0, 0, 0, 0, 0],
   "vocal":      [-2, -1, 0, 2, 4, 4, 2, 0, -1, -2],
-  "electronic": [4, 3, 0, -1, -2, 0, 1, 2, 3, 4]
+  "hiphop":     [7, 6, 4, 1, 0, -1, 0, 1, 3, 3],
+  "electronic": [4, 3, 0, -1, -2, 0, 1, 2, 3, 4],
+  "live":       [4, 3, 1, -1, -1, 0, 1, 2, 3, 2],
+  "soft":       [2, 1, 0, 0, -1, -1, -2, -2, -3, -4]
 }
 ```
+
+`EqualizerPresets.quick = [flat, pop, rock, bass]`：播放器旁边只给这四个，其余在设置里。
 
 ## 后端映射
 
@@ -153,7 +159,7 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 | `lib/data/services/impl/media_kit_player_service.dart` | 实现后端；串行写 `af` |
 | `lib/features/player/application/equalizer_controller.dart` | 唯一状态所有者：加载、应用、节流、落盘 |
 | `lib/features/player/application/equalizer_providers.dart` | `equalizerControllerProvider`、`equalizerAvailableProvider` |
-| `lib/features/player/presentation/equalizer_sheet.dart` | 面板与三个入口共用 |
+| `lib/shared/ui/equalizer_sheet.dart` | 快捷面板与完整编辑器（两个面板、一套状态） |
 | `lib/config/app_initializer.dart` | 音频初始化后恢复一次 |
 
 - 启动顺序：`PersistenceService.init()` → `AudioPlayerService.init()` → `EqualizerController.restore()`；失败只记日志，不拦住首屏（与播放会话同一口径）。
@@ -164,19 +170,26 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 ## 界面
 
 - 面板走 `showCompactSheet`（`lib/shared/ui/compact_sheet.dart`），宽 `CompactTokens.sheetWidth`，内容超高时面板内滚动。
-- 结构自上而下：
-  1. 标题「均衡器」+ 开关 + 「重置」；
-  2. 预设 chips 一行（可换行）：命中哪组选中哪组；手动拖动后追加一枚高亮的「自定义」chip，不写进设置；
-  3. 10 个竖向滑块，中心 0 dB，上 +12、下 -12，拖动时显示当前 dB；
-  4. 底部一行只读小字：说明提升频段会用等量预放抵消（`equalizerHint`）。
-- 关闭状态：滑块仍可改，灰显但不锁死；读者可以先调曲线再打开开关。
-- 三个入口：
+1.37.3 起分两层，状态仍是同一个 `EqualizerController`：
 
-| 入口 | 位置 | 细节 |
+| 面板 | 谁打开 | 内容 |
 | --- | --- | --- |
-| 底栏 | `player_dock.dart` 动作行 → 「更多」菜单 | 动作行不换行，1.37.2 起只画三个图标：收藏、队列、`Icons.more_horiz_rounded`；迷你窗口与均衡器都折进「更多」菜单（`Icons.picture_in_picture_alt_rounded` / `Icons.equalizer_rounded`）。不再按宽度藏入口，窄窗也不会溢出 |
-| 正在播放页 | `_TopBar` 队列按钮右侧 | `_RoundButton`，tooltip 用当前语言；只按可用性判断，不受宽度限制 |
-| 设置 | 「播放」卡新增一行「均衡器」 | 副标题写当前预设名；点开同一个面板 |
+| 快捷面板 `EqualizerQuickSheet` | 底栏「更多」菜单、正在播放页顶栏 | 标题 + 开关 + 4 个常用曲线（平坦 / 流行 / 摇滚 / 重低音）；手动改过的曲线追加高亮的「自定义」；底部一行小字指向设置（`equalizerQuickHint`） |
+| 完整编辑器 `EqualizerEditorSheet` | 设置 › 播放 › 均衡器 | 标题 + 开关 + 「重置」+ 12 个曲线 chips + 10 个竖向滑块 + 底部预放说明（`equalizerHint`） |
+
+- 为什么分两层：底栏和正在播放页顶栏只有几百像素，十个滑块加十二枚 chip 会跟播放控件抢空间；听歌时选曲线本来也只需要「按心情点一下」。
+- 快捷面板用 `EqualizerPresets.quick`，编辑器用 `EqualizerPresets.all`；两张表都在 model 里，面板不自己写一份。
+- 关闭状态：两个面板的控件仍可改，灰显但不锁死；读者可以先调曲线再打开开关。
+- 后端不可用：两个面板照常打开，控件置灰且不回调，顶部写 `equalizerUnavailable`。
+- 编辑器里的滑块中心 0 dB，上 +12、下 -12，拖动时在滑轨上显示当前 dB。
+
+入口：
+
+| 入口 | 位置 | 打开 |
+| --- | --- | --- |
+| 底栏 | `player_dock.dart` 动作行 → 「更多」菜单 | 快捷面板。动作行 1.37.2 起只画三个图标：收藏、队列、`Icons.more_horiz_rounded`；迷你窗口与均衡器折进菜单（`Icons.picture_in_picture_alt_rounded` / `Icons.equalizer_rounded`），不再按宽度藏入口 |
+| 正在播放页 | `_TopBar` 队列按钮右侧的 `_RoundButton` | 快捷面板；只按可用性判断，不受宽度限制 |
+| 设置 | 「播放」卡一行「均衡器」 | 完整编辑器；副标题写「当前曲线名 · 全部预设与十段滑杆」 |
 
 - 滑块带 `Semantics(label: '31 Hz', value: '+4 dB')`，方向键可调；图标按钮统一用 `TuneTooltip`。
 - 底栏只订阅可用性；面板打开时才订阅频段值，一次拖动不重建整页。
@@ -187,15 +200,16 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 | --- | --- | --- |
 | `equalizerTitle` | 均衡器 | 面板标题 |
 | `equalizerEnable` | 启用均衡器 | 开关 |
-| `equalizerPresetFlat` / `Pop` / `Rock` / `Jazz` / `Classical` / `Bass` / `Vocal` / `Electronic` | 平坦 / 流行 / 摇滚 / 爵士 / 古典 / 重低音 / 人声 / 电子 | 8 个预设名 |
+| `equalizerPresetFlat` / `Pop` / `Rock` / `Jazz` / `Classical` / `Acoustic` / `Bass` / `Vocal` / `Hiphop` / `Electronic` / `Live` / `Soft` | 平坦 / 流行 / 摇滚 / 爵士 / 古典 / 原声 / 重低音 / 人声 / 嘻哈 / 电子 / 现场 / 轻柔 | 12 个预设名 |
 | `equalizerCustom` | 自定义 | 未命中预设时的状态 |
 | `equalizerReset` | 重置 | 恢复平坦 |
-| `equalizerHint` | 提升的频段会用等量预放抵消，避免削波 | 底部说明 |
+| `equalizerHint` | 提升的频段会用等量预放抵消，避免削波 | 编辑器底部说明 |
+| `equalizerQuickHint` | 更细的频段和全部预设见 设置 › 播放 | 快捷面板底部说明 |
 | `equalizerGainDb(value)` | {value} dB | 滑块值与语义标签 |
 | `equalizerFrequencyHz(frequency)` | {frequency} Hz | 频段刻度 |
 | `equalizerUnavailable` | 这个平台的播放后端不支持均衡器 | 后端不可用时的说明 |
 | `settingsEqualizerAction` | 均衡器 | 设置行标题 |
-| `settingsEqualizerActionHint` | 打开面板选择预设并拖动十个频段 | 设置行副标题 |
+| `settingsEqualizerActionHint` | 全部预设与十段滑杆 | 设置行副标题（前缀是当前曲线名） |
 | `playerEqualizer` | 均衡器 | 两个入口的 tooltip |
 
 - 模板是 `lib/l10n/app_zh_CN.arb`，同步 `app_en` / `app_zh` / `app_zh_TW`，再 `flutter gen-l10n`，产物入库。
@@ -211,8 +225,8 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 
 组件测试：
 
-- `test/shared/equalizer_sheet_test.dart`：10 个滑块、预设 chips、手动改动后显示「自定义」、后端不可用时整块置灰且不回调。
-- `test/shared/equalizer_entry_test.dart`：入口 → 面板的联动（`openEqualizerPanel` 读控制器与平台可用性）；面板里的预设、开关、复位都落回控制器；不可用平台仍能打开但只读。
+- `test/shared/equalizer_sheet_test.dart`：快捷面板只画 4 个 chip、没有滑块与重置；编辑器画 12 个 chip 与 10 个滑块，拖动回落到正确频段；手动改动后显示「自定义」；后端不可用时两个面板都置灰且不回调。
+- `test/shared/equalizer_entry_test.dart`：播放器入口 → 快捷面板的联动（`openEqualizerPanel` 读控制器与平台可用性）；预设与开关落回控制器、面板里不出现滑块；不可用平台仍能打开但只读。
 
 Linux 手测：
 
