@@ -2032,7 +2032,20 @@
   "settingsLocalizationApiBaseUrl": "Endpoint (base URL)",
   "settingsLocalizationApiKey": "API key",
   "settingsLocalizationApiModel": "Model",
-  "settingsLocalizationModelSuggestions": "Suggested models",
+  "settingsLocalizationModelsFetch": "Fetch models",
+  "settingsLocalizationModelsFetching": "Fetching…",
+  "settingsLocalizationModelsFetched": "{count} models found",
+  "@settingsLocalizationModelsFetched": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsLocalizationModelsFailed": "No models were returned. Check the endpoint and key, or type a model name.",
+  "settingsLocalizationModelsPick": "Choose model",
+  "settingsLocalizationModelsSearch": "Search models",
+  "settingsLocalizationModelsEmpty": "No matching model",
   "settingsLocalizationKeyHint": "The key is stored in plain text in this device's config folder and readable only by the current user.",
   "settingsLocalizationApiHint": "Supports OpenAI Chat, Anthropic Messages and Gemini. Usage comes from the response; a balance is shown only for providers that publish one.",
   "settingsLocalizationAvailabilityNeedsProvider": "Translation is paused until a provider is chosen.",

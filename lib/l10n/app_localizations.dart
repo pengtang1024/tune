@@ -8027,11 +8027,47 @@ abstract class AppLocalizations {
   /// **'模型'**
   String get settingsLocalizationApiModel;
 
-  /// No description provided for @settingsLocalizationModelSuggestions.
+  /// No description provided for @settingsLocalizationModelsFetch.
   ///
   /// In zh_CN, this message translates to:
-  /// **'常用模型'**
-  String get settingsLocalizationModelSuggestions;
+  /// **'获取模型'**
+  String get settingsLocalizationModelsFetch;
+
+  /// No description provided for @settingsLocalizationModelsFetching.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在获取…'**
+  String get settingsLocalizationModelsFetching;
+
+  /// No description provided for @settingsLocalizationModelsFetched.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已获取 {count} 个模型'**
+  String settingsLocalizationModelsFetched(int count);
+
+  /// No description provided for @settingsLocalizationModelsFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有获取到模型，确认端点与密钥后重试，或直接填写模型名。'**
+  String get settingsLocalizationModelsFailed;
+
+  /// No description provided for @settingsLocalizationModelsPick.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'选择模型'**
+  String get settingsLocalizationModelsPick;
+
+  /// No description provided for @settingsLocalizationModelsSearch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索模型'**
+  String get settingsLocalizationModelsSearch;
+
+  /// No description provided for @settingsLocalizationModelsEmpty.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有匹配的模型'**
+  String get settingsLocalizationModelsEmpty;
 
   /// No description provided for @settingsLocalizationKeyHint.
   ///

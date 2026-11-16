@@ -31,10 +31,7 @@ class GeminiTranslationEngine implements TranslationEngine {
     return value.replaceFirst(RegExp(r'/+$'), '');
   }
 
-  String get _model {
-    final typed = credential.model.trim();
-    return typed.isNotEmpty ? typed : provider.defaultModel.trim();
-  }
+  String get _model => credential.model.trim();
 
   String get _apiKey => credential.apiKey.trim();
 
@@ -82,10 +79,7 @@ class GeminiTranslationEngine implements TranslationEngine {
         },
       },
       options: Options(
-        headers: {
-          'x-goog-api-key': _apiKey,
-          ...provider.extraHeaders,
-        },
+        headers: {'x-goog-api-key': _apiKey, ...provider.extraHeaders},
       ),
     );
 

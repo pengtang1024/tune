@@ -4323,7 +4323,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsLocalizationApiModel => '模型';
 
   @override
-  String get settingsLocalizationModelSuggestions => '常用模型';
+  String get settingsLocalizationModelsFetch => '获取模型';
+
+  @override
+  String get settingsLocalizationModelsFetching => '正在获取…';
+
+  @override
+  String settingsLocalizationModelsFetched(int count) {
+    return '已获取 $count 个模型';
+  }
+
+  @override
+  String get settingsLocalizationModelsFailed => '没有获取到模型，确认端点与密钥后重试，或直接填写模型名。';
+
+  @override
+  String get settingsLocalizationModelsPick => '选择模型';
+
+  @override
+  String get settingsLocalizationModelsSearch => '搜索模型';
+
+  @override
+  String get settingsLocalizationModelsEmpty => '没有匹配的模型';
 
   @override
   String get settingsLocalizationKeyHint => '密钥以明文保存在本机配置目录，仅当前用户可读。';
@@ -8826,7 +8846,27 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsLocalizationApiModel => '模型';
 
   @override
-  String get settingsLocalizationModelSuggestions => '常用模型';
+  String get settingsLocalizationModelsFetch => '获取模型';
+
+  @override
+  String get settingsLocalizationModelsFetching => '正在获取…';
+
+  @override
+  String settingsLocalizationModelsFetched(int count) {
+    return '已获取 $count 个模型';
+  }
+
+  @override
+  String get settingsLocalizationModelsFailed => '没有获取到模型，确认端点与密钥后重试，或直接填写模型名。';
+
+  @override
+  String get settingsLocalizationModelsPick => '选择模型';
+
+  @override
+  String get settingsLocalizationModelsSearch => '搜索模型';
+
+  @override
+  String get settingsLocalizationModelsEmpty => '没有匹配的模型';
 
   @override
   String get settingsLocalizationKeyHint => '密钥以明文保存在本机配置目录，仅当前用户可读。';
@@ -13330,7 +13370,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get settingsLocalizationApiModel => '模型';
 
   @override
-  String get settingsLocalizationModelSuggestions => '常用模型';
+  String get settingsLocalizationModelsFetch => '取得模型';
+
+  @override
+  String get settingsLocalizationModelsFetching => '正在取得…';
+
+  @override
+  String settingsLocalizationModelsFetched(int count) {
+    return '已取得 $count 個模型';
+  }
+
+  @override
+  String get settingsLocalizationModelsFailed => '沒有取得模型，確認端點與金鑰後重試，或直接填寫模型名稱。';
+
+  @override
+  String get settingsLocalizationModelsPick => '選擇模型';
+
+  @override
+  String get settingsLocalizationModelsSearch => '搜尋模型';
+
+  @override
+  String get settingsLocalizationModelsEmpty => '沒有符合的模型';
 
   @override
   String get settingsLocalizationKeyHint => '金鑰以明文保存在本機設定目錄，僅目前使用者可讀。';

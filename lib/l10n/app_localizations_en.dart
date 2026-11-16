@@ -4676,7 +4676,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLocalizationApiModel => 'Model';
 
   @override
-  String get settingsLocalizationModelSuggestions => 'Suggested models';
+  String get settingsLocalizationModelsFetch => 'Fetch models';
+
+  @override
+  String get settingsLocalizationModelsFetching => 'Fetching…';
+
+  @override
+  String settingsLocalizationModelsFetched(int count) {
+    return '$count models found';
+  }
+
+  @override
+  String get settingsLocalizationModelsFailed =>
+      'No models were returned. Check the endpoint and key, or type a model name.';
+
+  @override
+  String get settingsLocalizationModelsPick => 'Choose model';
+
+  @override
+  String get settingsLocalizationModelsSearch => 'Search models';
+
+  @override
+  String get settingsLocalizationModelsEmpty => 'No matching model';
 
   @override
   String get settingsLocalizationKeyHint =>

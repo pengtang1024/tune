@@ -68,20 +68,22 @@ void main() {
     });
     final engine = GeminiTranslationEngine(
       provider: _gemini,
-      credential: const ProviderCredential(apiKey: 'gem-key'),
+      credential: const ProviderCredential(
+        apiKey: 'gem-key',
+        model: 'gemini-test-model',
+      ),
       dio: _dioWith(adapter),
     );
 
-    final result = await engine.translate(
-      ['Blue in Green'],
-      targetLanguage: 'zh-CN',
-    );
+    final result = await engine.translate([
+      'Blue in Green',
+    ], targetLanguage: 'zh-CN');
 
     final request = adapter.lastRequest!;
     expect(request.method, 'POST');
     expect(
       request.uri.toString(),
-      '${_gemini.baseUrl}/models/${_gemini.defaultModel}:generateContent',
+      '${_gemini.baseUrl}/models/gemini-test-model:generateContent',
     );
     expect(request.headers['x-goog-api-key'], 'gem-key');
 
@@ -117,14 +119,16 @@ void main() {
     });
     final engine = GeminiTranslationEngine(
       provider: _gemini,
-      credential: const ProviderCredential(apiKey: 'gem-key'),
+      credential: const ProviderCredential(
+        apiKey: 'gem-key',
+        model: 'gemini-test-model',
+      ),
       dio: _dioWith(adapter),
     );
 
-    final result = await engine.translate(
-      ['Kind of Blue'],
-      targetLanguage: 'zh-CN',
-    );
+    final result = await engine.translate([
+      'Kind of Blue',
+    ], targetLanguage: 'zh-CN');
 
     expect(result.translations, {'Kind of Blue': '泛蓝'});
     expect(result.promptTokens, 0);
@@ -135,7 +139,7 @@ void main() {
     final adapter = _JsonAdapter(200, const {});
     final engine = GeminiTranslationEngine(
       provider: _gemini,
-      credential: const ProviderCredential(),
+      credential: const ProviderCredential(model: 'gemini-test-model'),
       dio: _dioWith(adapter),
     );
 
@@ -150,7 +154,10 @@ void main() {
     final adapter = _JsonAdapter(200, {'candidates': const []});
     final engine = GeminiTranslationEngine(
       provider: _gemini,
-      credential: const ProviderCredential(apiKey: 'gem-key'),
+      credential: const ProviderCredential(
+        apiKey: 'gem-key',
+        model: 'gemini-test-model',
+      ),
       dio: _dioWith(adapter),
     );
 

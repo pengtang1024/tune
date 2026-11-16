@@ -33,10 +33,7 @@ class AnthropicTranslationEngine implements TranslationEngine {
     return value.replaceFirst(RegExp(r'/+$'), '');
   }
 
-  String get _model {
-    final typed = credential.model.trim();
-    return typed.isNotEmpty ? typed : provider.defaultModel.trim();
-  }
+  String get _model => credential.model.trim();
 
   String get _apiKey => credential.apiKey.trim();
 

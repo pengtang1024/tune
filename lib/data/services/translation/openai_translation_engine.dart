@@ -29,10 +29,7 @@ class OpenAiTranslationEngine implements TranslationEngine {
     return value.replaceFirst(RegExp(r'/+$'), '');
   }
 
-  String get _model {
-    final typed = credential.model.trim();
-    return typed.isNotEmpty ? typed : provider.defaultModel.trim();
-  }
+  String get _model => credential.model.trim();
 
   String get _apiKey => credential.apiKey.trim();
 
@@ -64,10 +61,7 @@ class OpenAiTranslationEngine implements TranslationEngine {
         'model': _model,
         'temperature': 0,
         'messages': [
-          {
-            'role': 'system',
-            'content': translationInstruction(targetLanguage),
-          },
+          {'role': 'system', 'content': translationInstruction(targetLanguage)},
           {'role': 'user', 'content': translationPayload(texts)},
         ],
       },
