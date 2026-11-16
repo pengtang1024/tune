@@ -1,57 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/data/services/translation/translation_provider_catalog.dart';
-import 'package:tune/domain/models/translation_provider.dart';
 import 'package:tune/features/localization/application/localization_providers.dart';
-
-/// The vendor dropdown: the catalog plus the empty entry.
-class SettingsLocalizationProviderPicker extends StatelessWidget {
-  final String value;
-  final ValueChanged<String?> onChanged;
-
-  const SettingsLocalizationProviderPicker({
-    super.key,
-    required this.value,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final strings = context.loc;
-    String labelOf(TranslationProvider provider) {
-      if (provider.isLocalModel) {
-        return strings.settingsLocalizationProviderLocal;
-      }
-      if (provider.isCustom) {
-        return strings.settingsLocalizationProviderCustom;
-      }
-      return provider.name;
-    }
-
-    return InputDecorator(
-      decoration: const InputDecoration(isDense: true),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          items: [
-            DropdownMenuItem(
-              value: '',
-              child: Text(strings.settingsLocalizationProviderNone),
-            ),
-            for (final provider in translationProviderCatalog)
-              DropdownMenuItem(
-                value: provider.id,
-                child: Text(labelOf(provider)),
-              ),
-          ],
-          onChanged: onChanged,
-        ),
-      ),
-    );
-  }
-}
 
 /// Why translation is paused right now.
 class SettingsLocalizationAvailabilityNotice extends StatelessWidget {

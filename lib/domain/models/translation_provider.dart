@@ -13,6 +13,21 @@ enum TranslationProtocol {
 /// Which shape a balance endpoint answers in.
 enum TranslationBalanceParser { deepseek, moonshot, openrouter, siliconflow }
 
+/// Which shelf of the vendor list one entry sits on.
+enum TranslationProviderKind {
+  /// A monthly plan with included usage instead of a metered key.
+  subscription,
+
+  /// A metered API key from a hosted vendor.
+  api,
+
+  /// The bundled model that runs on this machine.
+  local,
+
+  /// A free-form OpenAI-compatible endpoint.
+  custom,
+}
+
 /// Where one provider keeps its balance, and how to read the answer.
 class TranslationBalanceApi {
   final String url;
@@ -56,6 +71,14 @@ class TranslationProvider {
   /// its model overview instead. False keeps the fetch button off the page.
   final bool listsModels;
 
+  /// An absolute model-list endpoint when the list does not hang off
+  /// [baseUrl]. OpenCode serves one gateway for several dialects, so its model
+  /// list sits one level above the chat paths.
+  final String? modelListUrl;
+
+  /// Whether the vendor sells a monthly plan instead of a metered API key.
+  final bool subscription;
+
   /// Headers some vendors expect besides the key.
   final Map<String, String> extraHeaders;
 
@@ -72,9 +95,19 @@ class TranslationProvider {
     this.isLocalModel = false,
     this.isCustom = false,
     this.listsModels = true,
+    this.modelListUrl,
+    this.subscription = false,
     this.extraHeaders = const {},
     this.balance,
   });
+
+  /// Which shelf the vendor page lists this entry on.
+  TranslationProviderKind get kind {
+    if (isLocalModel) return TranslationProviderKind.local;
+    if (isCustom) return TranslationProviderKind.custom;
+    if (subscription) return TranslationProviderKind.subscription;
+    return TranslationProviderKind.api;
+  }
 
   bool get supportsBalance => balance != null;
 }

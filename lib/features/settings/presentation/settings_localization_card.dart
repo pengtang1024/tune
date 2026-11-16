@@ -4,22 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/data/services/components/local_component.dart';
-import 'package:tune/data/services/components/local_component_registry.dart';
 import 'package:tune/data/services/translation/translation_provider_catalog.dart';
 import 'package:tune/domain/models/localization_config.dart';
 import 'package:tune/domain/models/translation_provider.dart';
-import 'package:tune/features/local_components/application/local_components_controller.dart';
 import 'package:tune/features/localization/application/localization_providers.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_localization_ledger.dart';
-import 'package:tune/features/settings/presentation/settings_localization_local_block.dart';
-import 'package:tune/features/settings/presentation/settings_localization_picker.dart';
-import 'package:tune/features/settings/presentation/settings_localization_provider_block.dart';
+import 'package:tune/features/settings/presentation/settings_localization_notices.dart';
+import 'package:tune/features/settings/presentation/settings_translation_vendors_dialog.dart';
+import 'package:tune/features/settings/presentation/settings_translation_vendors_labels.dart';
 import 'package:tune/shared/ui/settings_card_shell.dart';
 import 'package:tune/shared/ui/settings_switch_row.dart';
 
-/// The switch, the vendor and the optional local model of translation.
+/// The switch, the chosen vendor and the optional local model of translation.
+///
+/// The vendor itself is configured on its own page
+/// ([showTranslationVendorsDialog]): there are too many services, plans and
+/// quirks to keep inline, and the card only needs to say who is chosen.
 class SettingsLocalizationCard extends ConsumerStatefulWidget {
   const SettingsLocalizationCard({super.key});
 
@@ -30,75 +31,6 @@ class SettingsLocalizationCard extends ConsumerStatefulWidget {
 
 class _SettingsLocalizationCardState
     extends ConsumerState<SettingsLocalizationCard> {
-  late final TextEditingController _baseUrl;
-  late final TextEditingController _apiKey;
-  late final TextEditingController _model;
-  late String _syncedBackend;
-
-  /// The endpoint the model list was last read from; `null` until asked.
-  ProviderModelQuery? _modelQuery;
-
-  @override
-  void initState() {
-    super.initState();
-    final config = ref.read(settingsControllerProvider).localization;
-    _syncedBackend = config.backendId;
-    final credential = config.activeCredential;
-    _baseUrl = TextEditingController(text: credential.baseUrl);
-    _apiKey = TextEditingController(text: credential.apiKey);
-    _model = TextEditingController(text: credential.model);
-  }
-
-  @override
-  void dispose() {
-    _baseUrl.dispose();
-    _apiKey.dispose();
-    _model.dispose();
-    super.dispose();
-  }
-
-  void _applyCredential(LocalizationConfig config) {
-    if (_syncedBackend == config.backendId) return;
-    final credential = config.credentialFor(config.backendId);
-    _baseUrl.text = credential.baseUrl;
-    _apiKey.text = credential.apiKey;
-    _model.text = credential.model;
-    _syncedBackend = config.backendId;
-    _modelQuery = null;
-  }
-
-  /// Asks the chosen vendor for the models it currently serves.
-  ///
-  /// The query carries the endpoint and key the fields hold right now, so a
-  /// reader can look before saving. The family is invalidated first so asking
-  /// again always goes to the vendor instead of reusing an old answer.
-  void _refreshModels(TranslationProvider provider) {
-    if (provider.isLocalModel || !provider.listsModels) return;
-    final query = (
-      providerId: provider.id,
-      baseUrl: _baseUrl.text.trim(),
-      apiKey: _apiKey.text.trim(),
-    );
-    ref.invalidate(providerModelsProvider(query));
-    setState(() => _modelQuery = query);
-  }
-
-  void _saveProvider(TranslationProvider provider, LocalizationConfig config) {
-    ref
-        .read(settingsControllerProvider.notifier)
-        .setLocalization(
-          config.withCredential(
-            provider.id,
-            ProviderCredential(
-              apiKey: _apiKey.text.trim(),
-              model: _model.text.trim(),
-              baseUrl: _baseUrl.text.trim(),
-            ),
-          ),
-        );
-    _refreshModels(provider);
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -106,27 +38,13 @@ class _SettingsLocalizationCardState
     final config = ref.watch(
       settingsControllerProvider.select((settings) => settings.localization),
     );
-    ref.listen(
-      settingsControllerProvider.select((settings) => settings.localization),
-      (previous, next) {
-        if (previous?.backendId != next.backendId) {
-          setState(() => _applyCredential(next));
-        }
-      },
-    );
     final availability = ref.watch(translationAvailabilityProvider);
     final provider = providerById(config.backendId);
-    final isLocal = provider?.isLocalModel ?? false;
-    final isVendor = provider != null && !provider.isLocalModel;
-    final balance = isVendor && provider.supportsBalance
-        ? ref.watch(translationBalanceProvider)
-        : null;
-    final modelQuery = _modelQuery;
-    final models = modelQuery == null
-        ? null
-        : ref.watch(providerModelsProvider(modelQuery));
+    final credential = config.activeCredential;
+    final muted = theme.textTheme.labelSmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
     final controller = ref.read(settingsControllerProvider.notifier);
-    final localModel = ref.watch(activeTranslationModelProvider);
 
     return SettingsCard(
       index: '08',
@@ -163,38 +81,39 @@ class _SettingsLocalizationCardState
             ),
           ),
           const SizedBox(height: CompactTokens.space8),
-          SettingsLocalizationProviderPicker(
-            value: config.backendId,
-            onChanged: (id) => unawaited(_selectBackend(id, config)),
-          ),
-          const SizedBox(height: CompactTokens.space16),
-          if (isLocal)
-            SettingsLocalizationLocalBlock(
-              runtime: ref.watch(
-                localComponentStateProvider(
-                  LocalComponentRegistry.translationRuntime.id,
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      provider == null
+                          ? strings.settingsLocalizationProviderNone
+                          : translationVendorName(strings, provider),
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    if (provider != null)
+                      Text(
+                        provider.isCustom
+                            ? (credential.baseUrl.isEmpty
+                                  ? strings.settingsLocalizationApiBaseUrl
+                                  : credential.baseUrl)
+                            : provider.baseUrl,
+                        style: muted,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
                 ),
               ),
-              model: ref.watch(localComponentStateProvider(localModel.id)),
-              onDownload: () => unawaited(_downloadLocalComponents(localModel)),
-              onCancel: () => _cancelLocalComponents(localModel),
-              onRemove: () => unawaited(_removeLocalComponents(localModel)),
-            )
-          else if (isVendor)
-            SettingsLocalizationProviderBlock(
-              provider: provider,
-              baseUrl: _baseUrl,
-              apiKey: _apiKey,
-              model: _model,
-              models: models?.valueOrNull ?? const <String>[],
-              modelsLoading: models?.isLoading ?? false,
-              modelsFailed: models?.hasError ?? false,
-              balance: balance?.value,
-              onFetchModels: () => _refreshModels(provider),
-              onSave: () => _saveProvider(provider, config),
-              onCheckBalance: () =>
-                  ref.read(translationBalanceRequestProvider.notifier).state++,
-            ),
+              const SizedBox(width: CompactTokens.space8),
+              OutlinedButton(
+                onPressed: () => unawaited(showTranslationVendorsDialog(context)),
+                child: Text(strings.settingsLocalizationVendorsOpen),
+              ),
+            ],
+          ),
           const SizedBox(height: CompactTokens.space16),
           SettingsLocalizationLedger(
             tokens: ref.watch(translationTokenUsageProvider).value?.total,
@@ -224,8 +143,11 @@ class _SettingsLocalizationCardState
       return;
     }
     if (!config.privacyAccepted && !(provider?.isLocalModel ?? false)) {
+      final strings = context.loc;
       final accepted = await _confirmPrivacy(
-        provider?.name ?? context.loc.settingsLocalizationProviderNone,
+        provider == null
+            ? strings.settingsLocalizationProviderNone
+            : translationVendorName(strings, provider),
       );
       if (!accepted || !mounted) return;
       ref
@@ -238,49 +160,6 @@ class _SettingsLocalizationCardState
     ref
         .read(settingsControllerProvider.notifier)
         .setLocalization(config.copyWith(enabled: true));
-  }
-
-  Future<void> _selectBackend(String? id, LocalizationConfig config) async {
-    if (id == null || id == config.backendId) return;
-    final provider = providerById(id);
-    final controller = ref.read(settingsControllerProvider.notifier);
-    if (provider == null) {
-      controller.setLocalization(config.copyWith(backendId: ''));
-      return;
-    }
-    var accepted = config.privacyAccepted;
-    if (!provider.isLocalModel && !accepted) {
-      accepted = await _confirmPrivacy(provider.name);
-      if (!accepted || !mounted) return;
-    }
-    final next = config.copyWith(
-      backendId: provider.id,
-      privacyAccepted: accepted,
-    );
-    controller.setLocalization(next);
-    _applyCredential(next);
-  }
-
-  Future<void> _downloadLocalComponents(LocalComponentSpec model) async {
-    final controller = ref.read(localComponentsControllerProvider.notifier);
-    final states = ref.read(localComponentsControllerProvider).valueOrNull;
-    for (final spec in [LocalComponentRegistry.translationRuntime, model]) {
-      final current = states?[spec.id];
-      if (current == null || current.usable || current.busy) continue;
-      await controller.download(spec.id);
-    }
-  }
-
-  void _cancelLocalComponents(LocalComponentSpec model) {
-    final controller = ref.read(localComponentsControllerProvider.notifier);
-    controller.cancel(LocalComponentRegistry.translationRuntime.id);
-    controller.cancel(model.id);
-  }
-
-  Future<void> _removeLocalComponents(LocalComponentSpec model) async {
-    final controller = ref.read(localComponentsControllerProvider.notifier);
-    await controller.remove(LocalComponentRegistry.translationRuntime.id);
-    await controller.remove(model.id);
   }
 
   Future<bool> _confirmPrivacy(String providerName) async {

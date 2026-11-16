@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.41.1",
-  "build": 81,
-  "released_at": "2026-11-16T14:11:20Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.41.1",
-  "notes": "### 变更\n\n- 面板上两处叫法按音频工程的用法改准：开关行从「启用均衡器」改成「均衡器开关」\n  （面板标题已经是「均衡器」，行里不再重复动词），宽度选择器从「频段宽度」改成\n  「带宽」，说明改成「以倍频程计，数值越小影响越窄」；英文同步成 Equalizer switch\n  与 Bandwidth。只动文案，不改行为与存储。",
+  "version": "1.42.0",
+  "build": 82,
+  "released_at": "2026-11-16T14:17:03Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.42.0",
+  "notes": "- 翻译设置里的服务商改成独立页面：可搜索，按「订阅套餐 / 按量 API / 本地 / 自定义」分组。\n- 新增 OpenCode Go（订阅套餐）与 OpenCode Zen（按量），模型列表按各自的列表地址查询。\n- 自定义与本地条目按界面语言显示名称。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.41.1/tune-linux-x64-1.41.1.tar.gz",
-      "size": 53615719,
-      "sha256": "ec5c9a3541d2ccb54d0903ae89a23043ab0ab6ed84029a201356b05b915154dd"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.42.0/tune-linux-x64-1.42.0.tar.gz",
+      "size": 53624653,
+      "sha256": "356fb054e3ef885bf0c691b33682078805ad53c5a17c852dbb2d75373761d5b8"
     }
   }
 }

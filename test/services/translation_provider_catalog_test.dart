@@ -67,6 +67,30 @@ void main() {
     expect(providerById('deepseek')!.isLocalModel, isFalse);
   });
 
+  test('the plan and the metered gateway each name their own model list', () {
+    // Their chat base and their list live under different roots, so the
+    // catalog carries the absolute list URL instead of deriving it.
+    final go = providerById('opencode-go')!;
+    expect(go.subscription, isTrue);
+    expect(go.kind, TranslationProviderKind.subscription);
+    expect(go.modelListUrl, 'https://opencode.ai/inference/go/v1/models');
+
+    final zen = providerById('opencode-zen')!;
+    expect(zen.subscription, isFalse);
+    expect(zen.kind, TranslationProviderKind.api);
+    expect(zen.modelListUrl, 'https://opencode.ai/inference/v1/models');
+  });
+
+  test('the local and custom entries say what they are', () {
+    expect(providerById('custom')!.kind, TranslationProviderKind.custom);
+    expect(providerById('local')!.kind, TranslationProviderKind.local);
+    expect(
+      providerById('openai')!.kind,
+      TranslationProviderKind.api,
+      reason: 'a metered key is the ordinary case',
+    );
+  });
+
   test('an unknown id finds nothing', () {
     expect(providerById('nope'), isNull);
   });

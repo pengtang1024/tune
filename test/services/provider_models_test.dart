@@ -12,7 +12,7 @@ class _JsonAdapter implements HttpClientAdapter {
   _JsonAdapter(this.status, [this.body = const {}]);
 
   final int status;
-  final Map<String, dynamic> body;
+  final Object body;
   int calls = 0;
   RequestOptions? lastRequest;
 
@@ -212,5 +212,31 @@ void main() {
 
     expect(models, isEmpty);
     expect(adapter.calls, 0);
+  });
+
+  test('a catalog list URL wins over the chat base', () async {
+    // OpenCode keeps chat under /inference/go/openai/v1 but its list under
+    // /inference/go/v1, so the derived URL would be wrong.
+    final adapter = _JsonAdapter(200, {
+      'data': [
+        {'id': 'opencode-model'},
+      ],
+    });
+
+    final models = await _fetch(adapter, 'opencode-go');
+
+    expect(models, ['opencode-model']);
+    expect(
+      adapter.lastRequest!.uri.toString(),
+      'https://opencode.ai/inference/go/v1/models',
+    );
+  });
+
+  test('a bare list of names is read as well as data[] and models[]', () async {
+    final adapter = _JsonAdapter(200, ['plain-one', 'plain-two']);
+
+    final models = await _fetch(adapter, 'opencode-zen');
+
+    expect(models, ['plain-one', 'plain-two']);
   });
 }
