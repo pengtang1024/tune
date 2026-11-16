@@ -159,7 +159,10 @@ void main() {
         .playQueue([songs.first]);
     await tester.pumpAndSettle();
 
-    expect(find.byIcon(Icons.equalizer_rounded), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey<String>('dock-more')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 

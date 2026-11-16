@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.37.1",
-  "build": 70,
-  "released_at": "2026-11-16T11:08:48Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.37.1",
-  "notes": "### 变更\n\n- **底栏去掉重复的「展开正在播放」图标**：点歌曲信息（封面 / 标题那一片）本来就进同一页，\n  这个按钮只是把同一个动作做了两遍，还把动作行挤到需要为均衡器额外定一个宽度下限。\n  现在动作行是音量、收藏、队列、迷你、均衡器五个位置里去掉重复项后的四个入口。",
+  "version": "1.37.2",
+  "build": 71,
+  "released_at": "2026-11-16T11:28:03Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.37.2",
+  "notes": "### 变更\n\n- **底栏动作行收成三个图标，其余进「更多」**：收藏、队列、`更多` 三个常驻，迷你窗口与均衡器\n  折进同一张菜单（菜单项带图标和当前语言的名字）。原先按窗口宽度藏均衡器入口的 `900` 阈值\n  随之下线，窄窗也不会把动作行挤出边界。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.37.1/tune-linux-x64-1.37.1.tar.gz",
-      "size": 53585075,
-      "sha256": "35f5c389450cdf7f1614e35d8bd229d4b3a8878f753b282454138e12ad87a68e"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.37.2/tune-linux-x64-1.37.2.tar.gz",
+      "size": 53585703,
+      "sha256": "8a7132d75f25105e175b27cbfac2e3b7dd4a6145eb999ee1ab87616f83377bd4"
     }
   }
 }
