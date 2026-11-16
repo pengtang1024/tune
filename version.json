@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.37.2",
-  "build": 71,
-  "released_at": "2026-11-16T11:28:03Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.37.2",
-  "notes": "### 变更\n\n- **底栏动作行收成三个图标，其余进「更多」**：收藏、队列、`更多` 三个常驻，迷你窗口与均衡器\n  折进同一张菜单（菜单项带图标和当前语言的名字）。原先按窗口宽度藏均衡器入口的 `900` 阈值\n  随之下线，窄窗也不会把动作行挤出边界。",
+  "version": "1.38.0",
+  "build": 72,
+  "released_at": "2026-11-16T11:39:17Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.38.0",
+  "notes": "### 新增\n\n- **分栏视图成为音乐的默认读法**：左列是分组（专辑 / 节目 / 书），右列是这一组的曲目，\n  两列同时在场。1.36.1 把默认从平铺改成封面墙，虽然一张专辑不再散成十几行，但曲目被藏到\n  了另一页——「多种列表」变成了「一次只看一种」。现在两者同屏：点左边换右边，「全部」回到\n  整库，窄窗口里左列自动收窄，视图开关在内容区不到 760 时收成一颗菜单。\n\n### 变更\n\n- **播客与有声书的开关**各多一档「分栏」，仍是只保留这类内容说得通的档位。\n- **工具栏断点**：内容区宽度不到 760 时视图开关收成菜单，避免英文标签在这条单行里溢出。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.37.2/tune-linux-x64-1.37.2.tar.gz",
-      "size": 53585703,
-      "sha256": "8a7132d75f25105e175b27cbfac2e3b7dd4a6145eb999ee1ab87616f83377bd4"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.38.0/tune-linux-x64-1.38.0.tar.gz",
+      "size": 53593809,
+      "sha256": "2433e38eae5241041eb69101211a4b7feccdcd9298cfb4c7255c126d5aeb09ce"
     }
   }
 }
