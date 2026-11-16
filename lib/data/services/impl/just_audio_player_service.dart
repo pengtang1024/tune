@@ -36,6 +36,15 @@ class JustAudioPlayerService implements AudioPlayerService {
         // 各取一份）默认 32MB，播一首本地曲就多驻留 ~35MB。音乐播放的
         // 采样率固定，8MB 足够缓存约 3 分钟的 320kbps 音频，也够网络流
         // 顶住常见的抖动。
+        //
+        // 下面这个值只管**内存**缓存。media_kit 1.2.6 无条件给 libmpv 传
+        // `cache-on-disk=yes`，而 mpv 0.41 的 `--demuxer-cache-dir` 默认是空串
+        // （`cache path: '' -> '-'`），于是每开一个网络流都会打印一条
+        // `[lavf] Failed to create file cache.`，磁盘缓存一次也没建成。
+        // 这个属性不经过任何一层公开配置，直接给 mpv 设不了；包也没有更新
+        // 版本可换（2.1.0 已是最高）。所以这里如实只声明内存缓存——8MB 对
+        // 音乐足够，磁盘缓存本来也只是给视频拖进度用的。见
+        // docs/troubleshooting.md 的「日志里出现 lavf Failed to create file cache」。
         JustAudioMediaKit.bufferSize = 8 * 1024 * 1024;
         JustAudioMediaKit.ensureInitialized(
           linux: Platform.isLinux,
