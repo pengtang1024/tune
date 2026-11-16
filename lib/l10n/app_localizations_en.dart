@@ -348,6 +348,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryViewAlbums => 'Albums view';
 
   @override
+  String get libraryViewShows => 'Shows';
+
+  @override
+  String get libraryViewBooks => 'Books';
+
+  @override
   String get libraryViewCollections => 'Collections view';
 
   @override

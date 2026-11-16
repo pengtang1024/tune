@@ -10,6 +10,7 @@ import 'package:tune/features/library/presentation/library_search_field.dart';
 import 'package:tune/features/library/presentation/library_sort_button.dart';
 import 'package:tune/features/library/presentation/library_source_filter.dart';
 import 'package:tune/features/library/presentation/library_view_mode.dart';
+import 'package:tune/features/library/domain/library_layout.dart';
 import 'package:tune/features/library/presentation/library_view_switch.dart';
 
 /// Search, source filter, result count, sort and view of the library.
@@ -43,6 +44,7 @@ class LibraryToolbar extends ConsumerWidget {
   final LibrarySort sort;
   final LibraryFilter filter;
   final LibraryViewMode view;
+  final LibraryLayout layout;
   final ValueChanged<String> onQueryChanged;
   final VoidCallback onClearQuery;
   final ValueChanged<String?> onSourceFilter;
@@ -72,6 +74,7 @@ class LibraryToolbar extends ConsumerWidget {
     required this.sort,
     required this.filter,
     required this.view,
+    required this.layout,
     required this.onQueryChanged,
     required this.onClearQuery,
     required this.onSourceFilter,
@@ -246,7 +249,12 @@ class LibraryToolbar extends ConsumerWidget {
       const SizedBox(width: CompactTokens.space8),
       LibrarySortButton(sort: sort, onSort: onSort, compact: compact),
       const SizedBox(width: CompactTokens.space8),
-      LibraryViewSwitch(view: view, onChanged: onViewChanged),
+      LibraryViewSwitch(
+        view: view,
+        views: layout.views,
+        groupingLabel: layout.groupingLabel,
+        onChanged: onViewChanged,
+      ),
     ];
   }
 }

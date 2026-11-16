@@ -1253,12 +1253,25 @@ class AppDatabase {
   }
 
   /// The playback queue, in play order.
+  /// Reads the queue, preferring the library's copy of a track.
+  ///
+  /// A queue entry is a snapshot taken when the track was played. The library
+  /// row is the same fact and gets corrected — 取数时的命名规则、打开库时的
+  /// 补齐都会写它 —— so the snapshot goes stale the moment either runs. Taking
+  /// the library copy when there is one keeps the queue from showing titles the
+  /// library already fixed; entries that are not in the library (streams, a
+  /// source that was removed) keep their snapshot.
   List<Song> loadQueue() {
-    final rows = _db.select('SELECT json FROM queue ORDER BY position');
+    final rows = _db.select(
+      'SELECT q.json AS queue_json, s.json AS library_json '
+      'FROM queue q LEFT JOIN songs s ON s.uri = q.uri '
+      'ORDER BY q.position',
+    );
     final songs = <Song>[];
     for (final row in rows) {
+      final source = row['library_json'] as String? ?? row['queue_json'] as String;
       try {
-        final decoded = jsonDecode(row['json'] as String);
+        final decoded = jsonDecode(source);
         if (decoded is! Map<String, dynamic>) continue;
         songs.add(Song.fromMap(decoded));
       } catch (_) {

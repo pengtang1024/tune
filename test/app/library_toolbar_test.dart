@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/library_sort.dart';
+import 'package:tune/features/library/domain/library_layout.dart';
 import 'package:tune/features/library/presentation/library_toolbar.dart';
 import 'package:tune/features/library/presentation/library_view_mode.dart';
 import 'package:tune/l10n/app_localizations.dart';
@@ -38,6 +40,7 @@ void main() {
       sort: LibrarySort.title,
       filter: filter,
       view: LibraryViewMode.values.first,
+      layout: libraryLayoutFor(ContentKind.music),
       onQueryChanged: (_) {},
       onClearQuery: () {},
       onSourceFilter: (_) {},
