@@ -991,7 +991,7 @@ void main() {
     final track = database.load().single;
 
     expect(track.artist, 'Handel, G F');
-    expect(track.title, '101 Sinfonia');
+    expect(track.title, 'Sinfonia');
   });
 });
 }

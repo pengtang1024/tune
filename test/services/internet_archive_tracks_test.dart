@@ -700,7 +700,7 @@ void main() {
       final song = result.songs.first;
       expect(song.artist, 'Edward ELGAR');
       expect(song.album, 'Enigma Variations');
-      expect(song.title, '01 Theme, I. C.A.E.');
+      expect(song.title, 'Theme, I. C.A.E.');
     });
 
     test('a track whose title repeats its artist loses the duplicate', () async {
@@ -741,7 +741,7 @@ void main() {
 
       final song = result.songs.first;
       expect(song.artist, 'Handel, G F');
-      expect(song.title, '103 And the glory of the Lord - Coro');
+      expect(song.title, 'And the glory of the Lord');
       expect(song.album, 'Messiah (Disc 1 of 3) - Part One');
     });
   });

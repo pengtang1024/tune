@@ -304,7 +304,7 @@ class AppDatabase {
     for (final row in db.select(
       'SELECT uri, title, artist, album FROM songs '
       "WHERE instr(title, ' - ') > 0 OR instr(album, ' - ') > 0 "
-      "OR artist = ''",
+      "OR artist = '' OR title GLOB '[0-9]*'",
     )) {
       final title = row['title'] as String? ?? '';
       final artist = row['artist'] as String? ?? '';

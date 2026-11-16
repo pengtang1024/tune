@@ -12,7 +12,7 @@ void main() {
 
       expect(naming.artist, 'Edward ELGAR');
       expect(naming.album, 'Enigma Variations');
-      expect(naming.title, '01 Theme, I. C.A.E.');
+      expect(naming.title, 'Theme, I. C.A.E.');
     });
 
     test('条目声明了 creator 时优先用它', () {
@@ -35,7 +35,7 @@ void main() {
         album: 'Messiah (Disc 1 of 3) - Part One',
       );
 
-      expect(naming.title, '103 And the glory of the Lord - Coro');
+      expect(naming.title, 'And the glory of the Lord');
       expect(naming.artist, 'Handel, G F');
       expect(naming.album, 'Messiah (Disc 1 of 3) - Part One');
     });
@@ -94,5 +94,74 @@ void main() {
       expect(naming.artist, 'Miles Davis');
       expect(naming.album, 'Kind of Blue');
     });
+  
+  test('a leading track number leaves the title', () {
+    expect(
+      normalizeTrackNaming(title: '01 Theme, I. C.A.E.', artist: 'Edward ELGAR', album: 'Enigma Variations').title,
+      'Theme, I. C.A.E.',
+    );
+    expect(
+      normalizeTrackNaming(title: '01 - The Shade of Cardinal Richelieu.', artist: 'A', album: 'B').title,
+      'The Shade of Cardinal Richelieu.',
+    );
+    expect(
+      normalizeTrackNaming(title: '02 II. H.D.S. - P.', artist: 'Edward ELGAR', album: 'Enigma Variations').title,
+      'II. H.D.S. - P.',
+    );
   });
+
+  test('a number that is part of the name stays', () {
+    for (final title in const ['7 Rings', '99 Luftballons', '24K Magic', '1999']) {
+      expect(
+        normalizeTrackNaming(title: title, artist: 'Someone', album: 'Somewhere').title,
+        title,
+        reason: title,
+      );
+    }
+  });
+
+  test('an arabic number repeats a roman numeral', () {
+    expect(
+      normalizeTrackNaming(title: '13 XIII. Romanza; +++', artist: 'Edward ELGAR', album: 'Enigma Variations').title,
+      'XIII. Romanza',
+    );
+  });
+
+  test('a disc track number goes when the album names the disc', () {
+    expect(
+      normalizeTrackNaming(
+        title: "102 Comfort ye - Ev'ry valley",
+        artist: 'Handel, G F',
+        album: 'Messiah (Disc 1 of 3) - Part One',
+      ).title,
+      "Comfort ye - Ev'ry valley",
+    );
+    // 碟号对不上（第二碟的 101）时不动。
+    expect(
+      normalizeTrackNaming(
+        title: '201 He was despised',
+        artist: 'Handel, G F',
+        album: 'Messiah (Disc 1 of 3) - Part One',
+      ).title,
+      '201 He was despised',
+    );
+  });
+
+  test('a performer credit at the end goes', () {
+    expect(
+      normalizeTrackNaming(
+        title: '103 And the glory of the Lord - Coro',
+        artist: 'Handel, G F',
+        album: 'Messiah (Disc 1 of 3) - Part One',
+      ).title,
+      'And the glory of the Lord',
+    );
+    // 不是角色名的尾巴保留：`Ev'ry valley` 是下一句唱词；专辑没写碟号时
+    // 开头的 `102` 也无从确认为轨号，一并原样留着。
+    expect(
+      normalizeTrackNaming(title: "102 Comfort ye - Ev'ry valley", artist: 'Handel, G F', album: 'Messiah').title,
+      "102 Comfort ye - Ev'ry valley",
+    );
+  });
+});
 }
