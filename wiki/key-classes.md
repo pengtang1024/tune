@@ -1,6 +1,6 @@
 # 关键类与函数
 
-> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.37.0 · 最后核对 2026-11-16
 >
 > 按「入口 → 状态机 → 服务接口 → 领域模型」组织。方法只列公开 API，完整签名以代码为准。
 
@@ -61,6 +61,12 @@ bootstrap 序列：
 - 自己 watch 播放器的当前曲目来取词，页面只读不改。
 - `reload()`：重新加载；`attach()`：附加读者指定的歌词文件并写盘（`.manual.lrc`）。
 
+### `EqualizerController` — `lib/features/player/application/equalizer_controller.dart`
+
+- provider：`equalizerControllerProvider`（`StateNotifierProvider<EqualizerController, EqualizerSettings>`）；`equalizerAvailableProvider` 读 `AudioPlayerService.equalizer?.isAvailable`。
+- `restore()`：启动时从 `audio_equalizer_v1` 读曲线并下发；`setGain()` / `setEnabled()` / `applyPreset()` / `reset()` 写状态并推送，落盘 400 ms 防抖。
+- 曲线模型 `EqualizerSettings`（`lib/domain/models/equalizer_settings.dart`）：10 段 31–16 kHz、±12 dB、步进 1，`presetId` 由曲线比对得出，不单独存。
+
 ### 播放辅助
 
 | 类 | 方法 | 职责 |
@@ -69,6 +75,7 @@ bootstrap 序列：
 | `TrackPrefetcher` | `prefetch()` | 按队列、模式、远程/直播状态预取下一首（失败回退网络播放） |
 | `ListPlayback` | `play()` / `playFrom()` | 列表点击行为，由 `settingsControllerProvider` 的 `replaceQueueOnClick` 驱动 |
 | `PlaybackSessionRecorder` | `read()` / `readVolume()` / `start()` | 会话基线读取与记录启动 |
+| `MpvEqualizerFilter` | `build(EqualizerSettings) → String?` | 把曲线翻成 mpv `af` 的 `lavfi` 图（预放 = `-max(0, 增益)`）；全平或关闭时返回 null |
 
 ## 音乐库
 

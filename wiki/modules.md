@@ -1,6 +1,6 @@
 # 主要模块职责
 
-> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.37.0 · 最后核对 2026-11-16
 >
 > 按 `lib/` 下的包逐一说明。每个 feature 内部都按 `domain → application → data → presentation` 分层。
 
@@ -34,11 +34,13 @@
 | application | `list_playback.dart` | 列表点击播放策略：替换队列或加入队列并播放（随设置） |
 | application | `playback_session_recorder.dart` | 播放会话持久化：队列切歌/编辑时写，进度每 5 秒写 |
 | application | `dead_songs_controller.dart` | 失效曲目（文件不在/地址刷不出）的标记与清理 |
+| application | `equalizer_controller.dart`、`equalizer_providers.dart` | 均衡器曲线：恢复/持久化（`audio_equalizer_v1`，400 ms 防抖）、预设命中、可用性取音频后端的探测结果 |
 | domain | `playback_state.dart` | `PlaybackState`：状态、进度、音量、模式、队列、当前 URI、历史、错误 |
 | domain | `play_mode.dart`、`playback_source.dart` | 播放模式枚举、播放来源（歌词文档模型 `LyricsDocument` 在 `lib/domain/models/lyrics_document.dart`） |
 | data | `playback_session_store.dart` | `queue` / `queue_meta` 表的读写 |
 | presentation | `player_dock.dart` | 底部播放条 |
 | presentation | `now_playing_page.dart`、`lyrics_panel.dart`、`now_playing_track_info.dart` | 正在播放页（整窗路由）与歌词面板 |
+| presentation | `equalizer_entry.dart` | 打开均衡器面板的入口（底栏与正在播放页共用；面板本体在 `lib/shared/ui/equalizer_sheet.dart`，不依赖 provider） |
 
 ## features/library —— 音乐库
 
@@ -144,7 +146,7 @@ service 不依赖 Riverpod，只编排 I/O；状态全在 controller。
 
 | 服务 | 接口 → 实现 | 职责 |
 | --- | --- | --- |
-| 音频播放 | `AudioPlayerService` → `JustAudioPlayerService` | 播放/暂停/跳转/音量/速度/事件流；Linux / Windows 都走 just_audio_media_kit（media_kit_libs_* + 系统 libmpv），主要依赖另有 SQLite（sqlite3 + sqlite3_flutter_libs）、audio_service、permission_handler、sherpa_onnx |
+| 音频播放 | `AudioPlayerService` → `MediaKitAudioPlayerService`（桌面）/ `JustAudioPlayerService`（移动） | 播放/暂停/跳转/音量/速度/事件流；桌面另实现 `AudioEqualizerBackend`（`mpv_equalizer_filter.dart` 生成 `af` lavfi 滤镜链，init 时探测可用性，写入选 100 ms 合并）；Linux / Windows 都走 just_audio_media_kit（media_kit_libs_* + 系统 libmpv），主要依赖另有 SQLite（sqlite3 + sqlite3_flutter_libs）、audio_service、permission_handler、sherpa_onnx |
 | 音乐扫描 | `CrossPlatformMusicScanner`（`music_scanner_config.dart` 给配置） | 本地目录扫描、元数据读取（`audio_metadata_reader`，vendor 补丁防恶意帧） |
 | 音源适配 | `MusicSourceAdapter` × 30 个注册类型（30 个适配器文件）+ `MusicSourceService` 注册表 | 取歌、浏览流、播放地址刷新、歌词；注册表可注入 |
 | 持久化 | `PersistenceService` → `FilePersistenceService` | 一偏好一文件；旧 JSON 由 `LegacyPreferenceMigration` 迁移 |
