@@ -56,6 +56,8 @@ const List<String> properNames = [
   'OpenRouter',
   'SiliconFlow',
   'Ollama (local)',
+  'OpenCode Go',
+  'OpenCode Zen',
   'Custom',
   'Bundled model',
   // The whisper.cpp model names the local engine menu shows — they are

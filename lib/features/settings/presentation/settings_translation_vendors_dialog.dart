@@ -15,6 +15,7 @@ import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_localization_local_block.dart';
 import 'package:tune/features/settings/presentation/settings_localization_provider_block.dart';
 import 'package:tune/features/settings/presentation/settings_translation_vendors_labels.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// Opens the vendor page: every service the player can translate with, in one
 /// searchable place, away from the switch and the ledger on the card.
@@ -224,10 +225,12 @@ class _SettingsTranslationVendorsDialogState
                       ),
                     ),
                   ),
-                  IconButton(
-                    tooltip: strings.close,
-                    icon: const Icon(Icons.close, size: 18),
-                    onPressed: () => Navigator.of(context).pop(),
+                  TuneTooltip(
+                    message: strings.close,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, size: 18),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                   ),
                 ],
               ),
