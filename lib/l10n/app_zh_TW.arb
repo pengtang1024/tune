@@ -2043,6 +2043,7 @@
     }
   },
   "settingsLocalizationModelsFailed": "沒有取得模型，確認端點與金鑰後重試，或直接填寫模型名稱。",
+  "settingsLocalizationModelsUnsupported": "該廠商不提供模型列表，請按其文件填寫模型名稱。",
   "settingsLocalizationModelsPick": "選擇模型",
   "settingsLocalizationModelsSearch": "搜尋模型",
   "settingsLocalizationModelsEmpty": "沒有符合的模型",

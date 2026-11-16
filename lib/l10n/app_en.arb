@@ -2043,6 +2043,7 @@
     }
   },
   "settingsLocalizationModelsFailed": "No models were returned. Check the endpoint and key, or type a model name.",
+  "settingsLocalizationModelsUnsupported": "This vendor publishes no model list; type a model name from its documentation.",
   "settingsLocalizationModelsPick": "Choose model",
   "settingsLocalizationModelsSearch": "Search models",
   "settingsLocalizationModelsEmpty": "No matching model",

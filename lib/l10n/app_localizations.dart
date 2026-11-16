@@ -8051,6 +8051,12 @@ abstract class AppLocalizations {
   /// **'没有获取到模型，确认端点与密钥后重试，或直接填写模型名。'**
   String get settingsLocalizationModelsFailed;
 
+  /// No description provided for @settingsLocalizationModelsUnsupported.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'该厂商不提供模型列表，请按其文档填写模型名。'**
+  String get settingsLocalizationModelsUnsupported;
+
   /// No description provided for @settingsLocalizationModelsPick.
   ///
   /// In zh_CN, this message translates to:

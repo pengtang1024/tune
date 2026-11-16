@@ -14,7 +14,8 @@ import 'package:tune/utils/logger.dart';
 ///
 /// A list is knowledge the vendor owns. An endpoint that is unreachable or
 /// refuses the key throws, so the page says the list could not be read; an
-/// answer in another shape yields no name. Either way the page never shows a
+/// answer in another shape yields no name. A vendor without the endpoint is
+/// marked in the catalog and never asked, so its button never appears. Either way the page never shows a
 /// model the vendor does not serve, and the reader keeps the free-form field.
 Future<List<String>> fetchProviderModels({
   required TranslationProvider provider,
@@ -22,7 +23,7 @@ Future<List<String>> fetchProviderModels({
   Dio? dio,
   Duration timeout = const Duration(seconds: 10),
 }) async {
-  if (provider.isLocalModel) return const [];
+  if (provider.isLocalModel || !provider.listsModels) return const [];
   final baseUrl = _baseUrlOf(provider, credential);
   if (baseUrl.isEmpty) return const [];
 

@@ -4337,6 +4337,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsLocalizationModelsFailed => '没有获取到模型，确认端点与密钥后重试，或直接填写模型名。';
 
   @override
+  String get settingsLocalizationModelsUnsupported => '该厂商不提供模型列表，请按其文档填写模型名。';
+
+  @override
   String get settingsLocalizationModelsPick => '选择模型';
 
   @override
@@ -8882,6 +8885,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsLocalizationModelsFailed => '没有获取到模型，确认端点与密钥后重试，或直接填写模型名。';
+
+  @override
+  String get settingsLocalizationModelsUnsupported => '该厂商不提供模型列表，请按其文档填写模型名。';
 
   @override
   String get settingsLocalizationModelsPick => '选择模型';
@@ -13430,6 +13436,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsLocalizationModelsFailed => '沒有取得模型，確認端點與金鑰後重試，或直接填寫模型名稱。';
+
+  @override
+  String get settingsLocalizationModelsUnsupported => '該廠商不提供模型列表，請按其文件填寫模型名稱。';
 
   @override
   String get settingsLocalizationModelsPick => '選擇模型';

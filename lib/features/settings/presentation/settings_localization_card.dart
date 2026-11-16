@@ -73,7 +73,7 @@ class _SettingsLocalizationCardState
   /// reader can look before saving. The family is invalidated first so asking
   /// again always goes to the vendor instead of reusing an old answer.
   void _refreshModels(TranslationProvider provider) {
-    if (provider.isLocalModel) return;
+    if (provider.isLocalModel || !provider.listsModels) return;
     final query = (
       providerId: provider.id,
       baseUrl: _baseUrl.text.trim(),

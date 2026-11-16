@@ -2043,6 +2043,7 @@
     }
   },
   "settingsLocalizationModelsFailed": "没有获取到模型，确认端点与密钥后重试，或直接填写模型名。",
+  "settingsLocalizationModelsUnsupported": "该厂商不提供模型列表，请按其文档填写模型名。",
   "settingsLocalizationModelsPick": "选择模型",
   "settingsLocalizationModelsSearch": "搜索模型",
   "settingsLocalizationModelsEmpty": "没有匹配的模型",

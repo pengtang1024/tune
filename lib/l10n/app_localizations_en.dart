@@ -4691,6 +4691,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'No models were returned. Check the endpoint and key, or type a model name.';
 
   @override
+  String get settingsLocalizationModelsUnsupported =>
+      'This vendor publishes no model list; type a model name from its documentation.';
+
+  @override
   String get settingsLocalizationModelsPick => 'Choose model';
 
   @override

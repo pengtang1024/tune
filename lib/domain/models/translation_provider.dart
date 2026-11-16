@@ -50,6 +50,12 @@ class TranslationProvider {
   /// Whether this entry is the free-form OpenAI-compatible endpoint.
   final bool isCustom;
 
+  /// Whether the vendor publishes the models it serves.
+  ///
+  /// Zhipu's reference lists no such endpoint; the reader types the name from
+  /// its model overview instead. False keeps the fetch button off the page.
+  final bool listsModels;
+
   /// Headers some vendors expect besides the key.
   final Map<String, String> extraHeaders;
 
@@ -65,6 +71,7 @@ class TranslationProvider {
     this.allowsEmptyKey = false,
     this.isLocalModel = false,
     this.isCustom = false,
+    this.listsModels = true,
     this.extraHeaders = const {},
     this.balance,
   });

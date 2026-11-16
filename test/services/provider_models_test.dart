@@ -197,6 +197,14 @@ void main() {
     expect(adapter.calls, 0);
   });
 
+  test('a vendor without a list endpoint is never asked', () async {
+    final adapter = _JsonAdapter(200, const {});
+    final models = await _fetch(adapter, 'zhipu');
+
+    expect(models, isEmpty);
+    expect(adapter.calls, 0, reason: 'no request can succeed, so none goes out');
+  });
+
   test('a custom endpoint without an address asks nothing', () async {
     final adapter = _JsonAdapter(200, {});
 

@@ -116,42 +116,47 @@ class _SettingsLocalizationProviderBlockState
           ),
         ),
         const SizedBox(height: CompactTokens.space4),
-        Wrap(
-          spacing: CompactTokens.space8,
-          runSpacing: CompactTokens.space4,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            OutlinedButton.icon(
-              onPressed: widget.modelsLoading ? null : widget.onFetchModels,
-              icon: widget.modelsLoading
-                  ? const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.refresh, size: 16),
-              label: Text(
-                widget.modelsLoading
-                    ? strings.settingsLocalizationModelsFetching
-                    : strings.settingsLocalizationModelsFetch,
+        if (provider.listsModels) ...[
+          Wrap(
+            spacing: CompactTokens.space8,
+            runSpacing: CompactTokens.space4,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              OutlinedButton.icon(
+                onPressed: widget.modelsLoading ? null : widget.onFetchModels,
+                icon: widget.modelsLoading
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.refresh, size: 16),
+                label: Text(
+                  widget.modelsLoading
+                      ? strings.settingsLocalizationModelsFetching
+                      : strings.settingsLocalizationModelsFetch,
+                ),
               ),
-            ),
-            if (widget.models.isNotEmpty) ...[
-              Text(
-                strings.settingsLocalizationModelsFetched(widget.models.length),
-                style: muted,
-              ),
-              TextButton(
-                onPressed: _pickModel,
-                child: Text(strings.settingsLocalizationModelsPick),
-              ),
+              if (widget.models.isNotEmpty) ...[
+                Text(
+                  strings.settingsLocalizationModelsFetched(
+                    widget.models.length,
+                  ),
+                  style: muted,
+                ),
+                TextButton(
+                  onPressed: _pickModel,
+                  child: Text(strings.settingsLocalizationModelsPick),
+                ),
+              ],
             ],
+          ),
+          if (widget.modelsFailed) ...[
+            const SizedBox(height: CompactTokens.space4),
+            Text(strings.settingsLocalizationModelsFailed, style: muted),
           ],
-        ),
-        if (widget.modelsFailed) ...[
-          const SizedBox(height: CompactTokens.space4),
-          Text(strings.settingsLocalizationModelsFailed, style: muted),
-        ],
+        ] else
+          Text(strings.settingsLocalizationModelsUnsupported, style: muted),
         const SizedBox(height: CompactTokens.space8),
         Row(
           children: [
