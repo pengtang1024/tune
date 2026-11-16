@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.35.1",
-  "build": 61,
-  "released_at": "2026-11-16T07:36:58Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.1",
-  "notes": "### 修复\n\n- **升级后旧曲目仍显示「未知艺术家」**：命名归一化原本只在取数时生效，1.35.0 之前\n  入库的行保留旧名字。现在打开数据库时会把「艺术家为空、专辑写着『艺术家 - 作品』」\n  的行补齐一次（`songs.artist = '' AND instr(album, ' - ') > 0`，补完条件自然为空，\n  后续打开零代价），写回标题、艺术家、专辑与排序键，并同步 `json` 列。",
+  "version": "1.35.2",
+  "build": 62,
+  "released_at": "2026-11-16T08:02:44Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.2",
+  "notes": "### 修复\n\n- **旧曲目的标题里仍重复艺术家**：1.35.1 打开库时只补齐「艺术家为空」的行，标题本身\n  写着 `Handel, Messiah - 101 Sinfonia`、艺术家列已经是 `Handel, G F` 的行没有被处理。\n  现在补齐范围扩到「标题或专辑含 ` - ` 且前半以艺术家名（或名字首词）开头」的行，\n  本机实测会改写 82 条标题、36 条专辑；补齐按行数记账，同一进程内不重复扫描。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.1/tune-linux-x64-1.35.1.tar.gz",
-      "size": 53672332,
-      "sha256": "ee83beb577606cf69c619b2535bad7d493c2c5a68534141fc08a27cedc370689"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.2/tune-linux-x64-1.35.2.tar.gz",
+      "size": 53675108,
+      "sha256": "6dd97a63b5ea6990303e5709e2336993384aab5fda654374881fd685a7628aa0"
     }
   }
 }
