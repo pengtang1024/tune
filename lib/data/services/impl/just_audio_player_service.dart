@@ -1,16 +1,18 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/data/services/audio_source_address.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
 
-/// 基于just_audio的音频播放服务实现
+/// 基于 just_audio 的音频播放服务实现。
+///
+/// 这条路径服务移动端：平台的音频焦点、audio_service 的会话集成都在
+/// just_audio 生态里。桌面端走 [MediaKitAudioPlayerService]，直接对接
+/// media_kit / libmpv，缓存策略由 `MpvPolicy` 声明。
 class JustAudioPlayerService implements AudioPlayerService {
   AudioPlayer? _audioPlayer;
 
@@ -27,35 +29,6 @@ class JustAudioPlayerService implements AudioPlayerService {
   @override
   Future<void> init() async {
     try {
-      // Linux 与 Windows 上 just_audio 没有够用的官方实现，使用 media_kit
-      // （libmpv）作为后端。Windows 的 just_audio_windows 不支持自定义
-      // 请求头，需要 token 的音源会放不出来；media_kit 会带上它们。
-      if (Platform.isLinux || Platform.isWindows) {
-        JustAudioMediaKit.title = 'Tune';
-        // libmpv 的解复用缓存（demuxer-max-bytes 与 demuxer-max-back-bytes
-        // 各取一份）默认 32MB，播一首本地曲就多驻留 ~35MB。音乐播放的
-        // 采样率固定，8MB 足够缓存约 3 分钟的 320kbps 音频，也够网络流
-        // 顶住常见的抖动。
-        //
-        // 下面这个值只管**内存**缓存。media_kit 1.2.6 无条件给 libmpv 传
-        // `cache-on-disk=yes`，而 mpv 0.41 的 `--demuxer-cache-dir` 默认是空串
-        // （`cache path: '' -> '-'`），于是每开一个网络流都会打印一条
-        // `[lavf] Failed to create file cache.`，磁盘缓存一次也没建成。
-        // 这个属性不经过任何一层公开配置，直接给 mpv 设不了；包也没有更新
-        // 版本可换（2.1.0 已是最高）。所以这里如实只声明内存缓存——8MB 对
-        // 音乐足够，磁盘缓存本来也只是给视频拖进度用的。见
-        // docs/troubleshooting.md 的「日志里出现 lavf Failed to create file cache」。
-        JustAudioMediaKit.bufferSize = 8 * 1024 * 1024;
-        JustAudioMediaKit.ensureInitialized(
-          linux: Platform.isLinux,
-          windows: Platform.isWindows,
-        );
-        Log.debug(
-          '已注册 ${Platform.isLinux ? 'Linux' : 'Windows'} 音频后端 '
-          '(just_audio_media_kit)',
-        );
-      }
-
       final session = await AudioSession.instance;
       await session.configure(
         AudioSessionConfiguration(
