@@ -13,6 +13,8 @@ import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
+import 'package:tune/features/library/application/library_initial_view_provider.dart';
+import 'package:tune/features/library/presentation/library_view_mode.dart';
 import '../services/fake_default_player_service.dart';
 import '../services/fake_persistence.dart';
 
@@ -54,9 +56,12 @@ void main() {
     required Widget home,
     List<Song> librarySongs = songs,
     FakeLibraryController Function(LibraryState state)? controller,
+    LibraryViewMode? initialView,
   }) {
     return ProviderScope(
       overrides: [
+        if (initialView != null)
+          libraryInitialViewProvider.overrideWithValue(initialView),
         persistenceServiceProvider.overrideWithValue(FakePersistenceService()),
         defaultPlayerServiceProvider.overrideWithValue(
           FakeDefaultPlayerService(),
@@ -77,7 +82,9 @@ void main() {
     );
   }
 
-  testWidgets('the library opens an album from the cover grid', (tester) async {
+  testWidgets('the library opens on the album wall, one card per album', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(900, 563);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -90,7 +97,24 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const ValueKey('library-albums')));
+    // 一首曲子一行是「五条同样的信息」；一张专辑一张卡才是一条信息。
+    expect(find.text('Album A'), findsOneWidget);
+    expect(find.text('Album B'), findsOneWidget);
+    expect(find.text('Album A first'), findsNothing);
+    expect(find.text('Album A second'), findsNothing);
+  });
+
+  testWidgets('the library opens an album from the cover grid', (tester) async {
+    tester.view.physicalSize = const Size(900, 563);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Album A'), findsOneWidget);
@@ -135,9 +159,6 @@ void main() {
         .playQueue([songs.first]);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const ValueKey('library-albums')));
-    await tester.pumpAndSettle();
-
     expect(find.byIcon(Icons.equalizer_rounded), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -153,9 +174,6 @@ void main() {
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
       ),
     );
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const ValueKey('library-albums')));
     await tester.pumpAndSettle();
 
     expect(find.textContaining('音乐 · '), findsNothing);
@@ -210,9 +228,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const ValueKey('library-albums')));
-    await tester.pumpAndSettle();
-
     expect(find.text('音乐 · 1'), findsOneWidget);
     expect(find.text('播客 · 1'), findsOneWidget);
     expect(find.text('有声书 · 1'), findsOneWidget);
@@ -235,6 +250,8 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         controller: _EmptyAlbumController.new,
+        // 断言的是列表里点专辑名不跳走，所以从列表打开。
+        initialView: LibraryViewMode.songs,
       ),
     );
     await tester.pumpAndSettle();

@@ -10,6 +10,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/library/application/library_initial_view_provider.dart';
 import 'package:tune/features/library/application/library_search_focus_provider.dart';
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/features/library/domain/library_album.dart';
@@ -79,7 +80,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   final ScrollController _columnsScrollController = ScrollController();
 
   /// How the list below the toolbar is read.
-  LibraryViewMode _view = LibraryViewMode.songs;
+  /// 读者自己选过的视图；为空表示「按这一类的默认读法」。空着不是缺陷：
+  /// 音乐一进来就该看到专辑墙，而不是五千行平铺的曲目。
+  LibraryViewMode? _view;
 
   /// Whether the category tree stands open.
   bool _treeExpanded = false;
@@ -250,7 +253,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   onAlbums: albumCount == 0
                       ? null
                       : () => _setView(LibraryViewMode.albums),
-                  albumsActive: _view == LibraryViewMode.albums,
+                  albumsActive: _effectiveView(layout) == LibraryViewMode.albums,
                   treeExpanded: _treeExpanded,
                   onToggleTree: () =>
                       setState(() => _treeExpanded = !_treeExpanded),
@@ -282,7 +285,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               sourceFilter: library.sourceFilter,
               sort: library.sort,
               filter: library.filter,
-              view: _view,
+              view: _effectiveView(layout),
               layout: layout,
               onQueryChanged: (value) {
                 ref.read(libraryControllerProvider.notifier).setQuery(value);
@@ -460,6 +463,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       );
     }
 
+    final view = _effectiveView(libraryLayoutForKinds(library.filter.kinds));
+
     if (openAlbum != null) {
       return _trackList(
         openAlbum.songs,
@@ -470,7 +475,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       );
     }
 
-    if (_view == LibraryViewMode.categories) {
+    if (view == LibraryViewMode.categories) {
       return LibraryCategoryView(
         kind: _categoryKind,
         onKindChanged: (kind) => setState(() => _categoryKind = kind),
@@ -482,7 +487,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       );
     }
 
-    if (_view == LibraryViewMode.columns) {
+    if (view == LibraryViewMode.columns) {
       return LayoutBuilder(
         builder: (context, constraints) {
           final rowWidth =
@@ -511,7 +516,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       );
     }
 
-    if (_view == LibraryViewMode.collections) {
+    if (view == LibraryViewMode.collections) {
       return LibraryCollectionsView(
         collections: libraryCollectionsOf(songs, sourceLabels),
         controller: _collectionsScrollController,
@@ -520,7 +525,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       );
     }
 
-    if (_view == LibraryViewMode.albums) {
+    if (view == LibraryViewMode.albums) {
       // The album grid is the only place that needs to know which album
       // plays. Listening here keeps a change of track from rebuilding the
       // page and its list.
@@ -770,6 +775,10 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     return null;
   }
 
+  /// 这一页真正在用的视图：读者点过的 > 测试指定的初始档 > 内容分类的默认读法。
+  LibraryViewMode _effectiveView(LibraryLayout layout) =>
+      _view ?? ref.read(libraryInitialViewProvider) ?? layout.primary;
+
   void _setView(LibraryViewMode view) {
     setState(() {
       _view = view;
@@ -781,8 +790,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// 「电台」没有专辑墙，停在那里只会是空的；「播客」进来就该看到节目，
   /// 而不是一个混着单集的平铺列表。
   void _applyLayoutForKind(ContentKind? kind) {
-    final layout = libraryLayoutFor(kind ?? ContentKind.music);
-    _view = layout.primary;
+    // 换一类内容就回到这一类自己的默认读法：读者先前挑的那一档只对上一类有效。
+    _view = null;
     _openAlbum = null;
   }
 

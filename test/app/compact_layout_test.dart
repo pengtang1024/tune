@@ -28,6 +28,8 @@ import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/shared/ui/source_badge.dart';
+import 'package:tune/features/library/application/library_initial_view_provider.dart';
+import 'package:tune/features/library/presentation/library_view_mode.dart';
 import '../services/fake_default_player_service.dart';
 import '../services/fake_persistence.dart';
 
@@ -99,6 +101,8 @@ void main() {
   }) {
     return ProviderScope(
       overrides: [
+        // 这些用例断言的是平铺列表，直接从列表打开。
+        libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
         persistenceServiceProvider.overrideWithValue(persistence),
         // The settings ask the desktop whether Tune is the default player;
         // the real service would shell out to the desktop of the machine
@@ -143,6 +147,7 @@ void main() {
       app(
         home: CompactShell(currentPath: '/library', child: child),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           playbackControllerProvider.overrideWith((ref) => controller),
         ],
@@ -212,6 +217,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -239,6 +245,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -293,6 +300,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(LibraryState(songs: songs)),
@@ -356,6 +364,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(LibraryState(songs: songs)),
@@ -399,6 +408,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -435,6 +445,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -471,6 +482,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -523,6 +535,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -559,6 +572,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -614,6 +628,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -653,6 +668,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -691,6 +707,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -1021,6 +1038,7 @@ void main() {
               QueuePanel(onClose: onClose, showTransport: true),
         ),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           playbackControllerProvider.overrideWith((ref) => controller),
         ],
@@ -1087,6 +1105,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1111,6 +1130,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1142,6 +1162,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1182,6 +1203,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1218,6 +1240,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1253,6 +1276,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1296,6 +1320,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1347,6 +1372,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1397,6 +1423,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -1444,6 +1471,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
+                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
