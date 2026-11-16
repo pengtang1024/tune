@@ -658,6 +658,92 @@ void main() {
 
       expect(result.songs.single.year, isNull);
     });
+
+    test('a record that names its artist only in the title is split', () async {
+      // Uploaders write "artist - work" as the item title and leave the
+      // creator empty; the list needs the two halves in two columns.
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {
+                'identifier': 'enigma',
+                'title': 'Edward ELGAR - Enigma Variations',
+              },
+            ],
+          },
+        },
+        '/metadata/enigma': {
+          // 一整张唱片：标题取文件自己的，专辑回落到条目名。
+          'metadata': {'title': 'Edward ELGAR - Enigma Variations'},
+          'files': [
+            {
+              'name': '01.mp3',
+              'format': 'VBR MP3',
+              'title': '01 Theme, I. C.A.E.',
+              'length': '200',
+            },
+            {
+              'name': '02.mp3',
+              'format': 'VBR MP3',
+              'title': '02 II. H.D.S. - P.',
+              'length': '210',
+            },
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      final song = result.songs.first;
+      expect(song.artist, 'Edward ELGAR');
+      expect(song.album, 'Enigma Variations');
+      expect(song.title, '01 Theme, I. C.A.E.');
+    });
+
+    test('a track whose title repeats its artist loses the duplicate', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'messiah', 'title': 'Handel Messiah'},
+            ],
+          },
+        },
+        '/metadata/messiah': {
+          'metadata': {
+            'title': 'Handel Messiah',
+            'creator': 'Handel, G F',
+            'album': 'Messiah (Disc 1 of 3) - Part One',
+          },
+          'files': [
+            {
+              'name': '103.mp3',
+              'format': 'VBR MP3',
+              'title': 'Handel, Messiah - 103 And the glory of the Lord - Coro',
+              'length': '300',
+            },
+            {
+              'name': '104.mp3',
+              'format': 'VBR MP3',
+              'title': 'Handel, Messiah - 104 Thus saith the Lord',
+              'length': '310',
+            },
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      final song = result.songs.first;
+      expect(song.artist, 'Handel, G F');
+      expect(song.title, '103 And the glory of the Lord - Coro');
+      expect(song.album, 'Messiah (Disc 1 of 3) - Part One');
+    });
   });
 }
 

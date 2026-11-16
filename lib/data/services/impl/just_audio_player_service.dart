@@ -1,16 +1,18 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/data/services/audio_source_address.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
 
-/// 基于just_audio的音频播放服务实现
+/// 基于 just_audio 的音频播放服务实现。
+///
+/// 这条路径服务移动端：平台的音频焦点、audio_service 的会话集成都在
+/// just_audio 生态里。桌面端走 [MediaKitAudioPlayerService]，直接对接
+/// media_kit / libmpv，缓存策略由 `MpvPolicy` 声明。
 class JustAudioPlayerService implements AudioPlayerService {
   AudioPlayer? _audioPlayer;
 
@@ -27,26 +29,6 @@ class JustAudioPlayerService implements AudioPlayerService {
   @override
   Future<void> init() async {
     try {
-      // Linux 与 Windows 上 just_audio 没有够用的官方实现，使用 media_kit
-      // （libmpv）作为后端。Windows 的 just_audio_windows 不支持自定义
-      // 请求头，需要 token 的音源会放不出来；media_kit 会带上它们。
-      if (Platform.isLinux || Platform.isWindows) {
-        JustAudioMediaKit.title = 'Tune';
-        // libmpv 的解复用缓存（demuxer-max-bytes 与 demuxer-max-back-bytes
-        // 各取一份）默认 32MB，播一首本地曲就多驻留 ~35MB。音乐播放的
-        // 采样率固定，8MB 足够缓存约 3 分钟的 320kbps 音频，也够网络流
-        // 顶住常见的抖动。
-        JustAudioMediaKit.bufferSize = 8 * 1024 * 1024;
-        JustAudioMediaKit.ensureInitialized(
-          linux: Platform.isLinux,
-          windows: Platform.isWindows,
-        );
-        Log.debug(
-          '已注册 ${Platform.isLinux ? 'Linux' : 'Windows'} 音频后端 '
-          '(just_audio_media_kit)',
-        );
-      }
-
       final session = await AudioSession.instance;
       await session.configure(
         AudioSessionConfiguration(

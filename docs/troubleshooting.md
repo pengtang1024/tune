@@ -19,6 +19,7 @@
 - [双击文件不开 Tune 或开出两个进程](#双击文件不开-tune-或开出两个进程)
 - [解压发行包后启动报插件加载失败](#解压发行包后启动报插件加载失败)
 - [启动慢或内存占用高](#启动慢或内存占用高)
+- [日志里出现 lavf Failed to create file cache](#日志里出现-lavf-failed-to-create-file-cache)
 - [Android 上的问题](#android-上的问题)
 - [自己从源码跑时的报错](#自己从源码跑时的报错)
 - [怎么提供有效信息](#怎么提供有效信息)
@@ -184,6 +185,30 @@
 - 升级到最新版本，这些修复已并入主线（[performance.md](performance.md) §1）。
 - 仍复现时用二分法缩小范围：把音乐库目录分几批移出扫描范围，看是哪一批触发，内存异常高时尤其有效。
 - 按下面「怎么提供有效信息」附上内存采样与复现路径。
+
+## 日志里出现 `lavf: Failed to create file cache`
+
+**现象**：终端里起应用（或 `flutter run -d linux`）时，开播第一首网络曲目会出现一到两条
+`[lavf] Failed to create file cache.`；播放本身正常。
+
+**可能原因**：上游的一处默认值错配，不是你的环境有问题。media_kit 1.2.6 给 libmpv
+无条件传 `cache-on-disk=yes`，而 mpv 0.41 的 `--demuxer-cache-dir` 默认是空串，mpv 解析出
+`cache path: '' -> '-'`，于是建不了缓存文件。结果是**只有内存缓存生效、磁盘缓存一次也没用上**。
+
+**怎么确认**：用系统 mpv 复现，与 Tune 无关也能看到同一条：
+
+```bash
+mpv --no-config --no-video --ao=null --cache=yes --cache-on-disk=yes \
+  --msg-level=all=debug https://archive.org/download/testmp3testfile/mpthreetest.mp3 2>&1 \
+  | grep -E "cache path|file cache"
+# [global] cache path: '' -> '-'
+# [lavf] Failed to create file cache.
+```
+
+**怎么处理**：不用处理。内存缓存是 8 MiB（[just_audio_player_service.dart](../lib/data/services/impl/just_audio_player_service.dart)
+的 `bufferSize`），按 320 kbps 算约 3 分钟，够网络流顶住抖动，也够拖动进度；磁盘缓存本来
+主要给视频拖进度用。要彻底消掉这条日志需要改 media_kit 源码（它没有公开的入口给 mpv 设
+`demuxer-cache-dir`，2.1.0 已是最高版本），收益不抵维护成本，因此保留为已知噪声。
 
 ## Android 上的问题
 
