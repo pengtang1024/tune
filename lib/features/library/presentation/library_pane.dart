@@ -162,6 +162,20 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       ),
     );
     final library = ref.watch(libraryControllerProvider.select(_librarySlice));
+    // 筛选面板里改了内容分类，就回到这一类自己的默认读法：读者先前挑的那一档
+    // 只对上一类有效（电台没有专辑墙，停在那里只会是空网格）。
+    ref.listen<String?>(
+      libraryControllerProvider.select(
+        (value) => value.valueOrNull?.filter.kinds.join(','),
+      ),
+      (previous, next) {
+        if (previous == null || previous == next) return;
+        setState(() {
+          _view = null;
+          _openAlbum = null;
+        });
+      },
+    );
     ref.listen<String?>(
       libraryControllerProvider.select((value) => value.valueOrNull?.query),
       (previous, next) {
@@ -223,8 +237,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     // tracks.
     final openAlbum = _openAlbum;
     final hasSourceIssues = library.hasSourceIssues;
-    // The scope names exactly one kind while the reader picked one; several
-    // kinds at once come from the filter panel, and the menu then says so.
+    // 只挑了一类内容时，计数用的是这一类的单位（首 / 集 / 章 / 条目）。
+    // 类型只在筛选面板里改，页头不再放独立菜单。
     final selectedKind = library.filter.kinds.length == 1
         ? library.filter.kinds.first
         : null;
@@ -251,9 +265,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   onScan: _scan,
                   scanning: library.isScanning,
                   onSearchOnline: widget.onSearchOnline,
-                  selectedKind: selectedKind,
-                  onKind: _selectKind,
-                  showKindMenu: library.otherKindCount > 0,
                   onAlbums: albumCount == 0
                       ? null
                       : () => _setView(LibraryViewMode.albums),
@@ -830,14 +841,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     });
   }
 
-  /// 分类变了就换读法：每种内容有自己的默认视图。
-  /// 「电台」没有专辑墙，停在那里只会是空的；「播客」进来就该看到节目，
-  /// 而不是一个混着单集的平铺列表。
-  void _applyLayoutForKind(ContentKind? kind) {
-    // 换一类内容就回到这一类自己的默认读法：读者先前挑的那一档只对上一类有效。
-    _view = null;
-    _openAlbum = null;
-  }
 
   void _showAllSongs() {
     setState(() => _view = LibraryViewMode.songs);
@@ -933,23 +936,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       ..showSnackBar(
         SnackBar(content: Text(loc.sourcesSongsCleared(collection.name))),
       );
-  }
-
-  /// Narrows the page to one kind.
-  ///
-  /// The kind is a scope, not a filter: picking podcast shows the shows and
-  /// picking songs puts the stations and the shows away again. It writes the
-  /// same filter the panel writes, so the page, the chips and the tree all
-  /// agree on what is on screen.
-  void _selectKind(ContentKind kind) {
-    final filter = ref.read(libraryControllerProvider).requireValue.filter;
-    setState(() {
-      _applyLayoutForKind(kind);
-      _openAlbum = null;
-    });
-    ref
-        .read(libraryControllerProvider.notifier)
-        .setFilter(filter.copyWith(kinds: {kind}));
   }
 
   Future<void> _playAlbum(LibraryAlbum album) async {

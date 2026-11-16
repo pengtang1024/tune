@@ -3,7 +3,6 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// The heading of the library.
@@ -33,17 +32,13 @@ class LibraryHeader extends StatelessWidget {
   /// The content the page is scoped to, when it names exactly one kind.
   ///
   /// Null while the filter holds several kinds or none at all; the menu then
-  /// says it shows the kinds, not one of them.
-  final ContentKind? selectedKind;
 
   /// Narrows the page to one kind: songs, shows, books or stations.
-  final ValueChanged<ContentKind> onKind;
 
   /// Whether the library holds anything besides songs.
   ///
   /// A library of songs has no use for a menu that offers shows; the entry
   /// is left out instead of opening an empty list.
-  final bool showKindMenu;
 
   /// Opens the wall of albums.
   final VoidCallback? onAlbums;
@@ -62,9 +57,6 @@ class LibraryHeader extends StatelessWidget {
     required this.onScan,
     required this.scanning,
     required this.onSearchOnline,
-    required this.selectedKind,
-    required this.onKind,
-    required this.showKindMenu,
     required this.onAlbums,
     required this.albumsActive,
     required this.treeExpanded,
@@ -118,47 +110,6 @@ class LibraryHeader extends StatelessWidget {
               ),
             ),
           ),
-          if (showKindMenu) ...[
-            const SizedBox(width: CompactTokens.space12),
-            TuneTooltip(
-              message: context.loc.libraryFilterKinds,
-              child: PopupMenuButton<ContentKind>(
-                key: const ValueKey('library-content-kind'),
-                initialValue: selectedKind,
-                onSelected: onKind,
-                itemBuilder: (context) => [
-                  for (final kind in ContentKind.values)
-                    CheckedPopupMenuItem(
-                      value: kind,
-                      checked: kind == selectedKind,
-                      child: Text(_kindLabel(context, kind)),
-                    ),
-                ],
-                child: IgnorePointer(
-                  child: OutlinedButton.icon(
-                    onPressed: () {},
-                    style: _scopeStyle(
-                      theme,
-                      selectedKind != null &&
-                          selectedKind != ContentKind.music,
-                    ),
-                    icon: Icon(
-                      selectedKind == null
-                          ? Icons.tune_rounded
-                          : _kindIcon(selectedKind!),
-                      size: CompactTokens.icon16,
-                    ),
-                    label: Text(
-                      selectedKind == null
-                          ? context.loc.libraryFilterKinds
-                          : _kindLabel(context, selectedKind!),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: CompactTokens.space8),
-          ],
           if (onAlbums != null) ...[
             const SizedBox(width: CompactTokens.space12),
             OutlinedButton.icon(
@@ -266,18 +217,4 @@ class LibraryHeader extends StatelessWidget {
       );
 }
 
-String _kindLabel(BuildContext context, ContentKind kind) => switch (kind) {
-  ContentKind.music => context.loc.contentKindMusic,
-  ContentKind.podcast => context.loc.contentKindPodcast,
-  ContentKind.audiobook => context.loc.contentKindAudiobook,
-  ContentKind.radio => context.loc.contentKindRadio,
-  ContentKind.soundEffect => context.loc.contentKindSoundEffect,
-};
 
-IconData _kindIcon(ContentKind kind) => switch (kind) {
-  ContentKind.music => Icons.music_note_rounded,
-  ContentKind.podcast => Icons.podcasts_rounded,
-  ContentKind.audiobook => Icons.record_voice_over_rounded,
-  ContentKind.radio => Icons.radio_rounded,
-  ContentKind.soundEffect => Icons.graphic_eq_rounded,
-};

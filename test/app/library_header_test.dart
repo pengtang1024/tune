@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
-import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/features/library/presentation/library_header.dart';
 import 'package:tune/l10n/app_localizations.dart';
 
@@ -18,9 +17,6 @@ void main() {
   );
 
   LibraryHeader header({
-    ContentKind? selectedKind = ContentKind.music,
-    ValueChanged<ContentKind>? onKind,
-    bool showKindMenu = true,
     VoidCallback? onAlbums,
     bool albumsActive = false,
   }) {
@@ -30,48 +26,12 @@ void main() {
       onScan: () {},
       scanning: false,
       onSearchOnline: null,
-      selectedKind: selectedKind,
-      onKind: onKind ?? (_) {},
-      showKindMenu: showKindMenu,
       onAlbums: onAlbums,
       albumsActive: albumsActive,
       treeExpanded: false,
       onToggleTree: () {},
     );
   }
-
-  testWidgets('the content menu names the scope and offers every kind', (
-    tester,
-  ) async {
-    ContentKind? picked;
-    await tester.pumpWidget(app(header(onKind: (kind) => picked = kind)));
-
-    expect(find.text('音乐'), findsOneWidget);
-
-    await tester.tap(find.byKey(const ValueKey('library-content-kind')));
-    await tester.pumpAndSettle();
-
-    expect(find.text('有声书'), findsOneWidget);
-    expect(find.text('电台'), findsOneWidget);
-    expect(find.text('音效'), findsOneWidget);
-
-    await tester.tap(
-      find.widgetWithText(CheckedPopupMenuItem<ContentKind>, '音效'),
-    );
-    await tester.pumpAndSettle();
-
-    expect(picked, ContentKind.soundEffect);
-  });
-
-  testWidgets('a library of songs offers no content menu', (tester) async {
-    await tester.pumpWidget(app(header(showKindMenu: false)));
-
-    expect(
-      find.byKey(const ValueKey('library-content-kind')),
-      findsNothing,
-    );
-    expect(find.text('电台'), findsNothing);
-  });
 
   testWidgets('the albums entry opens the wall', (tester) async {
     var opened = 0;
