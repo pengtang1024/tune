@@ -18,9 +18,9 @@
 
 应用先读仓库根目录的静态清单 `version.json`，由 CDN 分发：
 
-1. `https://cdn.jsdelivr.net/gh/pengtang1024/tune@master/version.json`
+1. `https://raw.githubusercontent.com/pengtang1024/tune/master/version.json`
    （分支地址；`@latest` 会因仓库超过 jsDelivr 的 50 MB 包上限被拒）
-2. `https://raw.githubusercontent.com/pengtang1024/tune/master/version.json`
+2. `https://cdn.jsdelivr.net/gh/pengtang1024/tune@master/version.json`（仓库越过 jsDelivr 50 MB 包上限后已降为第二档，2026-11-16）
 3. 前两档都拿不到时，才读 GitHub 的 release 接口（有 token 挂 Bearer，没有就匿名）
 
 两份清单都拿到时会交叉核对：`build` 不同取较新的（CDN 边缘过期是发布后的常态），

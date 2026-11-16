@@ -19,14 +19,19 @@ class VersionManifestSource {
        urls = urls ?? defaultUrls,
        _cache = cache ?? VersionManifestCache.memory();
 
-  /// CDN first; the raw host is the second address and the cross-check.
+  /// The raw host first; the CDN is the second address and the cross-check.
   ///
-  /// The branch, not `@latest`: jsDelivr refuses a package of this repository
-  /// (`Package size exceeded the configured limit of 50 MB`), while the
-  /// branch address still serves single files.
+  /// The branch, not `@latest`. Until 2026-11-16 the CDN came first; the
+  /// repository has since grown past jsDelivr's 50 MB package limit, so the
+  /// branch address answers `403 Package size exceeded the configured limit
+  /// of 50 MB` as well (docs/update-cdn.md §1.1). Asking it first would spend
+  /// a round-trip to learn nothing, so the raw host — which has no such limit
+  /// and does not touch the API quota — leads. The CDN stays in the list
+  /// because a mirror of this file is cheap to add back if the repository
+  /// shrinks or a second host appears.
   static const List<String> defaultUrls = [
-    'https://cdn.jsdelivr.net/gh/pengtang1024/tune@master/version.json',
     'https://raw.githubusercontent.com/pengtang1024/tune/master/version.json',
+    'https://cdn.jsdelivr.net/gh/pengtang1024/tune@master/version.json',
   ];
 
   final Dio _dio;
