@@ -115,6 +115,27 @@ class LocalComponentRegistry {
     platforms: {AppPlatform.linux, AppPlatform.windows},
   );
 
+  static const LocalComponentSpec fingerprintRuntime = LocalComponentSpec(
+    id: 'share-fingerprint-runtime',
+    kind: LocalComponentKind.runtime,
+    label: LocalComponentLabel.fingerprintRuntime,
+    archive: LocalComponentArchive.tarGz,
+    executable: 'fpcalc',
+    files: [
+      LocalComponentFile(
+        fileName: 'chromaprint-fpcalc-1.5.1-linux-x86_64.tar.gz',
+        url:
+            'https://github.com/acoustid/chromaprint/releases/download/'
+            'v1.5.1/chromaprint-fpcalc-1.5.1-linux-x86_64.tar.gz',
+        bytes: 2752946,
+        sha256: '4d7433a7f778e5946d7225230681cbcd634e153316ecac87c538c33ac32387a5',
+      ),
+    ],
+    systemNames: ['fpcalc'],
+    systemPaths: ['~/.local/bin/fpcalc', '/usr/bin/fpcalc', '/usr/local/bin/fpcalc'],
+    platforms: {AppPlatform.linux},
+  );
+
   static const List<LocalComponentSpec> whisperModels = [
     LocalComponentSpec(
       id: 'lyrics-whisper-model-tiny',

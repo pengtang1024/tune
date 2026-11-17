@@ -219,5 +219,7 @@ String componentLabel(BuildContext context, LocalComponentLabel label) {
     LocalComponentLabel.funasrNanoModel =>
       strings.settingsLocalComponentFunasrNanoModel,
     LocalComponentLabel.ffmpeg => strings.settingsLocalComponentFfmpeg,
+    LocalComponentLabel.fingerprintRuntime =>
+      strings.settingsLocalComponentFingerprint,
   };
 }

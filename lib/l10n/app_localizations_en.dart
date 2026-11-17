@@ -4981,4 +4981,162 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playerEqualizer => 'Equalizer';
+
+  @override
+  String get shareAddFile => 'Add a file';
+
+  @override
+  String get shareCancel => 'Cancel';
+
+  @override
+  String get shareCloseRoom => 'Close the room';
+
+  @override
+  String get shareCopied => 'Copied';
+
+  @override
+  String get shareCopyInvite => 'Copy';
+
+  @override
+  String get shareDeclareGenerated => 'Made with AI';
+
+  @override
+  String get shareDeclareLicensed => 'I bought a licence';
+
+  @override
+  String get shareDeclareOwnComposition => 'I wrote it';
+
+  @override
+  String get shareDeclareOwnRecording => 'I recorded it';
+
+  @override
+  String get shareDeclareTitle => 'Where does this come from?';
+
+  @override
+  String get shareDeclared => 'Shared, with the declaration on the file';
+
+  @override
+  String get shareEmpty => 'Nothing yet';
+
+  @override
+  String get shareEntryBody =>
+      'Send generated or self-owned music to other Tune windows on the same network, with the AI label kept on the file';
+
+  @override
+  String get shareEntryTitle => 'Share over LAN';
+
+  @override
+  String get shareFileMissing => 'That file is gone';
+
+  @override
+  String get shareHostRoom => 'Open a room';
+
+  @override
+  String get shareImportToLibrary => 'Add to the library';
+
+  @override
+  String get shareImported => 'Added to the library';
+
+  @override
+  String get shareInbox => 'Inbox';
+
+  @override
+  String get shareInviteCode => 'Invite code';
+
+  @override
+  String get shareInviteHint => 'Paste the invite code';
+
+  @override
+  String get shareInviteInvalid => 'That invite code cannot be read';
+
+  @override
+  String get shareJoinRoom => 'Join with a code';
+
+  @override
+  String get shareMembers => 'In the room';
+
+  @override
+  String get shareReceive => 'Take';
+
+  @override
+  String get shareRejected => 'The room would not take it';
+
+  @override
+  String get shareReport => 'Report';
+
+  @override
+  String get shareReportConfirm => 'Report and delete this from this device?';
+
+  @override
+  String get shareReported => 'Reported and deleted';
+
+  @override
+  String get shareRevoke => 'Stop sharing';
+
+  @override
+  String get shareRevoked => 'No longer shared';
+
+  @override
+  String get shareRoomClosed => 'The room is closed';
+
+  @override
+  String get shareRoomItems => 'In this room';
+
+  @override
+  String get shareSubtitle =>
+      'A room is a handful of Tune windows on one network. Nothing leaves the room, and nothing is uploaded anywhere';
+
+  @override
+  String get shareTitle => 'Sharing';
+
+  @override
+  String get shareYourItems => 'What I share';
+
+  @override
+  String get settingsLocalComponentFingerprint => 'Audio fingerprint (fpcalc)';
+
+  @override
+  String get shareLookupTitle => 'Content lookup';
+
+  @override
+  String get shareLookupSubtitle =>
+      'Paste your AcoustID client key. Without it nothing is looked up, and the gate treats that as \"not checked\".';
+
+  @override
+  String get shareLookupHint => 'AcoustID client key';
+
+  @override
+  String get shareLookupSave => 'Save';
+
+  @override
+  String get shareLookupSaved => 'Saved';
+
+  @override
+  String get shareLookupReady => 'Ready — lookup runs on every shared item.';
+
+  @override
+  String get shareLookupMissingKey => 'No client key yet — lookup is off.';
+
+  @override
+  String get shareLookupMissingFpcalc =>
+      'Install the audio fingerprint component to enable lookup.';
+
+  @override
+  String get shareLookupDownload => 'Download fpcalc';
+
+  @override
+  String get shareLookupDownloading => 'Downloading…';
+
+  @override
+  String get shareLookupDownloadFailed => 'Download failed, try again later.';
+
+  @override
+  String get shareLocalPort => 'Local port';
+
+  @override
+  String get shareNetworkReachable => 'Room is reachable over the internet.';
+
+  @override
+  String get shareNetworkLanOnly =>
+      'No internet entry was found; same LAN only.';
 }

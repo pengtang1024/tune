@@ -44,6 +44,7 @@
 | 歌词第二票 | `lyrics-sherpa-runtime`（sherpa-onnx）、`lyrics-sensevoice-model` |
 | 歌词可选第三家族 | `lyrics-funasr-nano-model`（Fun-ASR-Nano，复用上面的 sherpa-onnx 运行时） |
 | 歌词（Android） | `lyrics-whisper-onnx-model-small`（whisper-small 的 ONNX int8 encoder/decoder/tokens，供应用内 FFI） |
+| 分享查重 | `share-fingerprint-runtime`（chromaprint `fpcalc` 1.5.1，Linux x86_64） |
 | 转码 | `ffmpeg`（GPL-2.0-or-later 构建，由本项目自己发布） |
 
 运行时与模型分开下载、分开校验、分开删除。翻译模型按默认、低配、高质量三档并列；引擎取第一个可用的档位，下载仍从默认档开始。SenseVoice 体积大且权重协议需单独确认，只在读者点击时下载，不进默认安装。

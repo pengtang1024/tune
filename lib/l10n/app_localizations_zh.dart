@@ -4609,6 +4609,160 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get playerEqualizer => '均衡器';
+
+  @override
+  String get shareAddFile => '添加文件';
+
+  @override
+  String get shareCancel => '取消';
+
+  @override
+  String get shareCloseRoom => '关闭房间';
+
+  @override
+  String get shareCopied => '已复制';
+
+  @override
+  String get shareCopyInvite => '复制';
+
+  @override
+  String get shareDeclareGenerated => 'AI 生成';
+
+  @override
+  String get shareDeclareLicensed => '我买了授权';
+
+  @override
+  String get shareDeclareOwnComposition => '我自己写的';
+
+  @override
+  String get shareDeclareOwnRecording => '我自己录的';
+
+  @override
+  String get shareDeclareTitle => '这条内容的来源是？';
+
+  @override
+  String get shareDeclared => '已分享，声明写在文件里';
+
+  @override
+  String get shareEmpty => '还没有';
+
+  @override
+  String get shareEntryBody => '把生成的或自己拥有版权的音乐发给同一网络里的其它 Tune，AI 标识跟着文件走';
+
+  @override
+  String get shareEntryTitle => '局域网分享';
+
+  @override
+  String get shareFileMissing => '这个文件不在了';
+
+  @override
+  String get shareHostRoom => '开一个房间';
+
+  @override
+  String get shareImportToLibrary => '加入音乐库';
+
+  @override
+  String get shareImported => '已加入音乐库';
+
+  @override
+  String get shareInbox => '收件箱';
+
+  @override
+  String get shareInviteCode => '邀请码';
+
+  @override
+  String get shareInviteHint => '粘贴邀请码';
+
+  @override
+  String get shareInviteInvalid => '这个邀请码认不出来';
+
+  @override
+  String get shareJoinRoom => '用邀请码加入';
+
+  @override
+  String get shareMembers => '房间里的人';
+
+  @override
+  String get shareReceive => '收取';
+
+  @override
+  String get shareRejected => '房间里没有收下';
+
+  @override
+  String get shareReport => '举报';
+
+  @override
+  String get shareReportConfirm => '举报后这条会从本机删掉，确定吗？';
+
+  @override
+  String get shareReported => '已举报并删除';
+
+  @override
+  String get shareRevoke => '撤销分享';
+
+  @override
+  String get shareRevoked => '已撤销分享';
+
+  @override
+  String get shareRoomClosed => '房间已关闭';
+
+  @override
+  String get shareRoomItems => '房间里的内容';
+
+  @override
+  String get shareSubtitle => '房间就是同一网络里的几个 Tune。内容不出房间，也不上传到任何服务器';
+
+  @override
+  String get shareTitle => '分享';
+
+  @override
+  String get shareYourItems => '我要分享的';
+
+  @override
+  String get settingsLocalComponentFingerprint => '音频指纹（fpcalc）';
+
+  @override
+  String get shareLookupTitle => '内容查重';
+
+  @override
+  String get shareLookupSubtitle =>
+      '填入 AcoustID 的 client key。没填就什么都不查，闸门会把这一格当成「没查」。';
+
+  @override
+  String get shareLookupHint => 'AcoustID client key';
+
+  @override
+  String get shareLookupSave => '保存';
+
+  @override
+  String get shareLookupSaved => '已保存';
+
+  @override
+  String get shareLookupReady => '已就绪 —— 每条分享内容都会查重。';
+
+  @override
+  String get shareLookupMissingKey => '还没有 client key —— 查重没开。';
+
+  @override
+  String get shareLookupMissingFpcalc => '装一下音频指纹组件，查重才能跑。';
+
+  @override
+  String get shareLookupDownload => '下载 fpcalc';
+
+  @override
+  String get shareLookupDownloading => '正在下载…';
+
+  @override
+  String get shareLookupDownloadFailed => '下载失败，稍后再试。';
+
+  @override
+  String get shareLocalPort => '本机端口';
+
+  @override
+  String get shareNetworkReachable => '这个房间可以从外网直连。';
+
+  @override
+  String get shareNetworkLanOnly => '没探测到外网入口，现在只能同一局域网连。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -9216,6 +9370,160 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get playerEqualizer => '均衡器';
+
+  @override
+  String get shareAddFile => '添加文件';
+
+  @override
+  String get shareCancel => '取消';
+
+  @override
+  String get shareCloseRoom => '关闭房间';
+
+  @override
+  String get shareCopied => '已复制';
+
+  @override
+  String get shareCopyInvite => '复制';
+
+  @override
+  String get shareDeclareGenerated => 'AI 生成';
+
+  @override
+  String get shareDeclareLicensed => '我买了授权';
+
+  @override
+  String get shareDeclareOwnComposition => '我自己写的';
+
+  @override
+  String get shareDeclareOwnRecording => '我自己录的';
+
+  @override
+  String get shareDeclareTitle => '这条内容的来源是？';
+
+  @override
+  String get shareDeclared => '已分享，声明写在文件里';
+
+  @override
+  String get shareEmpty => '还没有';
+
+  @override
+  String get shareEntryBody => '把生成的或自己拥有版权的音乐发给同一网络里的其它 Tune，AI 标识跟着文件走';
+
+  @override
+  String get shareEntryTitle => '局域网分享';
+
+  @override
+  String get shareFileMissing => '这个文件不在了';
+
+  @override
+  String get shareHostRoom => '开一个房间';
+
+  @override
+  String get shareImportToLibrary => '加入音乐库';
+
+  @override
+  String get shareImported => '已加入音乐库';
+
+  @override
+  String get shareInbox => '收件箱';
+
+  @override
+  String get shareInviteCode => '邀请码';
+
+  @override
+  String get shareInviteHint => '粘贴邀请码';
+
+  @override
+  String get shareInviteInvalid => '这个邀请码认不出来';
+
+  @override
+  String get shareJoinRoom => '用邀请码加入';
+
+  @override
+  String get shareMembers => '房间里的人';
+
+  @override
+  String get shareReceive => '收取';
+
+  @override
+  String get shareRejected => '房间里没有收下';
+
+  @override
+  String get shareReport => '举报';
+
+  @override
+  String get shareReportConfirm => '举报后这条会从本机删掉，确定吗？';
+
+  @override
+  String get shareReported => '已举报并删除';
+
+  @override
+  String get shareRevoke => '撤销分享';
+
+  @override
+  String get shareRevoked => '已撤销分享';
+
+  @override
+  String get shareRoomClosed => '房间已关闭';
+
+  @override
+  String get shareRoomItems => '房间里的内容';
+
+  @override
+  String get shareSubtitle => '房间就是同一网络里的几个 Tune。内容不出房间，也不上传到任何服务器';
+
+  @override
+  String get shareTitle => '分享';
+
+  @override
+  String get shareYourItems => '我要分享的';
+
+  @override
+  String get settingsLocalComponentFingerprint => '音频指纹（fpcalc）';
+
+  @override
+  String get shareLookupTitle => '内容查重';
+
+  @override
+  String get shareLookupSubtitle =>
+      '填入 AcoustID 的 client key。没填就什么都不查，闸门会把这一格当成「没查」。';
+
+  @override
+  String get shareLookupHint => 'AcoustID client key';
+
+  @override
+  String get shareLookupSave => '保存';
+
+  @override
+  String get shareLookupSaved => '已保存';
+
+  @override
+  String get shareLookupReady => '已就绪 —— 每条分享内容都会查重。';
+
+  @override
+  String get shareLookupMissingKey => '还没有 client key —— 查重没开。';
+
+  @override
+  String get shareLookupMissingFpcalc => '装一下音频指纹组件，查重才能跑。';
+
+  @override
+  String get shareLookupDownload => '下载 fpcalc';
+
+  @override
+  String get shareLookupDownloading => '正在下载…';
+
+  @override
+  String get shareLookupDownloadFailed => '下载失败，稍后再试。';
+
+  @override
+  String get shareLocalPort => '本机端口';
+
+  @override
+  String get shareNetworkReachable => '这个房间可以从外网直连。';
+
+  @override
+  String get shareNetworkLanOnly => '没探测到外网入口，现在只能同一局域网连。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -13824,4 +14132,158 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get playerEqualizer => '等化器';
+
+  @override
+  String get shareAddFile => '加入檔案';
+
+  @override
+  String get shareCancel => '取消';
+
+  @override
+  String get shareCloseRoom => '關閉房間';
+
+  @override
+  String get shareCopied => '已複製';
+
+  @override
+  String get shareCopyInvite => '複製';
+
+  @override
+  String get shareDeclareGenerated => 'AI 生成';
+
+  @override
+  String get shareDeclareLicensed => '我買了授權';
+
+  @override
+  String get shareDeclareOwnComposition => '我自己寫的';
+
+  @override
+  String get shareDeclareOwnRecording => '我自己錄的';
+
+  @override
+  String get shareDeclareTitle => '這條內容的來源是？';
+
+  @override
+  String get shareDeclared => '已分享，聲明寫在檔案裡';
+
+  @override
+  String get shareEmpty => '還沒有';
+
+  @override
+  String get shareEntryBody => '把生成的或自己擁有版權的音樂傳給同一網路裡的其它 Tune，AI 標識跟著檔案走';
+
+  @override
+  String get shareEntryTitle => '區域網路分享';
+
+  @override
+  String get shareFileMissing => '這個檔案不在了';
+
+  @override
+  String get shareHostRoom => '開一個房間';
+
+  @override
+  String get shareImportToLibrary => '加入音樂庫';
+
+  @override
+  String get shareImported => '已加入音樂庫';
+
+  @override
+  String get shareInbox => '收件匣';
+
+  @override
+  String get shareInviteCode => '邀請碼';
+
+  @override
+  String get shareInviteHint => '貼上邀請碼';
+
+  @override
+  String get shareInviteInvalid => '這個邀請碼認不出來';
+
+  @override
+  String get shareJoinRoom => '用邀請碼加入';
+
+  @override
+  String get shareMembers => '房間裡的人';
+
+  @override
+  String get shareReceive => '收取';
+
+  @override
+  String get shareRejected => '房間裡沒有收下';
+
+  @override
+  String get shareReport => '檢舉';
+
+  @override
+  String get shareReportConfirm => '檢舉後這條會從本機刪掉，確定嗎？';
+
+  @override
+  String get shareReported => '已檢舉並刪除';
+
+  @override
+  String get shareRevoke => '撤銷分享';
+
+  @override
+  String get shareRevoked => '已撤銷分享';
+
+  @override
+  String get shareRoomClosed => '房間已關閉';
+
+  @override
+  String get shareRoomItems => '房間裡的內容';
+
+  @override
+  String get shareSubtitle => '房間就是同一網路裡的幾個 Tune。內容不出房間，也不上傳到任何伺服器';
+
+  @override
+  String get shareTitle => '分享';
+
+  @override
+  String get shareYourItems => '我要分享的';
+
+  @override
+  String get settingsLocalComponentFingerprint => '音訊指紋（fpcalc）';
+
+  @override
+  String get shareLookupTitle => '內容查重';
+
+  @override
+  String get shareLookupSubtitle =>
+      '填入 AcoustID 的 client key。沒填就什麼都不查，閘門會把這一格當成「沒查」。';
+
+  @override
+  String get shareLookupHint => 'AcoustID client key';
+
+  @override
+  String get shareLookupSave => '儲存';
+
+  @override
+  String get shareLookupSaved => '已儲存';
+
+  @override
+  String get shareLookupReady => '已就緒 —— 每條分享內容都會查重。';
+
+  @override
+  String get shareLookupMissingKey => '還沒有 client key —— 查重沒開。';
+
+  @override
+  String get shareLookupMissingFpcalc => '裝一下音訊指紋元件，查重才能跑。';
+
+  @override
+  String get shareLookupDownload => '下載 fpcalc';
+
+  @override
+  String get shareLookupDownloading => '正在下載…';
+
+  @override
+  String get shareLookupDownloadFailed => '下載失敗，稍後再試。';
+
+  @override
+  String get shareLocalPort => '本機埠';
+
+  @override
+  String get shareNetworkReachable => '這個房間可以從外網直連。';
+
+  @override
+  String get shareNetworkLanOnly => '沒探測到外網入口，現在只能同一區域網路連。';
 }

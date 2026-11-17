@@ -59,6 +59,7 @@
 | [`update-cdn.md`](update-cdn.md) | `version.json`、CDN 三档取数、退避调度与签名规划 |
 | [`android.md`](android.md) | Android 的后台播放、通知、权限、MediaStore / SAF 扫描 |
 | [`equalizer.md`](equalizer.md) | 10 段均衡器：mpv `af` 滤镜链、状态、面板与三处入口（1.37.0 起） |
+| [`ai-music-sharing.md`](ai-music-sharing.md) | 局域网 AI 音乐分享：mesh 房间、准入闸门、AI 标识与查重（1.47.0 起） |
 
 ## 现状与排障
 
