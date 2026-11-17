@@ -384,12 +384,17 @@ LibraryAlbum _albumOf(List<Song> songs, {String? key}) {
   String? coverPath;
   String? coverUrl;
   for (final song in ordered) {
+    // A row whose artwork is a site icon has a cached copy on disk too, so the
+    // URL is what decides: without that check an already-cached favicon keeps
+    // winning the group even after the source stops handing it over.
+    final url = song.artworkUrl;
+    final isIcon = url != null && url.isNotEmpty && !_isCoverArt(url);
+    if (isIcon) continue;
     final path = song.albumArtPath;
     if (coverPath == null && path != null && path.isNotEmpty) {
       coverPath = path;
     }
-    final url = song.artworkUrl;
-    if (coverUrl == null && url != null && _isCoverArt(url)) {
+    if (coverUrl == null && url != null && url.isNotEmpty) {
       coverUrl = url;
     }
     if (coverPath != null && coverUrl != null) break;

@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.46.1",
-  "build": 92,
-  "released_at": "2026-11-16T23:57:16Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.46.1",
-  "notes": "### 修复\n\n- **电台的站点图标被当成专辑封面**：`未知专辑` 那一组的封面取的是组里第一首有图的歌，电台行带的\n  是 `favicon.ico`，放大到四十像素就是一块与主题无关的高饱和色。现在站点图标不参与封面挑选，\n  没有真封面的组退回中性占位。\n- **组行偏高**：封面 40 → 32、行高 44 → 40，与下面的曲目行（32）站在同一条网格上，不再一大一小。",
+  "version": "1.46.2",
+  "build": 93,
+  "released_at": "2026-11-17T00:08:53Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.46.2",
+  "notes": "### 修复\n\n- **已经缓存下来的站点图标仍然当封面**：1.46.1 只拦住了新取回的地址，库里早先缓存的 `favicon.ico`\n  仍然占着 `未知专辑` 的封面位。现在封面挑选按歌曲的 `artworkUrl` 判断——站点图标连它缓存到磁盘的\n  副本一起跳过。\n- 电台行本身仍显示站点图标（24 像素下它就是识别标志），只是它不再参与组封面的挑选。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.46.1/tune-linux-x64-1.46.1.tar.gz",
-      "size": 53609248,
-      "sha256": "56565294f18f5e20b8439c75db9c52b3c655d36bdee6bd0f422350f895af8be3"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.46.2/tune-linux-x64-1.46.2.tar.gz",
+      "size": 53607138,
+      "sha256": "33a146c537aef257735027cd89540760383a846d4a98985f3dd0e93777c490a8"
     }
   }
 }
