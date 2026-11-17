@@ -10,6 +10,7 @@ import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
+import 'package:tune/features/share/presentation/share_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/features/smart_lyrics/presentation/marks_page.dart';
 import 'package:tune/features/sources/presentation/sources_pane.dart';
@@ -23,6 +24,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           path == '/discover' ||
           path == '/favorites' ||
           path == '/sources' ||
+          path == '/share' ||
           path == '/settings' ||
           path == '/now-playing' ||
           path == '/marks') {
@@ -57,6 +59,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/sources',
             pageBuilder: (context, state) =>
                 sectionPage(state, const SourcesPane()),
+          ),
+          GoRoute(
+            path: '/share',
+            pageBuilder: (context, state) =>
+                sectionPage(state, const SharePane()),
           ),
           GoRoute(
             path: '/settings',

@@ -27,6 +27,7 @@
 | 查偏好和本地数据存在哪、谁在写 | [`docs/architecture.md`](docs/architecture.md) 的「持久化」 |
 | 加表、加列、改索引、写 SQL 前查列与约束 | [`docs/data-model.md`](docs/data-model.md) |
 | 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
+| 做 AI 音乐分享（mesh 房间、准入、AI 标识） | [`docs/ai-music-sharing.md`](docs/ai-music-sharing.md)（M0–M2 已实施） |
 | 查推荐 / 发现页的模型、入口、隐私边界 | [`docs/recommendation.md`](docs/recommendation.md)（M1–M5 已实施） |
 | 查智能歌词 / 字幕的票池共识、账本口径与里程碑 | [`docs/smart-lyrics.md`](docs/smart-lyrics.md)（M0–M13 已实施；产品口径：每首有词，准入降级为高置信标注） |
 | 查本地组件（翻译/歌词模型、FFmpeg）的注册、下载校验与设置页 | [`docs/local-components.md`](docs/local-components.md) |

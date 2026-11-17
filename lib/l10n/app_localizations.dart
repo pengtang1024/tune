@@ -8572,6 +8572,312 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'均衡器'**
   String get playerEqualizer;
+
+  /// No description provided for @shareAddFile.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'添加文件'**
+  String get shareAddFile;
+
+  /// No description provided for @shareCancel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'取消'**
+  String get shareCancel;
+
+  /// No description provided for @shareCloseRoom.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关闭房间'**
+  String get shareCloseRoom;
+
+  /// No description provided for @shareCopied.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已复制'**
+  String get shareCopied;
+
+  /// No description provided for @shareCopyInvite.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'复制'**
+  String get shareCopyInvite;
+
+  /// No description provided for @shareDeclareGenerated.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'AI 生成'**
+  String get shareDeclareGenerated;
+
+  /// No description provided for @shareDeclareLicensed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'我买了授权'**
+  String get shareDeclareLicensed;
+
+  /// No description provided for @shareDeclareOwnComposition.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'我自己写的'**
+  String get shareDeclareOwnComposition;
+
+  /// No description provided for @shareDeclareOwnRecording.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'我自己录的'**
+  String get shareDeclareOwnRecording;
+
+  /// No description provided for @shareDeclareTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这条内容的来源是？'**
+  String get shareDeclareTitle;
+
+  /// No description provided for @shareDeclared.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已分享，声明写在文件里'**
+  String get shareDeclared;
+
+  /// No description provided for @shareEmpty.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有'**
+  String get shareEmpty;
+
+  /// No description provided for @shareEntryBody.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'把生成的或自己拥有版权的音乐发给同一网络里的其它 Tune，AI 标识跟着文件走'**
+  String get shareEntryBody;
+
+  /// No description provided for @shareEntryTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'局域网分享'**
+  String get shareEntryTitle;
+
+  /// No description provided for @shareFileMissing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这个文件不在了'**
+  String get shareFileMissing;
+
+  /// No description provided for @shareHostRoom.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'开一个房间'**
+  String get shareHostRoom;
+
+  /// No description provided for @shareImportToLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加入音乐库'**
+  String get shareImportToLibrary;
+
+  /// No description provided for @shareImported.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已加入音乐库'**
+  String get shareImported;
+
+  /// No description provided for @shareInbox.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收件箱'**
+  String get shareInbox;
+
+  /// No description provided for @shareInviteCode.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'邀请码'**
+  String get shareInviteCode;
+
+  /// No description provided for @shareInviteHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'粘贴邀请码'**
+  String get shareInviteHint;
+
+  /// No description provided for @shareInviteInvalid.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这个邀请码认不出来'**
+  String get shareInviteInvalid;
+
+  /// No description provided for @shareJoinRoom.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用邀请码加入'**
+  String get shareJoinRoom;
+
+  /// No description provided for @shareMembers.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'房间里的人'**
+  String get shareMembers;
+
+  /// No description provided for @shareReceive.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收取'**
+  String get shareReceive;
+
+  /// No description provided for @shareRejected.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'房间里没有收下'**
+  String get shareRejected;
+
+  /// No description provided for @shareReport.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'举报'**
+  String get shareReport;
+
+  /// No description provided for @shareReportConfirm.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'举报后这条会从本机删掉，确定吗？'**
+  String get shareReportConfirm;
+
+  /// No description provided for @shareReported.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已举报并删除'**
+  String get shareReported;
+
+  /// No description provided for @shareRevoke.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'撤销分享'**
+  String get shareRevoke;
+
+  /// No description provided for @shareRevoked.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已撤销分享'**
+  String get shareRevoked;
+
+  /// No description provided for @shareRoomClosed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'房间已关闭'**
+  String get shareRoomClosed;
+
+  /// No description provided for @shareRoomItems.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'房间里的内容'**
+  String get shareRoomItems;
+
+  /// No description provided for @shareSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'房间就是同一网络里的几个 Tune。内容不出房间，也不上传到任何服务器'**
+  String get shareSubtitle;
+
+  /// No description provided for @shareTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'分享'**
+  String get shareTitle;
+
+  /// No description provided for @shareYourItems.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'我要分享的'**
+  String get shareYourItems;
+
+  /// No description provided for @settingsLocalComponentFingerprint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音频指纹（fpcalc）'**
+  String get settingsLocalComponentFingerprint;
+
+  /// No description provided for @shareLookupTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'内容查重'**
+  String get shareLookupTitle;
+
+  /// No description provided for @shareLookupSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填入 AcoustID 的 client key。没填就什么都不查，闸门会把这一格当成「没查」。'**
+  String get shareLookupSubtitle;
+
+  /// No description provided for @shareLookupHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'AcoustID client key'**
+  String get shareLookupHint;
+
+  /// No description provided for @shareLookupSave.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'保存'**
+  String get shareLookupSave;
+
+  /// No description provided for @shareLookupSaved.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已保存'**
+  String get shareLookupSaved;
+
+  /// No description provided for @shareLookupReady.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已就绪 —— 每条分享内容都会查重。'**
+  String get shareLookupReady;
+
+  /// No description provided for @shareLookupMissingKey.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有 client key —— 查重没开。'**
+  String get shareLookupMissingKey;
+
+  /// No description provided for @shareLookupMissingFpcalc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'装一下音频指纹组件，查重才能跑。'**
+  String get shareLookupMissingFpcalc;
+
+  /// No description provided for @shareLookupDownload.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下载 fpcalc'**
+  String get shareLookupDownload;
+
+  /// No description provided for @shareLookupDownloading.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在下载…'**
+  String get shareLookupDownloading;
+
+  /// No description provided for @shareLookupDownloadFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下载失败，稍后再试。'**
+  String get shareLookupDownloadFailed;
+
+  /// No description provided for @shareLocalPort.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本机端口'**
+  String get shareLocalPort;
+
+  /// No description provided for @shareNetworkReachable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这个房间可以从外网直连。'**
+  String get shareNetworkReachable;
+
+  /// No description provided for @shareNetworkLanOnly.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没探测到外网入口，现在只能同一局域网连。'**
+  String get shareNetworkLanOnly;
 }
 
 class _AppLocalizationsDelegate

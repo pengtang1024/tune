@@ -24,6 +24,7 @@ enum LocalComponentLabel {
   sensevoiceModel,
   funasrNanoModel,
   ffmpeg,
+  fingerprintRuntime,
 }
 
 /// How an archive is packed, so the installer picks the right decoder.

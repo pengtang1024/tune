@@ -402,6 +402,14 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 播放器与音乐库 UI 不需要改：一个类型可以被多个实例共用，界面对实例一视同仁。
 
+### 加一个房间式的功能（分享）
+
+分享（`lib/features/share/`）是「房间里有别人」的功能，它**不是音源类型**，也不要往音源注册表里加：
+
+- 底层连接在 `lib/data/services/mesh/`（发现、邀请码、传输、清单签名、可达探测），与曲库、音源体系无关。
+- 扫描器把房间当曲库会把别人的条目灌进音乐库；`lib/features/player/application/track_prefetcher.dart:29` 的预取还会把每条抓成本地副本。收下的文件先落收件箱，用户点「加入音乐库」才复制进曲库目录并触发扫描。
+- 状态归属：房间会话在 `lib/features/share/application/share_session.dart`（纯 Dart，不依赖 provider），Riverpod 只在 `share_session_controller.dart` 里包一层；持久化走 `library.db` 的 `share_rooms` / `share_items` / `share_events`。
+
 ### 加一个页面 / 页签
 
 1. 在 `features/` 下建包，按 domain → application → presentation 的顺序。

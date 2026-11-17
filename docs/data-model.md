@@ -21,7 +21,7 @@
 
 ## 2. 表清单总览
 
-共 **11 张表**，全部落在同一个文件：`<application support>/library/library.db`（`lib/features/library/data/impl/library_storage_io.dart:362,394-396`）。打开时设 `journal_mode = WAL`、`synchronous = NORMAL`、`busy_timeout = 5000`（`lib/data/services/database/app_database.dart:48-52`）；曲库、播放会话、播放记录、智能歌词四个 store 各自 `AppDatabase.open` 同一个路径，所以「同一个库」是靠路径约定，不是靠一个单例。
+共 **14 张表**，全部落在同一个文件：`<application support>/library/library.db`（`lib/features/library/data/impl/library_storage_io.dart:362,394-396`）。打开时设 `journal_mode = WAL`、`synchronous = NORMAL`、`busy_timeout = 5000`（`lib/data/services/database/app_database.dart:48-52`）；曲库、播放会话、播放记录、智能歌词四个 store 各自 `AppDatabase.open` 同一个路径，所以「同一个库」是靠路径约定，不是靠一个单例。
 
 | 表名 | 存什么 | 谁写 | 谁读 |
 | --- | --- | --- | --- |
@@ -36,6 +36,12 @@
 | `smart_lyrics_marks` | 读者/共识打的标记 | `SmartLyricsTaskStore` 的标记方法 | 标记管理页、歌词面板、任务排序 |
 | `text_translations` | 翻译缓存（按文本哈希） | `TranslationStore.writeBatch` | `TranslationStore.readHashes` |
 | `translation_usage` | 翻译 token 账本 | `TranslationStore.addUsage` | `TranslationStore.usageSince` |
+| `share_rooms` | 分享房间：room id、名字、房间密钥、开/关时间 | `ShareStore.recordRoom` / `closeRoom` | 分享会话与外网可达判定 |
+| `share_items` | 分享条目：内容编号、元数据、缘起、AI 标识、方向、落盘路径、软删时间 | `ShareStore.rememberShared` / `rememberReceived` / `markRemoved` | 收件箱、清单、撤销与举报 |
+| `share_events` | 分享事件：生成台账、撤销、举报、黑名单留痕 | `ShareStore.logEvent` / `noteGenerated` / `block` / `addReport` | 准入闸门的台账与黑名单查询 |
+
+
+分享的三张表同样落在 `library.db`，由 `lib/features/share/data/share_store.dart` 自建（不写进 `app_database.dart`，与曲库表互不依赖）：文件仍留在磁盘上，表里只记「有过、从谁那里来、什么时候下架」；撤销与举报是软删（`removed_at` / `removed_reason`），生成台账记在 `share_events.kind = 'generated'` 而不是条目行上——同一条内容可以既是生成物、又被分享出去。M0 时代那四份 JSON 由 `importLegacyShareJson` 搬进表并改名 `.migrated`。
 
 ## 3. 逐表
 

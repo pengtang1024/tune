@@ -70,6 +70,7 @@ dependencies:
 
   # RSS parsing for the podcast source
   xml: ^6.6.1
+  cryptography: ^2.9.0
 
   # Token signing for the Subsonic source
   crypto: ^3.0.7
