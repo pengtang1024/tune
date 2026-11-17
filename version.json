@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.46.2",
-  "build": 93,
-  "released_at": "2026-11-17T00:08:53Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.46.2",
-  "notes": "### 修复\n\n- **已经缓存下来的站点图标仍然当封面**：1.46.1 只拦住了新取回的地址，库里早先缓存的 `favicon.ico`\n  仍然占着 `未知专辑` 的封面位。现在封面挑选按歌曲的 `artworkUrl` 判断——站点图标连它缓存到磁盘的\n  副本一起跳过。\n- 电台行本身仍显示站点图标（24 像素下它就是识别标志），只是它不再参与组封面的挑选。",
+  "version": "1.46.3",
+  "build": 94,
+  "released_at": "2026-11-17T00:25:38Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.46.3",
+  "notes": "### 修复\n\n- **没有专辑名的行不再借第一首的图当封面。** 「未知专辑」这类行本来没有封面，之前取组里第一首有图的歌，而某些音源给的是一张纯色占位图，在列表里就是一块亮色方块。现在这类行保持中性占位。\n\n### 文档与工程\n\n- `docs/library-browse.md` 记下这条取舍。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.46.2/tune-linux-x64-1.46.2.tar.gz",
-      "size": 53607138,
-      "sha256": "33a146c537aef257735027cd89540760383a846d4a98985f3dd0e93777c490a8"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.46.3/tune-linux-x64-1.46.3.tar.gz",
+      "size": 53609625,
+      "sha256": "4567627227131304b2ca9c69013f3c9080e98d513d4a3761ab022583c69b92a2"
     }
   }
 }

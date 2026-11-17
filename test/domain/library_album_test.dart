@@ -659,7 +659,7 @@ void main() {
         id: 1,
         title: 'Smooth jazz',
         artist: '',
-        album: '',
+        album: 'Late night radio',
         uri: 'tune://radio/one',
         sourceId: 'radio',
         artworkUrl: 'http://101smoothjazz.com/favicon.ico',
@@ -670,7 +670,7 @@ void main() {
         id: 2,
         title: 'Late night',
         artist: '',
-        album: '',
+        album: 'Late night radio',
         uri: 'tune://radio/two',
         sourceId: 'radio',
         artworkUrl: 'https://cdn.example.com/cover.jpg',
@@ -681,6 +681,33 @@ void main() {
     expect(album.coverUrl, 'https://cdn.example.com/cover.jpg');
   });
 
+  test('a group without an album name shows no cover', () {
+    final songs = [
+      rowSong(
+        title: 'One',
+        album: '',
+        artist: 'A',
+        duration: 1000,
+        addedAt: 1,
+        uri: 'noname-1',
+      ).copyWith(artworkUrl: 'https://cdn.example.com/cyan.png'),
+      rowSong(
+        title: 'Two',
+        album: '',
+        artist: 'B',
+        duration: 1000,
+        addedAt: 2,
+        uri: 'noname-2',
+      ),
+    ];
+
+    final groups = libraryAlbumGroupsOf(songs);
+
+    expect(groups, hasLength(1));
+    expect(groups.single.name, isEmpty);
+    expect(groups.single.coverUrl, isNull);
+    expect(groups.single.coverPath, isNull);
+  });
 }
 
 /// A track with the facts the row order reads.
