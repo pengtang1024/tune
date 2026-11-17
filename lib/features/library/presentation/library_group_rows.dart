@@ -137,7 +137,9 @@ class _GroupRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final name = album.name.isEmpty
+    final name = album.key == librarySingletonKey
+        ? context.loc.librarySingletons
+        : album.name.isEmpty
         ? context.loc.libraryUnknownAlbum
         : album.name;
     final artist = album.hasMultipleArtists

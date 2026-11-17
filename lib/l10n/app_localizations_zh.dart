@@ -291,6 +291,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryVariousArtists => '多位艺术家';
 
   @override
+  String get librarySingletons => '单曲';
+
+  @override
   String get libraryUnknownAlbum => '未知专辑';
 
   @override
@@ -5052,6 +5055,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryVariousArtists => '多位艺术家';
 
   @override
+  String get librarySingletons => '单曲';
+
+  @override
   String get libraryUnknownAlbum => '未知专辑';
 
   @override
@@ -9811,6 +9817,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryVariousArtists => '多位藝術家';
+
+  @override
+  String get librarySingletons => '單曲';
 
   @override
   String get libraryUnknownAlbum => '未知專輯';

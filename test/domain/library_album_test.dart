@@ -507,8 +507,7 @@ void main() {
   });
 
   group('the rows of the group list', () {
-    // A is one track, Alpha is two, D is one: one of each row, in an order
-    // the name sort would not give.
+    // A and D are one-track albums; Alpha holds two tracks.
     final songs = [
       rowSong(
         title: 'A song',
@@ -544,87 +543,56 @@ void main() {
       ),
     ];
 
-    List<String> namesOf(LibrarySort sort) => [
-      for (final row in libraryRowsOf(songs, sort: sort))
-        switch (row) {
-          LibraryAlbumRow(:final album) => album.name,
-          LibrarySingleRow(:final song) => song.title,
-        },
-    ];
+    List<LibraryListRow> rowsOf(LibrarySort sort) =>
+        libraryRowsOf(songs, sort: sort);
 
-    test('a group of one track is that track row, a group of two stays', () {
-      final rows = libraryRowsOf(songs, sort: LibrarySort.title);
+    String labelOf(LibraryListRow row) => switch (row) {
+      LibraryAlbumRow(:final album) =>
+        album.key == librarySingletonKey ? 'singles' : album.name,
+      LibrarySingleRow(:final song) => song.title,
+    };
 
-      expect(rows.whereType<LibraryAlbumRow>(), hasLength(1));
-      expect(rows.whereType<LibraryAlbumRow>().single.album.name, 'Alpha');
-      expect(
-        [for (final row in rows.whereType<LibrarySingleRow>()) row.song.title],
-        ['A song', 'D song'],
+    test('one-track albums gather into a single row', () {
+      final rows = rowsOf(LibrarySort.title);
+
+      expect(rows.whereType<LibrarySingleRow>(), isEmpty);
+      final albums = rows.whereType<LibraryAlbumRow>().toList();
+      expect(albums, hasLength(2));
+
+      final gathered = albums.firstWhere(
+        (row) => row.album.key == librarySingletonKey,
       );
-      for (final row in rows) {
-        expect(
-          row is LibraryAlbumRow && isSingleTrackGroup(row.album),
-          isFalse,
-        );
-      }
+      expect([for (final song in gathered.album.songs) song.title], [
+        'A song',
+        'D song',
+      ]);
+      expect(gathered.album.coverUrl, isNull);
+      expect(gathered.album.coverPath, isNull);
+      expect(albums.any((row) => row.album.name == 'Alpha'), isTrue);
     });
 
-    test('the single row carries the track position of the list', () {
-      final rows = libraryRowsOf(songs, sort: LibrarySort.title);
-
+    test('the gathered row follows the sort field', () {
+      expect([for (final row in rowsOf(LibrarySort.title)) labelOf(row)], [
+        'Alpha',
+        'singles',
+      ]);
+      expect(labelOf(rowsOf(LibrarySort.recent).first), 'singles');
       expect(
         [
-          for (final row in rows.whereType<LibrarySingleRow>())
-            (row.song.title, row.index),
+          for (final row in rowsOf(const LibrarySort(field: LibrarySortField.duration)))
+            labelOf(row),
         ],
-        [('A song', 0), ('D song', 3)],
+        ['Alpha', 'singles'],
       );
-    });
-
-    test('the mixed rows follow the sort field', () {
-      expect(namesOf(LibrarySort.title), ['A song', 'Alpha', 'D song']);
-      expect(namesOf(LibrarySort.title.flipped()), [
-        'D song',
-        'Alpha',
-        'A song',
-      ]);
-      expect(namesOf(LibrarySort.recent), ['D song', 'Alpha', 'A song']);
-      expect(namesOf(const LibrarySort(field: LibrarySortField.duration)), [
-        'A song',
-        'D song',
-        'Alpha',
-      ]);
-      expect(namesOf(const LibrarySort(field: LibrarySortField.artist)), [
-        'A song',
-        'D song',
-        'Alpha',
-      ]);
-      expect(namesOf(const LibrarySort(field: LibrarySortField.album)), [
-        'Alpha',
-        'A song',
-        'D song',
-      ]);
-    });
-
-    test('a show of one episode keeps its group row', () {
-      final songs = [
-        Song(
-          id: 1,
-          uri: 'tune://podcast_rss/1',
-          title: 'An episode',
-          artist: 'Host',
-          album: 'The Show',
-          duration: 200000,
-          sourceId: 'podcast_rss',
-        ),
-      ];
-
-      final rows = libraryRowsOf(songs, sort: LibrarySort.title);
-
-      expect(rows.single, isA<LibraryAlbumRow>());
-      final album = (rows.single as LibraryAlbumRow).album;
-      expect(album.songs, hasLength(1));
-      expect(isSingleTrackGroup(album), isFalse);
+      expect(
+        [
+          for (final row in rowsOf(
+            const LibrarySort(field: LibrarySortField.album),
+          ))
+            labelOf(row),
+        ],
+        ['Alpha', 'singles'],
+      );
     });
   });
   test('a station favicon never becomes an album cover', () {

@@ -36,7 +36,9 @@ class LibraryAlbumHeader extends StatelessWidget {
       size: CompactTypeScale.displayMedium,
       height: 0.95,
     );
-    final name = album.name.isEmpty
+    final name = album.key == librarySingletonKey
+        ? context.loc.librarySingletons
+        : album.name.isEmpty
         ? context.loc.libraryUnknownAlbum
         : album.name;
     final artist = album.isUnknown && album.hasMultipleArtists

@@ -562,6 +562,12 @@ abstract class AppLocalizations {
   /// **'多位艺术家'**
   String get libraryVariousArtists;
 
+  /// No description provided for @librarySingletons.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单曲'**
+  String get librarySingletons;
+
   /// No description provided for @libraryUnknownAlbum.
   ///
   /// In zh_CN, this message translates to:
