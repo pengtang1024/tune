@@ -652,6 +652,35 @@ void main() {
     final album = libraryAlbumGroupsOf(songs).single;
     expect(album.coverUrl, isNull);
   });
+
+  test('a cached site icon does not cover its group either', () {
+    final songs = [
+      Song(
+        id: 1,
+        title: 'Smooth jazz',
+        artist: '',
+        album: '',
+        uri: 'tune://radio/one',
+        sourceId: 'radio',
+        artworkUrl: 'http://101smoothjazz.com/favicon.ico',
+        albumArtPath: '/tmp/artwork/favicon-1.png',
+        duration: 0,
+      ),
+      Song(
+        id: 2,
+        title: 'Late night',
+        artist: '',
+        album: '',
+        uri: 'tune://radio/two',
+        sourceId: 'radio',
+        artworkUrl: 'https://cdn.example.com/cover.jpg',
+        duration: 0,
+      ),
+    ];
+    final album = libraryAlbumGroupsOf(songs).single;
+    expect(album.coverUrl, 'https://cdn.example.com/cover.jpg');
+  });
+
 }
 
 /// A track with the facts the row order reads.
