@@ -198,21 +198,43 @@ final class LibrarySingleRow extends LibraryListRow {
 /// and its total length for a group, and the track's own facts for a single.
 /// A tie falls back to the row name, so the list does not jump between
 /// rebuilds when the sort column is equal.
+/// The key of the row that gathers every one-track album.
+const String librarySingletonKey = '\u0000singletons';
+
 List<LibraryListRow> libraryRowsOf(
   List<Song> songs, {
   required LibrarySort sort,
 }) {
-  final indexOf = <String, int>{
-    for (var i = 0; i < songs.length; i++) songs[i].uri: i,
-  };
   final rows = <LibraryListRow>[];
+  final singletons = <Song>[];
+  final singletonArtists = <String>{};
   for (final album in libraryAlbumGroupsOf(songs)) {
-    if (isSingleTrackGroup(album)) {
-      final song = album.songs.single;
-      rows.add(LibrarySingleRow(song, index: indexOf[song.uri] ?? rows.length));
-    } else {
+    if (!isSingleTrackGroup(album)) {
       rows.add(LibraryAlbumRow(album));
+      continue;
     }
+    // One-track albums are not albums to browse: a shelf of hundreds of rows
+    // that each hold a single song is exactly the wall of rows this list is
+    // meant to avoid. They gather into one row instead.
+    singletons.addAll(album.songs);
+    for (final song in album.songs) {
+      final artist = song.artist.trim();
+      if (artist.isNotEmpty) singletonArtists.add(artist);
+    }
+  }
+  if (singletons.isNotEmpty) {
+    singletons.sort(albumOrderOf);
+    rows.add(
+      LibraryAlbumRow(
+        LibraryAlbum(
+          key: librarySingletonKey,
+          name: '',
+          artist: singletonArtists.length == 1 ? singletonArtists.single : '',
+          kind: ContentKind.music,
+          songs: List.unmodifiable(singletons),
+        ),
+      ),
+    );
   }
   rows.sort((left, right) => _compareRows(left, right, sort));
   return rows;

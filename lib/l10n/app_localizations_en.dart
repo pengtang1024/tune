@@ -351,6 +351,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryVariousArtists => 'Various artists';
 
   @override
+  String get librarySingletons => 'Singles';
+
+  @override
   String get libraryUnknownAlbum => 'Unknown album';
 
   @override

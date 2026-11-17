@@ -139,9 +139,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
-  testWidgets('a group of two stays one row, a group of one is that track', (
-    tester,
-  ) async {
+  testWidgets('one-track albums gather into a single row', (tester) async {
     sizeOf(tester, const Size(900, 563));
 
     await tester.pumpWidget(
@@ -155,36 +153,24 @@ void main() {
     expect(find.text('Album A'), findsOneWidget);
     expect(find.text('2 首'), findsOneWidget);
     expect(find.text('Album A first'), findsNothing);
-    expect(find.text('Album A second'), findsNothing);
 
-    // 只有一首的专辑不算一张专辑：它就是那一首曲目，直接画成曲目行。
-    expect(find.byType(LibraryTrackCard), findsOneWidget);
-    expect(find.text('Album B first'), findsOneWidget);
-    expect(find.text('1 首'), findsNothing);
+    // 只有一首的专辑不是一张专辑可浏览：它们聚成一行，列表不再逐条铺开。
+    expect(find.text('单曲'), findsOneWidget);
+    expect(find.text('1 首'), findsOneWidget);
+    expect(find.text('Album B first'), findsNothing);
+    expect(find.byType(LibraryTrackCard), findsNothing);
 
-    // 两种行在同一个列表里。
-    expect(
-      find.descendant(
-        of: find.byType(LibraryGroupRows),
-        matching: find.byType(LibraryTrackCard),
-      ),
-      findsOneWidget,
-    );
-
-    // 组行 44、曲目行 32，两种高度混在一个列表里就不能再钉 itemExtent；
-    // 但行依旧不保活。
     final list = tester.widget<ListView>(
       find.descendant(
         of: find.byType(LibraryGroupRows),
         matching: find.byType(ListView),
       ),
     );
-    expect(list.itemExtent, isNull);
     final delegate = list.childrenDelegate as SliverChildBuilderDelegate;
     expect(delegate.addAutomaticKeepAlives, isFalse);
   });
 
-  testWidgets('a single row plays at once and never opens the album page', (
+  testWidgets('the gathered row opens its tracks instead of playing', (
     tester,
   ) async {
     sizeOf(tester, const Size(1120, 760));
@@ -199,23 +185,16 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(LibraryTrackCard));
+    await tester.tap(find.text('单曲'));
     await tester.pumpAndSettle();
 
-    expect(audio.playedSong?.uri, '/music/b1.mp3');
-    // 单曲行没有「专辑内页」：点它就是放它，列表还在原处。
-    expect(find.byKey(const ValueKey('library-group-back')), findsNothing);
-    // The dock writes the playing title too; the row itself is still there.
-    expect(
-      find.descendant(
-        of: find.byType(LibraryGroupRows),
-        matching: find.text('Album B first'),
-      ),
-      findsOneWidget,
-    );
+    // 点它只是打开这一组，不播放；内页有返回行。
+    expect(audio.playedSong, isNull);
+    expect(find.text('Album B first'), findsOneWidget);
+    expect(find.byKey(const ValueKey('library-group-back')), findsOneWidget);
   });
 
-  testWidgets('a double click marks a single row, like a row of an album', (
+  testWidgets('a double click marks a track of the gathered row', (
     tester,
   ) async {
     sizeOf(tester, const Size(1120, 760));
@@ -230,7 +209,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // 双击的第二下是收藏；曲目行的这套语义在两种列表里是同一份实现。
+    await tester.tap(find.text('单曲'));
+    await tester.pumpAndSettle();
+
+    // 双击的第二下是收藏；这套语义只有一份实现。
     await tester.tap(find.byType(LibraryTrackCard));
     await tester.pump(const Duration(milliseconds: 50));
     await tester.tap(find.byType(LibraryTrackCard));
@@ -268,8 +250,9 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('library-group-back')));
     await tester.pumpAndSettle();
 
-    // Album B is one track, so it is a track row and has no group page.
-    expect(find.text('Album B first'), findsOneWidget);
+    // 一首的那张专辑在「单曲」组里，回到列表时不会直接铺出来。
+    expect(find.text('单曲'), findsOneWidget);
+    expect(find.text('Album B first'), findsNothing);
     expect(find.text('Album A first'), findsNothing);
     expect(tester.takeException(), isNull);
   });
