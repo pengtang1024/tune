@@ -309,12 +309,16 @@ LibraryAlbum _groupOf(List<Song> songs, {required String key}) {
     if (artist.isNotEmpty) artists.add(artist);
   }
   final album = _albumOf(songs, key: key);
+  // Tracks with no album name have no cover to show: the first one with an
+  // image is arbitrary, and sources often hand over a generic placeholder that
+  // reads as a bright block in the list. Such a row keeps the neutral tile.
+  final hasAlbumName = album.name.isNotEmpty;
   return LibraryAlbum(
     key: key,
     name: album.name,
     artist: artists.length == 1 ? artists.single : '',
-    coverPath: album.coverPath,
-    coverUrl: album.coverUrl,
+    coverPath: hasAlbumName ? album.coverPath : null,
+    coverUrl: hasAlbumName ? album.coverUrl : null,
     songs: album.songs,
     kind: album.kind,
   );
