@@ -217,9 +217,17 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
 
 - **隐式标识**（写进文件元数据，FLAC Vorbis comment / ID3v2 TXXX / MP4 `©too`）：
   `AI_GENERATED=1`、`GENERATOR=<模型名>`、`CONTENT_ID=<contentId>`、`PRODUCER=tune`。
+  已实施（2026-11-18）：写侧收口在 `features/share/data/share_label_facts.dart`（键名与容器口径唯一一份）
+  与 `share_label_writer.dart`；FLAC/MP3 由随包 vendor 的写侧直接写（`vendor/audio_metadata_reader`），
+  MP4 家族与 ogg/opus 交 ffmpeg 改写（`share_label_ffmpeg.dart`），WAV 这类放不下定制键的容器
+  判 `unsupportedContainer` 原样保留。每次写入都回读核对，四个键逐条等值才算已标识。
 - **显式标识**（写进分享副本的音频流）：开头插入 1.2 秒语音提示「本音频由人工智能生成」；
   不放语音也可以，退化成同样的节奏提示音，二者都符合 GB 45438—2025 对音频的要求。
+  已实施：`features/share/data/share_copy.dart` 的 `ShareCopyBuilder` 在发布前生成带提示音的副本
+  （默认无声节奏提示音，两声短促；带语音的版本留待录好素材再换），副本头部 1.2 秒前置。
 - **界面标识**：列表中用「AI 生成」chip（写法见 [chips.md](chips.md)），详情页显示模型与生成时间。
+  已实施：`features/share/presentation/share_lists.dart` 的行标识用 `MetaBadge`（`_AiMark`），
+  点开弹窗显示生成者与生成时间。
 - **不提供去除能力**：不导出无标识版本，不提供「清理元数据」开关；第三方工具能去，那是它的事，
   但**本应用不给这个按钮**——这一条直接对应《标识办法》「不得删除、篡改、伪造标识」。
 
@@ -227,11 +235,19 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
 
 ### 8.1 目录
 
-- `lib/features/share/domain/`：`share_item.dart`、`share_admission.dart`（纯规则）、`share_room.dart`。
-- `lib/features/share/application/`：`share_controller.dart`（房间状态的所有者）、provider。
-- `lib/features/share/data/`：`share_store.dart`（三张新表）、`generation_ledger.dart`、`blob_store.dart`。
-- `lib/features/share/presentation/`：房间页、收件箱、条目详情。
-- `lib/data/services/mesh/`：`discovery.dart`、`transport.dart`、`protocol.dart`、`crypto.dart`。
+- `lib/features/share/domain/`：`share_item.dart`、`share_provenance.dart`、`share_ai_disclosure.dart`、
+  `share_declaration.dart`、`share_admission.dart`（纯规则）、`share_session_state.dart`、
+  `share_lookup_status.dart`；房间编排不在 domain，房间没有独立状态对象（见 §13）。
+- `lib/features/share/application/`：`share_session.dart`（房间状态的所有者）与
+  `share_session_controller.dart`（provider）。
+- `lib/features/share/data/`：`share_store.dart`、`share_inbox.dart`、`share_ledger.dart`、
+  `share_blocklist.dart`、`share_reports.dart`、`share_config.dart`、`acoustid_lookup.dart`、
+  `share_migration.dart`，以及标识写入的 `share_label_{facts,writer,ffmpeg}.dart` 与
+  提示音副本的 `share_copy.dart`。
+- `lib/features/share/presentation/`：`share_pane.dart`（页面）、`share_lists.dart`、
+  `share_entry_card.dart`、`share_lookup_section.dart`。
+- `lib/data/services/mesh/`：`mesh_{protocol,crypto,identity,messages,peer,room,transfer,discovery,reachability}.dart`
+  与 `room_invite.dart`；文件名都带 `mesh_` 前缀，不存在 `discovery.dart`/`transport.dart` 这类裸名。
 
 依赖方向仍是 presentation → application → domain / data，协议层不 import 任何 feature。
 
@@ -278,7 +294,7 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
 | 阶段 | 内容 | 出口判据 |
 | --- | --- | --- |
 | M0 局域网 ✅ | 房间、UDP 广播发现、清单交换、分块传输、手工「我确认是自有/生成」勾选 | 两台机器同一 Wi-Fi 互相收发 50 MB 音频，中断续传 |
-| M1 凭证 ✅ | 生成台账、Ed25519 清单签名、AI 标识写入、收端二次验签 | 伪造清单/改元数据/伪造 ledgerId 三类用例全部被拒 |
+| M1 凭证 ✅ | 生成台账、Ed25519 清单签名、AI 标识写入（隐式写侧 + 提示音副本，2026-11-18 补齐）、收端二次验签 | 伪造清单/改元数据/伪造 ledgerId 三类用例全部被拒 |
 | M2 撤销与举报 ✅ | 撤销广播、对端删副本、举报留痕、本地黑名单 | 撤销后对端清单与收件箱都清空；举报落一条 `share_events` 记录且编号进黑名单 |
 | 跨网 ✅ | 邀请码带可达地址（公网 IPv6 / 用户自带隧道）、双栈监听 | 两台不同网络（或同机两个地址族）之间用邀请码直连成功 |
 | M2 AcoustID 查重 ✅（接线） | `AcoustIdLookup` + `fpcalc` 探测 + 闸门 `known_recording` 优先于台账 | 把商业曲改名混入，被 AcoustID 挡住（或明确落在「未收录」分支） |
@@ -361,6 +377,31 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
 - **`features/share/presentation/share_pane.dart`**：删掉「对外地址」对话框——页面上没有输入框、也没有
   一键穿透按钮；房间成立后只显示邀请码、本机端口，以及一行如实的状态（可跨网 / 仅同网）。
 - 仍未做：打洞、中继、房间目录——见 §5.6 与 §11。
+
+### 13.2 AI 标识落地：写入端补齐（2026-11-18）
+
+§10 里 M1 的「AI 标识写入」此前只在清单（disclosure JSON）里登记，文件本身没有标识——
+这一轮把它落到字节上，三件事同时交付：
+
+- **隐式标识写入**：`share_label_facts.dart` 收口四个键（`AI_GENERATED` / `GENERATOR` /
+  `CONTENT_ID` / `PRODUCER`）与容器口径；`share_label_writer.dart` 负责「写 + 回读核对」，
+  FLAC/MP3 走 vendor 写侧（这次补齐了 vendor 的 FLAC `UNKNOWN=`、ID3v2 TXXX 与 MP4 自定义键），
+  MP4 家族与 ogg/opus 走 ffmpeg（`-movflags use_metadata_keys` 这对开关不加，自定义键会被丢）；
+  WAV 判 `unsupportedContainer`。写失败或回读对不上都是 `failed`，不降级成「当没写」。
+- **提示音副本**：`share_copy.dart` 的 `ShareCopyBuilder` 在发布前生成副本——ffmpeg 合成
+  1.2 秒节奏提示音前置，音频流不重编码（流复制），副本名带 `.ai-share.` 标记，落
+  `<support>/share/outbox/<源编号前 12 位>/`；同源幂等覆盖。带语音版本留待素材录好再换。
+- **准入与接线**：闸门新增 `admitted_from_label`——别人分享的 AI 副本不再要求本机台账命中，
+  改为凭**读到的字节里的四条标识**放行（`share_admission.dart`，默认关闭，台账命中仍最强）。
+  `share_session.dart` 的 `addLocalItem` 对生成物走「建副本 → 写标识 → 用副本字节重算编号」的
+  管线，副本登记进 `_derivedCopies`：撤销副本时连原始件一起拉黑、关房时全部清理，
+  outbox 不会无界增长。`revoke` 改成异步并先写黑名单再广播，撤销与举报的封禁口径对称。
+
+测试：`test/features/share_label_writer_test.dart`（FLAC/MP3/opus/m4a 写入与回读、幂等、
+不支持容器、损坏文件 fail-closed）、`test/features/share_copy_prelude_test.dart`（副本时长、
+幂等、非生成物不建副本）、`test/features/share_admission_test.dart` 新增「字节里的隐式标识」
+6 例、`test/features/share_ai_copy_e2e_test.dart` 两例真跑 ffmpeg 的端到端（生成 → 副本 →
+广播 → 访客收下 → 撤销删副本），share 相关用例共 198 条全绿。
 
 ## 相关文档
 
