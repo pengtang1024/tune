@@ -4617,6 +4617,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get shareAddFile => '添加文件';
 
   @override
+  String get shareAiGenerated => 'AI 生成';
+
+  @override
+  String shareAiLabelTooltip(String producer) {
+    return '这条内容由人工智能生成。标识写在文件元数据里，并在开头加了 1.2 秒提示音；本应用不提供去除标识的入口。生成者：$producer';
+  }
+
+  @override
+  String get shareAiGenerator => '生成者';
+
+  @override
+  String get shareAiGeneratedAt => '生成时间';
+
+  @override
+  String get shareAiClose => '知道了';
+
+  @override
   String get shareCancel => '取消';
 
   @override
@@ -9379,6 +9396,23 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get shareAddFile => '添加文件';
+
+  @override
+  String get shareAiGenerated => 'AI 生成';
+
+  @override
+  String shareAiLabelTooltip(String producer) {
+    return '这条内容由人工智能生成。标识写在文件元数据里，并在开头加了 1.2 秒提示音；本应用不提供去除标识的入口。生成者：$producer';
+  }
+
+  @override
+  String get shareAiGenerator => '生成者';
+
+  @override
+  String get shareAiGeneratedAt => '生成时间';
+
+  @override
+  String get shareAiClose => '知道了';
 
   @override
   String get shareCancel => '取消';
@@ -14144,6 +14178,23 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get shareAddFile => '加入檔案';
+
+  @override
+  String get shareAiGenerated => 'AI 生成';
+
+  @override
+  String shareAiLabelTooltip(String producer) {
+    return '這條內容由人工智慧產生。標識寫在檔案元資料裡，並在開頭加了 1.2 秒提示音；本應用不提供去除標識的入口。產生者：$producer';
+  }
+
+  @override
+  String get shareAiGenerator => '產生者';
+
+  @override
+  String get shareAiGeneratedAt => '產生時間';
+
+  @override
+  String get shareAiClose => '知道了';
 
   @override
   String get shareCancel => '取消';

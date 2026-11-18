@@ -2262,6 +2262,18 @@
   "settingsEqualizerActionHint": "全部预设与十段滑杆",
   "playerEqualizer": "均衡器",
   "shareAddFile": "添加文件",
+  "shareAiGenerated": "AI 生成",
+  "shareAiLabelTooltip": "这条内容由人工智能生成。标识写在文件元数据里，并在开头加了 1.2 秒提示音；本应用不提供去除标识的入口。生成者：{producer}",
+  "@shareAiLabelTooltip": {
+    "placeholders": {
+      "producer": {
+        "type": "String"
+      }
+    }
+  },
+  "shareAiGenerator": "生成者",
+  "shareAiGeneratedAt": "生成时间",
+  "shareAiClose": "知道了",
   "shareCancel": "取消",
   "shareCloseRoom": "关闭房间",
   "shareCopied": "已复制",

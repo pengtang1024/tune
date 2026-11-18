@@ -2179,6 +2179,18 @@
   "settingsEqualizerActionHint": "全部預設與十段滑桿",
   "playerEqualizer": "等化器",
   "shareAddFile": "加入檔案",
+  "shareAiGenerated": "AI 生成",
+  "shareAiLabelTooltip": "這條內容由人工智慧產生。標識寫在檔案元資料裡，並在開頭加了 1.2 秒提示音；本應用不提供去除標識的入口。產生者：{producer}",
+  "@shareAiLabelTooltip": {
+    "placeholders": {
+      "producer": {
+        "type": "String"
+      }
+    }
+  },
+  "shareAiGenerator": "產生者",
+  "shareAiGeneratedAt": "產生時間",
+  "shareAiClose": "知道了",
   "shareCancel": "取消",
   "shareCloseRoom": "關閉房間",
   "shareCopied": "已複製",

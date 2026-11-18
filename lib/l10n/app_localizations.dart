@@ -8585,6 +8585,36 @@ abstract class AppLocalizations {
   /// **'添加文件'**
   String get shareAddFile;
 
+  /// No description provided for @shareAiGenerated.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'AI 生成'**
+  String get shareAiGenerated;
+
+  /// No description provided for @shareAiLabelTooltip.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这条内容由人工智能生成。标识写在文件元数据里，并在开头加了 1.2 秒提示音；本应用不提供去除标识的入口。生成者：{producer}'**
+  String shareAiLabelTooltip(String producer);
+
+  /// No description provided for @shareAiGenerator.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'生成者'**
+  String get shareAiGenerator;
+
+  /// No description provided for @shareAiGeneratedAt.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'生成时间'**
+  String get shareAiGeneratedAt;
+
+  /// No description provided for @shareAiClose.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'知道了'**
+  String get shareAiClose;
+
   /// No description provided for @shareCancel.
   ///
   /// In zh_CN, this message translates to:
