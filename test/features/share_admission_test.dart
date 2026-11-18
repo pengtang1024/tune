@@ -38,6 +38,7 @@ ShareAdmissionReason _evaluate({
   String? receivedContentId,
   String? matchedRecording,
   bool evidenceVerified = true,
+  bool labelVerified = false,
   bool blocked = false,
   int roomItemCount = 0,
   int roomBytes = 0,
@@ -51,6 +52,7 @@ ShareAdmissionReason _evaluate({
       receivedContentId: receivedContentId,
       matchedRecording: matchedRecording,
       evidenceVerified: evidenceVerified,
+      labelVerified: labelVerified,
       blocked: blocked,
       roomItemCount: roomItemCount,
       roomBytes: roomBytes,
@@ -187,6 +189,85 @@ void main() {
       expect(
         _evaluate(evidenceVerified: false),
         ShareAdmissionReason.rejectedMissingEvidence,
+      );
+    });
+  });
+
+  group('字节里的隐式标识', () {
+    test('台账没命中但标识读得回来 → 按标识放行', () {
+      final reason = _evaluate(
+        item: _item(
+          provenance: ShareProvenance.generated,
+          aiDisclosure: _completeDisclosure,
+          evidenceHashes: const <String>{},
+        ),
+        labelVerified: true,
+      );
+      expect(reason, ShareAdmissionReason.admittedFromLabel);
+      expect(reason.isAdmitted, isTrue);
+    });
+
+    test('标识读得回来但清单自述的标识不全 → 仍然拒绝', () {
+      expect(
+        _evaluate(
+          item: _item(
+            provenance: ShareProvenance.generated,
+            aiDisclosure: const ShareAiDisclosure(isSynthetic: true),
+            evidenceHashes: const <String>{},
+          ),
+          labelVerified: true,
+        ),
+        ShareAdmissionReason.rejectedUnprovenGeneration,
+      );
+    });
+
+    test('没去读字节里的标识 → 维持原口径拒绝，不采信对端自述', () {
+      expect(
+        _evaluate(
+          item: _item(
+            provenance: ShareProvenance.generated,
+            aiDisclosure: _completeDisclosure,
+            evidenceHashes: const <String>{},
+          ),
+        ),
+        ShareAdmissionReason.rejectedUnprovenGeneration,
+      );
+    });
+
+    test('标识再全也挡不住查重命中', () {
+      expect(
+        _evaluate(
+          item: _item(
+            provenance: ShareProvenance.generated,
+            aiDisclosure: _completeDisclosure,
+            evidenceHashes: const <String>{},
+          ),
+          labelVerified: true,
+          matchedRecording: '某首商业歌',
+        ),
+        ShareAdmissionReason.rejectedKnownRecording,
+      );
+    });
+
+    test('台账仍是最强证据，标识只是补位', () {
+      expect(
+        _evaluate(
+          item: _item(
+            provenance: ShareProvenance.generated,
+            aiDisclosure: _completeDisclosure,
+            evidenceHashes: const <String>{},
+          ),
+          ledgerHit: true,
+          labelVerified: true,
+        ),
+        ShareAdmissionReason.admittedFromLedger,
+      );
+    });
+
+    test('非生成物不去读标识，声明路径不受影响', () {
+      expect(
+        _evaluate(item: _item(provenance: ShareProvenance.ownRecording)),
+        ShareAdmissionReason.admittedFromDeclaration,
       );
     });
   });
