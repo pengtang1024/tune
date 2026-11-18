@@ -19,9 +19,9 @@ class ShareInbox {
   /// 收下一条：文件已经在 [ShareInboxEntry.path]，这里只登记事实。
   Future<void> save(List<ShareInboxEntry> entries) async {
     for (final entry in entries) {
-      if (store
-          .receivedEntries()
-          .any((known) => known.item.contentId == entry.item.contentId)) {
+      if (store.receivedEntries().any(
+        (known) => known.item.contentId == entry.item.contentId,
+      )) {
         continue;
       }
       store.rememberReceived(

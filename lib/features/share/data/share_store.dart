@@ -71,8 +71,10 @@ class ShareStore {
         removed_reason TEXT
       )
     ''');
-    _db.execute('CREATE INDEX IF NOT EXISTS idx_share_items_direction '
-        'ON share_items (direction, removed_at)');
+    _db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_share_items_direction '
+      'ON share_items (direction, removed_at)',
+    );
     _db.execute('''
       CREATE TABLE IF NOT EXISTS share_events (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,8 +85,10 @@ class ShareStore {
         at INTEGER NOT NULL
       )
     ''');
-    _db.execute('CREATE INDEX IF NOT EXISTS idx_share_events_content '
-        'ON share_events (content_id, at)');
+    _db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_share_events_content '
+      'ON share_events (content_id, at)',
+    );
   }
 
   // ---- 房间 ----------------------------------------------------------------
@@ -183,10 +187,10 @@ class ShareStore {
   }
 
   bool isShared(String contentId) => _db.select(
-        'SELECT 1 FROM share_items WHERE content_id = ? '
-        'AND direction = ? AND removed_at IS NULL',
-        [contentId, 'shared'],
-      ).isNotEmpty;
+    'SELECT 1 FROM share_items WHERE content_id = ? '
+    'AND direction = ? AND removed_at IS NULL',
+    [contentId, 'shared'],
+  ).isNotEmpty;
 
   /// 生成台账：本机声明这是生成物的事实。
   ///
@@ -197,9 +201,9 @@ class ShareStore {
   }
 
   bool hasGenerated(String contentId) => _db.select(
-        'SELECT 1 FROM share_events WHERE kind = ? AND content_id = ?',
-        ['generated', contentId],
-      ).isNotEmpty;
+    'SELECT 1 FROM share_events WHERE kind = ? AND content_id = ?',
+    ['generated', contentId],
+  ).isNotEmpty;
 
   /// 撤销/举报：软删。记录留着，回答「什么时候下架过」。
   void markRemoved(String contentId, {required String reason}) {
@@ -247,7 +251,9 @@ class ShareStore {
   }
 
   ShareItem? _itemOf(Row row) {
-    final provenance = ShareProvenance.parse(row['provenance'] as String? ?? '');
+    final provenance = ShareProvenance.parse(
+      row['provenance'] as String? ?? '',
+    );
     if (provenance == null) {
       return null;
     }
@@ -274,7 +280,9 @@ class ShareStore {
     }
     try {
       final decoded = jsonDecode(raw);
-      return decoded is List ? decoded.whereType<String>().toList() : const <String>[];
+      return decoded is List
+          ? decoded.whereType<String>().toList()
+          : const <String>[];
     } on FormatException {
       return const <String>[];
     }
@@ -322,7 +330,9 @@ class ShareStore {
           contentId: contentId,
           name: name,
           reason: row['reason'] as String? ?? 'unknown',
-          createdAt: DateTime.fromMillisecondsSinceEpoch(row['at'] as int? ?? 0),
+          createdAt: DateTime.fromMillisecondsSinceEpoch(
+            row['at'] as int? ?? 0,
+          ),
           fromPeerId: row['peer_id'] as String? ?? '',
         ),
       );
@@ -344,9 +354,9 @@ class ShareStore {
   }
 
   bool isBlocked(String contentId) => _db.select(
-        'SELECT 1 FROM share_events WHERE kind = ? AND content_id = ?',
-        ['blocked', contentId],
-      ).isNotEmpty;
+    'SELECT 1 FROM share_events WHERE kind = ? AND content_id = ?',
+    ['blocked', contentId],
+  ).isNotEmpty;
 
   // ---- 事件 ----------------------------------------------------------------
 
@@ -359,13 +369,7 @@ class ShareStore {
     _db.execute(
       'INSERT INTO share_events (content_id, kind, reason, peer_id, at) '
       'VALUES (?, ?, ?, ?, ?)',
-      [
-        contentId,
-        kind,
-        reason,
-        peerId,
-        DateTime.now().millisecondsSinceEpoch,
-      ],
+      [contentId, kind, reason, peerId, DateTime.now().millisecondsSinceEpoch],
     );
   }
 

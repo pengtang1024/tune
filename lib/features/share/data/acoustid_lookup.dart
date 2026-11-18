@@ -102,11 +102,14 @@ class AcoustIdLookup {
       final title = first['title'];
       final artists = first['artists'];
       final id = first['id'];
-      final artist = artists is List && artists.isNotEmpty && artists.first is Map
+      final artist =
+          artists is List && artists.isNotEmpty && artists.first is Map
           ? (artists.first as Map)['name']
           : null;
       if (title is String && title.isNotEmpty) {
-        return artist is String && artist.isNotEmpty ? '$title — $artist' : title;
+        return artist is String && artist.isNotEmpty
+            ? '$title — $artist'
+            : title;
       }
       if (id is String && id.isNotEmpty) {
         return id;
@@ -121,7 +124,7 @@ class AcoustIdLookup {
     final home = env['HOME'];
     final dirs = <String>[
       if (env['PATH'] != null) ...env['PATH']!.split(':'),
-      if (home != null) ...[ '$home/.local/bin', '$home/bin' ],
+      if (home != null) ...['$home/.local/bin', '$home/bin'],
     ];
     for (final dir in dirs) {
       if (dir.trim().isEmpty) {
