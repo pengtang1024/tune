@@ -286,6 +286,36 @@ class Id3v4Writer extends BaseMetadataWriter<Mp3Metadata> {
     } else if (metadata.contentType != null) {
       _writeFrame(builder, "TCON", metadata.contentType!);
     }
+
+    // 定制键写回（TXXX）。读侧把每条 TXXX 存成 customMetadata[描述]=内容
+    // （见 parsers/tags/id3v2.dart），但上游写侧从不输出 TXXX，于是任何自定义键
+    // 都会在重写标签时被静默删除。AI 合规标识 AI_GENERATED / GENERATOR /
+    // CONTENT_ID 要落在这类键上，必须补齐才能通过回读校验。
+    // customMetadata 里还混着「非 TXXX 的未知帧」—— 读侧拿 4 字节帧 ID 当键存
+    // 进来；把它们伪装成 TXXX 会篡改原帧语义，所以这类键跳过。上游原本一个
+    // customMetadata 都不写，因此这段只会新增内容，不改变旧行为。
+    for (final entry in metadata.customMetadata.entries) {
+      if (_rawFrameIdPattern.hasMatch(entry.key)) continue;
+      _writeUserTextFrame(builder, entry.key, entry.value);
+    }
+  }
+
+  static final RegExp _rawFrameIdPattern = RegExp(r"^[A-Z0-9]{4}$");
+
+  /// 写一条 TXXX：描述 + 空字节 + 内容。
+  ///
+  /// 描述就是键名，这样 ffprobe 和其它标签库都能把它读成 KEY=value 的形式，
+  /// 与本包读侧的 customMetadata 口径保持一致。编码字节 0x03(UTF-8) 由
+  /// [_writeFrameWithBytes] 统一写入，这里不能重复写，否则读回来的键名会带上
+  /// 一个多余的 \x03。
+  void _writeUserTextFrame(
+      BytesBuilder builder, String description, String value) {
+    final frameBytes = Uint8List.fromList(<int>[
+      ...utf8.encode(description),
+      0x00, // 描述以空字节结束
+      ...utf8.encode(value),
+    ]);
+    _writeFrameWithBytes(builder, "TXXX", frameBytes);
   }
 
   void _writeFrame(BytesBuilder builder, String frameId, String data) {
