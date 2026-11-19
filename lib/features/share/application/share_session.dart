@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:cryptography/cryptography.dart';
 import 'package:tune/features/share/domain/share_admission.dart';
 import 'package:tune/features/share/domain/share_item.dart';
 import 'package:tune/features/share/domain/share_session_state.dart';
 
+import '../../../data/services/mesh/mesh_crypto.dart';
 import '../../../data/services/mesh/mesh_discovery.dart';
 import '../../../data/services/mesh/mesh_identity.dart';
 import '../../../data/services/mesh/mesh_messages.dart';
@@ -13,9 +15,12 @@ import '../../../data/services/mesh/mesh_peer.dart';
 import '../../../data/services/mesh/mesh_protocol.dart';
 import '../../../data/services/mesh/mesh_reachability.dart';
 import '../../../data/services/mesh/mesh_room.dart';
+import '../../../data/services/mesh/mesh_session_crypto.dart';
 import '../../../data/services/mesh/mesh_transfer.dart';
 import '../../../data/services/mesh/room_invite.dart';
+import '../data/share_copy.dart';
 import '../data/share_inbox.dart';
+import '../data/share_label_writer.dart';
 import '../data/share_blocklist.dart';
 import '../data/share_ledger.dart';
 import '../data/share_reports.dart';
@@ -43,6 +48,9 @@ class ShareSession {
     this.reports,
     this.blocklist,
     this.recordingLookup,
+    this.copyBuilder,
+    this.labelWriter = const ShareLabelWriter(),
+    this.outbox,
     this.publiclyReachable = false,
   })  : _invite = invite,
         _room = room,
@@ -69,6 +77,15 @@ class ShareSession {
   /// AcoustID 查重；没接时为 null。
   final ShareRecordingLookup? recordingLookup;
 
+  /// 分享副本的构建器（开头插 AI 提示音）。没装配就不产出副本。
+  final ShareCopyBuilder? copyBuilder;
+
+  /// 隐式标识的写入与核验。核验不依赖它写成功——读得出就算。
+  final ShareLabelWriter labelWriter;
+
+  /// 副本落盘目录；按源内容编号分子目录，同名源文件不会互相覆盖。
+  final Directory? outbox;
+
   /// 房主自动探测到了可跨网直连的地址（公网 IPv6 或路由器映射）。
   final bool publiclyReachable;
 
@@ -84,6 +101,10 @@ class ShareSession {
   final Map<String, File> _localFiles = <String, File>{};
   final Map<String, ShareRemoteItem> _remote = <String, ShareRemoteItem>{};
   final Map<String, MeshFileReceiver> _receivers = <String, MeshFileReceiver>{};
+
+  /// 派生副本：副本编号 → 落盘位置与它的源编号。撤销时按这张表删文件。
+  final Map<String, ({File file, String originContentId})> _derivedCopies =
+      <String, ({File file, String originContentId})>{};
   final StreamController<ShareSessionState> _states =
       StreamController<ShareSessionState>.broadcast();
   final List<StreamSubscription<Object?>> _subscriptions =
@@ -99,6 +120,9 @@ class ShareSession {
     ShareReports? reports,
     ShareBlocklist? blocklist,
     ShareRecordingLookup? recordingLookup,
+    ShareCopyBuilder? copyBuilder,
+    ShareLabelWriter labelWriter = const ShareLabelWriter(),
+    Directory? outbox,
     InternetAddress? address,
     MeshReachability? reachability,
   }) async {
@@ -136,6 +160,9 @@ class ShareSession {
       reports: reports,
       blocklist: blocklist,
       recordingLookup: recordingLookup,
+      copyBuilder: copyBuilder,
+      labelWriter: labelWriter,
+      outbox: outbox,
     );
     await session._start(invite: session.invite);
     return session;
@@ -151,6 +178,9 @@ class ShareSession {
     ShareReports? reports,
     ShareBlocklist? blocklist,
     ShareRecordingLookup? recordingLookup,
+    ShareCopyBuilder? copyBuilder,
+    ShareLabelWriter labelWriter = const ShareLabelWriter(),
+    Directory? outbox,
   }) async {
     final room = MeshRoom(
       roomKey: invite.roomKey,
@@ -172,6 +202,9 @@ class ShareSession {
       reports: reports,
       blocklist: blocklist,
       recordingLookup: recordingLookup,
+      copyBuilder: copyBuilder,
+      labelWriter: labelWriter,
+      outbox: outbox,
     );
     await session._start(invite: invite);
     return session;
@@ -251,22 +284,38 @@ class ShareSession {
   Future<MeshPeer> _connect(String host, int port) async {
     final socket =
         await Socket.connect(host, port, timeout: MeshRoom.dialTimeout);
-    return MeshPeer.dial(socket, roomKey: roomKey, localHello: _hello());
+    return _dialPeer(socket);
   }
 
   /// `MeshRoom.joined` 只报进来的连接，拨出去的这条要自己登记。
   Future<void> _dial(String host, int peerPort) async {
     final socket = await Socket.connect(host, peerPort, timeout: MeshRoom.dialTimeout);
-    final peer = await MeshPeer.dial(socket, roomKey: roomKey, localHello: _hello());
+    final peer = await _dialPeer(socket);
     await _onPeer(peer);
   }
 
-  MeshHello _hello() => MeshHello.create(
-    roomKey: roomKey,
-    displayName: displayName,
-    identityId: identity.peerId,
-    listenPort: _room.port,
-  );
+  /// 每条拨出的连接都配一对新的临时密钥：hello 里的公钥就是这一对的。
+  Future<MeshPeer> _dialPeer(Socket socket) async {
+    final hand = await _newHandshake();
+    return MeshPeer.dial(
+      socket,
+      roomKey: roomKey,
+      localHello: hand.hello,
+      ephemeralKeyPair: hand.ephemeral,
+    );
+  }
+
+  Future<({MeshHello hello, SimpleKeyPair ephemeral})> _newHandshake() async {
+    final ephemeral = await MeshSessionCrypto.newKeyPair();
+    final hello = MeshHello.create(
+      roomKey: roomKey,
+      displayName: displayName,
+      identityId: identity.peerId,
+      listenPort: _room.port,
+      ephemeralPubHex: await MeshSessionCrypto.pubKeyHex(ephemeral),
+    );
+    return (hello: hello, ephemeral: ephemeral);
+  }
 
   Future<void> _onPeer(MeshPeer peer) async {
     if (peer.identityId.isEmpty) {
@@ -485,11 +534,16 @@ class ShareSession {
     final matched = file == null
         ? null
         : await recordingLookup?.call(item, file);
+    // 标识核验只对手上有字节、且自称为生成物的条目做：读得出来才算，读不出来不认。
+    final labelVerified = item.provenance.isGenerated &&
+        file != null &&
+        await labelWriter.hasRequiredLabels(file);
     return ShareAdmission.evaluate(
       ShareAdmissionInput(
         item: item,
         manifestVerified: manifestVerified,
         ledgerHit: ledgerHit,
+        labelVerified: labelVerified,
         blocked: blocked,
         receivedContentId: receivedContentId,
         // 查重接不上时是 null（「没查」），不是「查过没问题」。
@@ -545,18 +599,93 @@ class ShareSession {
   }
 
   /// 本机加一条要分享的东西。发布前先过准入闸门。
+  ///
+  /// 生成物在这里被强制换成「分享副本」：开头加提示音、容器里写四条隐式标识，
+  /// 再用副本的最终字节重算内容编号。任何一步没成都拒发，绝不退化成原样外发。
   Future<bool> addLocalItem(ShareItem item, File file) async {
-    if (!ShareAdmission.canPublish(item)) {
+    final publish = item.provenance.isGenerated
+        ? await _stampDerivedCopy(item, file)
+        : item;
+    if (publish == null) {
+      return false;
+    }
+    if (!ShareAdmission.canPublish(publish)) {
       _fail('这条不满足分享条件：要么是本机生成的，要么有可以核对的权利声明');
       return false;
     }
-    _localItems[item.contentId] = item;
-    _localFiles[item.contentId] = file;
+    _localItems[publish.contentId] = publish;
+    _localFiles[publish.contentId] = publish == item
+        ? file
+        : _derivedCopies[publish.contentId]!.file;
     _emit();
     for (final peer in _peers.values) {
       await _sendInventory(peer);
     }
     return true;
+  }
+
+  /// 造出带标识的分享副本，并把条目换成副本的事实；失败返回 null 并已 _fail。
+  Future<ShareItem?> _stampDerivedCopy(ShareItem item, File file) async {
+    final builder = copyBuilder;
+    final outboxDirectory = outbox;
+    if (builder == null || outboxDirectory == null) {
+      // 没装配副本管线（单测与旧配置）：条目原样走闸门，标识完整性仍由 canPublish 拦。
+      return item;
+    }
+    // 按源编号分子目录：不同源的同名文件不会撞，同源重建是幂等覆盖。
+    final stage = Directory(
+      '${outboxDirectory.path}/${item.contentId.substring(0, 12)}',
+    );
+    await stage.create(recursive: true);
+    final built = await builder.build(file, directory: stage);
+    final copy = built.file;
+    if (built.outcome != ShareCopyOutcome.built || copy == null) {
+      _fail(
+        '生成物要先做出带标识的分享副本，这步没成：'
+        '${built.message ?? built.outcome.name}',
+      );
+      return null;
+    }
+    final stamped = await labelWriter.stamp(
+      copy,
+      disclosure: item.aiDisclosure,
+      originContentId: item.contentId,
+    );
+    if (stamped.outcome != ShareLabelOutcome.stamped &&
+        stamped.outcome != ShareLabelOutcome.alreadyStamped) {
+      await _discard(copy);
+      _fail('分享副本的 AI 标识没写进去：${stamped.message ?? stamped.outcome.name}');
+      return null;
+    }
+    // 字节已经变了：编号与体积必须按副本最终字节重算，否则收端一定判编号不符。
+    final copyId = await MeshCrypto.contentIdOfFile(copy);
+    _derivedCopies[copyId] = (file: copy, originContentId: item.contentId);
+    return ShareItem(
+      contentId: copyId,
+      name: _baseName(copy.path),
+      artist: item.artist,
+      sizeBytes: await copy.length(),
+      durationMs: built.durationMs ?? item.durationMs,
+      provenance: item.provenance,
+      createdAt: item.createdAt,
+      evidenceHashes: item.evidenceHashes,
+      aiDisclosure: item.aiDisclosure,
+    );
+  }
+
+  static String _baseName(String path) {
+    final separator = path.lastIndexOf(Platform.pathSeparator);
+    return separator < 0 ? path : path.substring(separator + 1);
+  }
+
+  Future<void> _discard(File file) async {
+    try {
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } on FileSystemException {
+      // 半成品删不掉也不影响结论：这条已经拒发，登记表里没有它。
+    }
   }
 
   /// 把别人的一条收到收件区。
@@ -588,11 +717,21 @@ class ShareSession {
   /// 本人下架：从房间清单里拿掉，并通知房里的人别再传、已传的删掉。
   ///
   /// 只下架分享关系，不动用户磁盘上那份原始文件。
-  void revoke(String contentId, {String reason = 'revoked'}) {
+  ///
+  /// 和收到别人的撤销、以及自己举报走同一套收口：编号进本机黑名单。否则
+  /// 房里还留着这份的人回头又能把它塞回我的收件箱，撤销就成了单向通知。
+  Future<void> revoke(String contentId, {String reason = 'revoked'}) async {
     if (_localItems.remove(contentId) == null) {
       return;
     }
     _localFiles.remove(contentId);
+    await blocklist?.add(contentId, reason: reason);
+    final derived = _derivedCopies.remove(contentId);
+    if (derived != null) {
+      // 源编号一起进黑名单：只封副本，别人把原始那份再传一遍就又回来了。
+      await blocklist?.add(derived.originContentId, reason: reason);
+      await _discard(derived.file);
+    }
     _room.broadcastJson(
       MeshMessageType.revoke,
       MeshRevoke(contentId: contentId, reason: reason).toJson(),
@@ -661,6 +800,10 @@ class ShareSession {
       await peer.close();
     }
     _peers.clear();
+    for (final derived in _derivedCopies.values) {
+      await _discard(derived.file);
+    }
+    _derivedCopies.clear();
     await _room.close();
     await _discovery.dispose();
     _state = _state.copyWith(phase: ShareSessionPhase.closed);

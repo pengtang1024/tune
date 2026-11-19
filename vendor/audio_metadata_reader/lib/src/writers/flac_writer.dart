@@ -147,6 +147,41 @@ class FlacWriter extends BaseMetadataWriter<VorbisMetadata> {
     writeComment("LOCATION", metadata.location);
     writeComment("CONTACT", metadata.contact);
     writeComment("ISRC", metadata.isrc);
+    // PRODUCER 在 Vorbis comment 里是标准键，读侧会把它解析进
+    // metadata.producer（见 parsers/tags/vorbis_comment.dart），但上游写侧漏了
+    // 这一项，于是每次重写元数据都会静默删掉这个键。分享合规要在副本里写死
+    // PRODUCER=tune，必须在写侧补齐，否则标识经一次改写就没了。
+    writeComment("PRODUCER", metadata.producer);
+
+    // 定制键写回：Vorbis comment 允许任意 KEY=VALUE，读侧把非标准键收进
+    // metadata.unknowns（键名大写）。上游只写固定字段，于是读到的自定义键会在
+    // 每次重写元数据时被丢掉 —— AI 标识里的 AI_GENERATED / GENERATOR /
+    // CONTENT_ID 正属于这一类，不补齐就通不过回读校验。
+    // 上面已写过的类型键一律跳过：同一键出现两份不合规，读侧也只保留一份，
+    // 等于凭空多出一个不确定来源。
+    const typedNames = {
+      "TITLE",
+      "VERSION",
+      "ALBUM",
+      "TRACKNUMBER",
+      "ARTIST",
+      "ALBUMARTIST",
+      "PERFORMER",
+      "COPYRIGHT",
+      "LICENSE",
+      "ORGANIZATION",
+      "DESCRIPTION",
+      "GENRE",
+      "DATE",
+      "LOCATION",
+      "CONTACT",
+      "ISRC",
+      "PRODUCER",
+    };
+    for (final entry in metadata.unknowns.entries) {
+      if (typedNames.contains(entry.key.toUpperCase())) continue;
+      writeComment(entry.key, [entry.value]);
+    }
 
     mainBuilder.add(intToUint32LE(count));
     mainBuilder.add(commentsBuilder.toBytes());

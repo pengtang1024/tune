@@ -11,7 +11,9 @@ import 'package:tune/data/services/mesh/room_invite.dart';
 import 'package:tune/data/services/providers/library_paths_provider.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/share/application/share_session.dart';
+import 'package:tune/features/share/data/share_copy.dart';
 import 'package:tune/features/share/data/share_inbox.dart';
+import 'package:tune/features/share/data/share_label_writer.dart';
 import 'package:tune/features/share/data/share_ledger.dart';
 import 'package:tune/features/share/data/share_migration.dart';
 import 'package:tune/features/share/data/acoustid_lookup.dart';
@@ -217,6 +219,9 @@ class ShareSessionController extends AsyncNotifier<ShareSessionState> {
         reports: await _loadReports(),
         blocklist: await _loadBlocklist(),
         recordingLookup: await _recordingLookup(),
+        copyBuilder: _copyBuilder(),
+        labelWriter: _labelWriter(),
+        outbox: await _outbox(),
       );
       _attach(session);
     } catch (error) {
@@ -244,11 +249,42 @@ class ShareSessionController extends AsyncNotifier<ShareSessionState> {
         reports: await _loadReports(),
         blocklist: await _loadBlocklist(),
         recordingLookup: await _recordingLookup(),
+        copyBuilder: _copyBuilder(),
+        labelWriter: _labelWriter(),
+        outbox: await _outbox(),
       );
       _attach(session);
     } catch (error) {
       state = AsyncError(error, StackTrace.current);
     }
+  }
+
+  /// ffmpeg 优先取本地组件目录，其次认 PATH（docs/local-components.md §3）。
+  ///
+  /// 返回的是闭包：每次调用才去解析目录，房间开着时组件下载完也能立刻生效。
+  Future<String?> Function() _ffmpegBinaryOf() {
+    return () async {
+      final components = LocalComponents(
+        supportDirectory: await getApplicationSupportDirectory(),
+      );
+      final file = await components.executable(LocalComponentRegistry.ffmpeg);
+      if (file != null) {
+        return file.path;
+      }
+      return null;
+    };
+  }
+
+  /// 副本管线：提示音前置 + 隐式标识写入 + 副本落盘目录。
+  ShareCopyBuilder _copyBuilder() =>
+      ShareCopyBuilder(ffmpegBinaryOf: _ffmpegBinaryOf());
+
+  ShareLabelWriter _labelWriter() =>
+      ShareLabelWriter(ffmpegBinaryOf: _ffmpegBinaryOf());
+
+  Future<Directory> _outbox() async {
+    final support = await getApplicationSupportDirectory();
+    return Directory('${support.path}/share/outbox');
   }
 
   void _attach(ShareSession session) {
@@ -314,9 +350,9 @@ class ShareSessionController extends AsyncNotifier<ShareSessionState> {
     return null;
   }
 
-  /// 本人下架：从房间和自己的清单里拿掉，房里的人会被通知删掉那份。
-  void revokeLocal(String contentId) {
-    _session?.revoke(contentId);
+  /// 本人下架：从房间和自己的清单里拿掉，编号进本机黑名单，房里的人会被通知删掉那份。
+  Future<void> revokeLocal(String contentId) async {
+    await _session?.revoke(contentId);
   }
 
   /// 举报并下架：本机删掉收件、记一条留痕。

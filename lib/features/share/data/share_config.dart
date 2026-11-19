@@ -22,7 +22,9 @@ class ShareConfig {
     } on FileSystemException {
       return <String, Object?>{};
     }
-    return decoded is Map ? decoded.cast<String, Object?>() : <String, Object?>{};
+    return decoded is Map
+        ? decoded.cast<String, Object?>()
+        : <String, Object?>{};
   }
 
   Future<String> acoustIdKey() async {
@@ -35,11 +37,7 @@ class ShareConfig {
     final data = await _read();
     await file.parent.create(recursive: true);
     await file.writeAsString(
-      jsonEncode(<String, Object?>{
-        ...data,
-        'v': 1,
-        'acoustIdKey': key.trim(),
-      }),
+      jsonEncode(<String, Object?>{...data, 'v': 1, 'acoustIdKey': key.trim()}),
     );
   }
 }

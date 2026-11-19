@@ -8,6 +8,13 @@ enum ShareAdmissionReason {
   /// 版权声明加可校验凭证，且没有撞上已知商业录音。
   admittedFromDeclaration('admitted_from_declaration'),
 
+  /// 生成物身上带着完整的隐式标识，且是收端自己从字节里读出来的。
+  ///
+  /// 台账只记本机生成过的那些字节；别人分享的 AI 副本没进过我的台账，
+  /// 但它容器里的四条标识是可复读的事实，所以认它——认的依据是读到的字节，
+  /// 不是对端自述。
+  admittedFromLabel('admitted_from_label'),
+
   rejectedMalformedContentId('rejected_malformed_content_id'),
   rejectedBlocked('rejected_blocked'),
   rejectedOversizeItem('rejected_oversize_item'),
@@ -26,7 +33,8 @@ enum ShareAdmissionReason {
 
   bool get isAdmitted =>
       this == ShareAdmissionReason.admittedFromLedger ||
-      this == ShareAdmissionReason.admittedFromDeclaration;
+      this == ShareAdmissionReason.admittedFromDeclaration ||
+      this == ShareAdmissionReason.admittedFromLabel;
 }
 
 /// 一条候选内容进房前能拿到的全部证据。
@@ -42,6 +50,7 @@ class ShareAdmissionInput {
     this.receivedContentId,
     this.matchedRecording,
     this.evidenceVerified = false,
+    this.labelVerified = false,
     this.blocked = false,
     this.roomItemCount = 0,
     this.roomBytes = 0,
@@ -60,6 +69,11 @@ class ShareAdmissionInput {
 
   /// 至少一项凭证哈希已经在本地核对过。
   final bool evidenceVerified;
+
+  /// 收端亲自从收到的字节里读回了完整的 AI 隐式标识。
+  ///
+  /// 默认 false——「没读过」不等于「读到了」，所以不传就等于不认。
+  final bool labelVerified;
 
   /// 本地黑名单里已有：撤销过、举报过的编号不再接收。
   final bool blocked;
@@ -121,7 +135,10 @@ abstract final class ShareAdmission {
           : ShareAdmissionReason.admittedFromLedger;
     }
     if (item.provenance.isGenerated) {
-      return ShareAdmissionReason.rejectedUnprovenGeneration;
+      // 本机台账之外的生成物，只认字节里那四条标识；标识不全照样拒。
+      return input.labelVerified && item.aiDisclosure.isComplete
+          ? ShareAdmissionReason.admittedFromLabel
+          : ShareAdmissionReason.rejectedUnprovenGeneration;
     }
     if (item.evidenceHashes.isEmpty || !input.evidenceVerified) {
       return ShareAdmissionReason.rejectedMissingEvidence;

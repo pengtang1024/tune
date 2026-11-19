@@ -122,38 +122,48 @@ class TXXXFrame {
     bool isUTF16 = encoding == 1 || encoding == 2;
 
     if (isUTF16) {
-      while (!(information[offset] == 0 && information[offset + 1] == 0)) {
+      while (offset + 1 < information.length &&
+          !(information[offset] == 0 && information[offset + 1] == 0)) {
         descriptionData.add(information[offset]);
         descriptionData.add(information[offset + 1]);
         offset += 2;
       }
 
       // we pass the final zeros
-      while (information[offset] == 0) {
+      while (offset < information.length && information[offset] == 0) {
         offset++;
       }
     } else {
-      while (information[offset] != 0) {
+      while (offset < information.length && information[offset] != 0) {
         descriptionData.add(information[offset++]);
+      }
+      // 描述符以单个 0x00 收尾，这一字节是分隔符、不属于内容。上游在这里停住却没有
+      // 跳过它，于是值被算成「NUL + 真值」：实测 ffprobe 读出 AI_GENERATED=1，本包
+      // 读回却带前导 NUL。按 == 比较的合规校验会把已标好的文件判成没标识（fail-closed
+      // 判对了现象、判错了文件），所以必须在读侧修。
+      if (offset < information.length) {
+        offset++;
       }
     }
 
     int lastCharPosition = information.length - 1;
 
     // can be 00 for utf16 or 0 for other
-    bool hasTerminalEmptyCharacter = information[lastCharPosition] == 0 &&
-        information[lastCharPosition - 1] == 0;
+    // 上游只按「末尾连续两个 0」判定，非 UTF-16 的「值 + 单个 0」被留在内容里（多一个
+    // 尾 NUL）；lastCharPosition - 1 在极短帧上还会越界读取。按编码分别判定。
+    bool hasTerminalEmptyCharacter = lastCharPosition >= offset &&
+        information[lastCharPosition] == 0 &&
+        (!isUTF16 ||
+            (lastCharPosition > 0 && information[lastCharPosition - 1] == 0));
 
     // we need to remove the empty character at the end
     // it's a single or double zero
-    final length = information.length -
-        offset -
-        (hasTerminalEmptyCharacter
-            ? isUTF16
-                ? 2
-                : 1
-            : 0);
-    final rest = information.buffer.asUint8List(offset, length);
+    final int trailing = hasTerminalEmptyCharacter ? (isUTF16 ? 2 : 1) : 0;
+    final int rawLength = information.length - offset - trailing;
+    final int length = rawLength < 0 ? 0 : rawLength;
+    // 用 sublist 而不是 buffer.asUint8List：后者按整个底层缓冲计算偏移，忽略这块
+    // 切片自身的 offsetInBytes，一旦帧数据是从更大缓冲区切出来的就会读到隔壁字节。
+    final rest = information.sublist(offset, offset + length);
 
     switch (encoding) {
       case 0:

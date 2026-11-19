@@ -130,7 +130,11 @@ void main() {
   group('握手与清单', () {
     test('手持房间密钥的 hello 能验过，换成别的密钥就验不过', () {
       final key = Uint8List.fromList(List<int>.generate(32, (i) => 31 - i));
-      final hello = MeshHello.create(roomKey: key, displayName: '本机');
+      final hello = MeshHello.create(
+        roomKey: key,
+        displayName: '本机',
+        ephemeralPubHex: 'aa' * 32,
+      );
       expect(hello.verifyWith(key), isTrue);
       final other = Uint8List.fromList(List<int>.filled(32, 7));
       expect(hello.verifyWith(other), isFalse);
@@ -138,13 +142,18 @@ void main() {
 
     test('篡改 random 后证明失效', () {
       final key = Uint8List.fromList(List<int>.filled(32, 9));
-      final hello = MeshHello.create(roomKey: key, displayName: '本机');
+      final hello = MeshHello.create(
+        roomKey: key,
+        displayName: '本机',
+        ephemeralPubHex: 'aa' * 32,
+      );
       final tampered = MeshHello(
         roomId: hello.roomId,
         peerId: hello.peerId,
         nonce: '0123456789abcdef',
         proof: hello.proof,
         displayName: hello.displayName,
+        ephemeralPubKey: hello.ephemeralPubKey,
       );
       expect(tampered.verifyWith(key), isFalse);
     });

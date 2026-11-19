@@ -1,6 +1,6 @@
 # AI 音乐分享（mesh）
 
-> 状态：设计（已实施） · 适用版本 1.38.1 · 最后核对 2026-11-16
+> 状态：设计（已实施） · 适用版本 1.48.0 · 最后核对 2026-11-19
 >
 > 实施范围：**M0 全量、M1 全量、M2 全量**（撤销、举报、黑名单、AcoustID 查重都已接线）。
 > `fpcalc` 已登记成可下载组件（`share-fingerprint-runtime`），client key 在分享页填；
@@ -133,11 +133,11 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
 
 ### 5.2 帧与消息
 
-帧格式：`4 字节大端长度（含类型字节）+ 1 字节类型 + JSON 负载`。M0 的传输是明文 TCP，加密随 M1 的凭据一起补。
+帧格式：`4 字节大端长度（含类型字节）+ 1 字节类型 + JSON 负载`。HELLO 帧明文，其余帧的载荷用 X25519 + ChaCha20-Poly1305 加密（见 5.3 与 13.3）。
 
 | 消息 | 方向 | 作用 |
 | --- | --- | --- |
-| `HELLO` | 双向 | 协议版本、peerId、房间证明（用 `roomKey` 的 HMAC） |
+| `HELLO` | 双向 | 协议版本、peerId、临时公钥、房间证明（HMAC 材料含临时公钥） |
 | `INVENTORY` | 双向 | 摘要清单：`[{cid, size, manifestHash}]`，只在加入时与变更时发 |
 | `ANNOUNCE` | 广播 | 新增一条（带完整清单与签名） |
 | `WANT` / `HAVE` | 双向 | 要哪些 cid / 我有哪些（位图） |
@@ -148,8 +148,8 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
 ### 5.3 加密与身份
 
 - 身份：Ed25519 长期密钥，`peerId = base32(sha256(pubkey))` 前 16 字节。
-- 会话：**尚未加密**——M0 的载荷走明文 TCP，靠「局域网/用户自己的隧道」这一层边界；X25519 + ChaCha20-Poly1305 排进 M1 的凭据工作。
-- 房间证明：`HMAC-SHA256(roomKey, peerId || nonce)`，证明持有邀请码，不上传 `roomKey`。
+- 会话：**每条连接端到端加密**——双方各出 X25519 临时密钥对，HKDF-SHA256 派生双方向密钥，ChaCha20-Poly1305 AEAD 加密（nonce 是严格递增计数器，AAD 是帧类型字节）；握手与密钥派生细节见 13.3。
+- 房间证明：`HMAC-SHA256(roomKey, peerId || nonce || ephemeralPubKey)`，证明持有邀请码并把临时公钥绑进握手转录，第三方换公钥即验签失败；不上传 `roomKey`。
 - 清单：`MeshInventory` 带 Ed25519 签名，验签先核 `peerId == sha256(公钥) 前 16 字节`，再验正文；坏条目让整份清单作废。
 
 ### 5.4 技术选型
@@ -217,9 +217,17 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
 
 - **隐式标识**（写进文件元数据，FLAC Vorbis comment / ID3v2 TXXX / MP4 `©too`）：
   `AI_GENERATED=1`、`GENERATOR=<模型名>`、`CONTENT_ID=<contentId>`、`PRODUCER=tune`。
+  已实施（2026-11-18）：写侧收口在 `features/share/data/share_label_facts.dart`（键名与容器口径唯一一份）
+  与 `share_label_writer.dart`；FLAC/MP3 由随包 vendor 的写侧直接写（`vendor/audio_metadata_reader`），
+  MP4 家族与 ogg/opus 交 ffmpeg 改写（`share_label_ffmpeg.dart`），WAV 这类放不下定制键的容器
+  判 `unsupportedContainer` 原样保留。每次写入都回读核对，四个键逐条等值才算已标识。
 - **显式标识**（写进分享副本的音频流）：开头插入 1.2 秒语音提示「本音频由人工智能生成」；
   不放语音也可以，退化成同样的节奏提示音，二者都符合 GB 45438—2025 对音频的要求。
+  已实施：`features/share/data/share_copy.dart` 的 `ShareCopyBuilder` 在发布前生成带提示音的副本
+  （默认无声节奏提示音，两声短促；带语音的版本留待录好素材再换），副本头部 1.2 秒前置。
 - **界面标识**：列表中用「AI 生成」chip（写法见 [chips.md](chips.md)），详情页显示模型与生成时间。
+  已实施：`features/share/presentation/share_lists.dart` 的行标识用 `MetaBadge`（`_AiMark`），
+  点开弹窗显示生成者与生成时间。
 - **不提供去除能力**：不导出无标识版本，不提供「清理元数据」开关；第三方工具能去，那是它的事，
   但**本应用不给这个按钮**——这一条直接对应《标识办法》「不得删除、篡改、伪造标识」。
 
@@ -227,11 +235,19 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
 
 ### 8.1 目录
 
-- `lib/features/share/domain/`：`share_item.dart`、`share_admission.dart`（纯规则）、`share_room.dart`。
-- `lib/features/share/application/`：`share_controller.dart`（房间状态的所有者）、provider。
-- `lib/features/share/data/`：`share_store.dart`（三张新表）、`generation_ledger.dart`、`blob_store.dart`。
-- `lib/features/share/presentation/`：房间页、收件箱、条目详情。
-- `lib/data/services/mesh/`：`discovery.dart`、`transport.dart`、`protocol.dart`、`crypto.dart`。
+- `lib/features/share/domain/`：`share_item.dart`、`share_provenance.dart`、`share_ai_disclosure.dart`、
+  `share_declaration.dart`、`share_admission.dart`（纯规则）、`share_session_state.dart`、
+  `share_lookup_status.dart`；房间编排不在 domain，房间没有独立状态对象（见 §13）。
+- `lib/features/share/application/`：`share_session.dart`（房间状态的所有者）与
+  `share_session_controller.dart`（provider）。
+- `lib/features/share/data/`：`share_store.dart`、`share_inbox.dart`、`share_ledger.dart`、
+  `share_blocklist.dart`、`share_reports.dart`、`share_config.dart`、`acoustid_lookup.dart`、
+  `share_migration.dart`，以及标识写入的 `share_label_{facts,writer,ffmpeg}.dart` 与
+  提示音副本的 `share_copy.dart`。
+- `lib/features/share/presentation/`：`share_pane.dart`（页面）、`share_lists.dart`、
+  `share_entry_card.dart`、`share_lookup_section.dart`。
+- `lib/data/services/mesh/`：`mesh_{protocol,crypto,identity,messages,peer,room,transfer,discovery,reachability}.dart`
+  与 `room_invite.dart`；文件名都带 `mesh_` 前缀，不存在 `discovery.dart`/`transport.dart` 这类裸名。
 
 依赖方向仍是 presentation → application → domain / data，协议层不 import 任何 feature。
 
@@ -278,7 +294,7 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
 | 阶段 | 内容 | 出口判据 |
 | --- | --- | --- |
 | M0 局域网 ✅ | 房间、UDP 广播发现、清单交换、分块传输、手工「我确认是自有/生成」勾选 | 两台机器同一 Wi-Fi 互相收发 50 MB 音频，中断续传 |
-| M1 凭证 ✅ | 生成台账、Ed25519 清单签名、AI 标识写入、收端二次验签 | 伪造清单/改元数据/伪造 ledgerId 三类用例全部被拒 |
+| M1 凭证 ✅ | 生成台账、Ed25519 清单签名、AI 标识写入（隐式写侧 + 提示音副本，2026-11-18 补齐）、会话加密（X25519 + ChaCha20-Poly1305，2026-11-19 补齐）、收端二次验签 | 伪造清单/改元数据/伪造 ledgerId 三类用例全部被拒；篡改密文一字节即断链 |
 | M2 撤销与举报 ✅ | 撤销广播、对端删副本、举报留痕、本地黑名单 | 撤销后对端清单与收件箱都清空；举报落一条 `share_events` 记录且编号进黑名单 |
 | 跨网 ✅ | 邀请码带可达地址（公网 IPv6 / 用户自带隧道）、双栈监听 | 两台不同网络（或同机两个地址族）之间用邀请码直连成功 |
 | M2 AcoustID 查重 ✅（接线） | `AcoustIdLookup` + `fpcalc` 探测 + 闸门 `known_recording` 优先于台账 | 把商业曲改名混入，被 AcoustID 挡住（或明确落在「未收录」分支） |
@@ -318,7 +334,7 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
 | `data/services/mesh/mesh_crypto.dart` | SHA-256 内容编号、HMAC-SHA256 房间证明、房间号派生、常量时间比较 |
 | `data/services/mesh/mesh_identity.dart` | Ed25519 身份，落在 `<support>/share/identity.json`，`peerId = sha256(公钥) 前 16 字节` |
 | `data/services/mesh/mesh_messages.dart` | HELLO / INVENTORY / WANT / BLOCK / REVOKE / PING / PONG，清单可签名 |
-| `data/services/mesh/mesh_peer.dart` | 单条连接的握手、收发与关闭 |
+| `data/services/mesh/mesh_peer.dart` | 单条连接的握手、会话加密收发与关闭 |
 | `data/services/mesh/mesh_room.dart` | 监听、拨号、成员表、广播（默认 8 人，硬上限 16） |
 | `data/services/mesh/mesh_transfer.dart` | 256 KiB 分块收发、限速、收端重算内容编号 |
 | `data/services/mesh/mesh_discovery.dart` | UDP 广播信标（端口 45871，2 秒一次、6 秒过期） |
@@ -336,14 +352,14 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
 - **四份事实已并进 `library.db`**：M0/M1 先用 JSON 快照（收件索引、台账、举报、黑名单），M2 换成
   `share_rooms` / `share_items` / `share_events` 三张表；老快照由 `importLegacyShareJson` 于首次
   打开时搬入并改名 `*.migrated`（`docs/data-model.md` 的「分享的三张表」）。
-- **M0 的加密只有对称层**：房间证明与内容寻址够用；分块载荷加密（X25519 + ChaCha20-Poly1305）随 M1 的凭据一起补。
+- **会话加密已落地**：原计划「随 M1 凭据一起补」的分块载荷加密在 2026-11-19 补齐（`mesh_session_crypto.dart`，见 13.3）；房间证明与内容寻址不变。
 - **入口在音源页底部一张卡**，没有设置页实验开关：少一个持久化开关，也少一处「关掉了但入口还在」的裂缝。
 
 闸门的两处落点：发块前（`_onWant`）与收齐后（`_onBlock`）各跑一遍完整判定，
 收端不信发送端的「我已经验过了」。台账命中是强证据，声明 + 证据哈希是次强，
 生成物没有台账一律拒（`rejected_unproven_generation`）。
 
-测试：`test/services/mesh_*`（协议 15、房间 9、传输 6、发现 6、身份 6、邀请码 5）与
+测试：`test/services/mesh_*`（协议 15、房间 9、传输 6、发现 6、身份 6、邀请码 5、会话加密 5）与
 `test/features/share_*` 与 `test/services/{mesh_*,room_invite}*`（闸门 19、会话 6、页面 2、台账 2、黑名单 2、
 查重 8、配置 2、表与迁移 2、跨网 2、邀请码 5、可达探测 9），共 101 条。
 
@@ -362,6 +378,55 @@ Tune 没有服务端、没有索引、不收费。这让它更接近「工具」
   一键穿透按钮；房间成立后只显示邀请码、本机端口，以及一行如实的状态（可跨网 / 仅同网）。
 - 仍未做：打洞、中继、房间目录——见 §5.6 与 §11。
 
+### 13.2 AI 标识落地：写入端补齐（2026-11-18）
+
+§10 里 M1 的「AI 标识写入」此前只在清单（disclosure JSON）里登记，文件本身没有标识——
+这一轮把它落到字节上，三件事同时交付：
+
+- **隐式标识写入**：`share_label_facts.dart` 收口四个键（`AI_GENERATED` / `GENERATOR` /
+  `CONTENT_ID` / `PRODUCER`）与容器口径；`share_label_writer.dart` 负责「写 + 回读核对」，
+  FLAC/MP3 走 vendor 写侧（这次补齐了 vendor 的 FLAC `UNKNOWN=`、ID3v2 TXXX 与 MP4 自定义键），
+  MP4 家族与 ogg/opus 走 ffmpeg（`-movflags use_metadata_keys` 这对开关不加，自定义键会被丢）；
+  WAV 判 `unsupportedContainer`。写失败或回读对不上都是 `failed`，不降级成「当没写」。
+- **提示音副本**：`share_copy.dart` 的 `ShareCopyBuilder` 在发布前生成副本——ffmpeg 合成
+  1.2 秒节奏提示音前置，音频流不重编码（流复制），副本名带 `.ai-share.` 标记，落
+  `<support>/share/outbox/<源编号前 12 位>/`；同源幂等覆盖。带语音版本留待素材录好再换。
+- **准入与接线**：闸门新增 `admitted_from_label`——别人分享的 AI 副本不再要求本机台账命中，
+  改为凭**读到的字节里的四条标识**放行（`share_admission.dart`，默认关闭，台账命中仍最强）。
+  `share_session.dart` 的 `addLocalItem` 对生成物走「建副本 → 写标识 → 用副本字节重算编号」的
+  管线，副本登记进 `_derivedCopies`：撤销副本时连原始件一起拉黑、关房时全部清理，
+  outbox 不会无界增长。`revoke` 改成异步并先写黑名单再广播，撤销与举报的封禁口径对称。
+
+测试：`test/features/share_label_writer_test.dart`（FLAC/MP3/opus/m4a 写入与回读、幂等、
+不支持容器、损坏文件 fail-closed）、`test/features/share_copy_prelude_test.dart`（副本时长、
+幂等、非生成物不建副本）、`test/features/share_admission_test.dart` 新增「字节里的隐式标识」
+6 例、`test/features/share_ai_copy_e2e_test.dart` 两例真跑 ffmpeg 的端到端（生成 → 副本 →
+广播 → 访客收下 → 撤销删副本），share 相关用例共 198 条全绿。
+
+
+### 13.3 会话加密落地（2026-11-19）
+
+M0/M1 的传输此前只有房间证明这层对称凭证，分块载荷走明文 TCP。这一轮把
+「X25519 + ChaCha20-Poly1305」落到每条连接上，设计原则：**fail-closed，不回落明文**。
+
+- **握手**：`MeshPeer.dial/accept` 各自生成 X25519 临时密钥对（`mesh_session_crypto.dart`），
+  `HELLO` 新增必填 `ephemeralPubKey`（64 位 hex）；`tryFromJson` 缺字段或长度不是 32 字节直接
+  返回 null——没有 legacy 分支，旧版 hello 一律拒收。
+- **房间证明升级**：HMAC 材料从 `peerId || nonce` 扩成 `peerId || nonce || ephemeralPubKey`
+  （`mesh_crypto.dart` 的 `roomProof`），把临时公钥绑进握手转录，防中间人换钥。
+- **密钥派生**：`sharedSecret = X25519(本端临时私钥, 对端临时公钥)`；HKDF-SHA256 的 salt 是
+  双方临时公钥按字典序拼接（绑定握手转录），info 是 `tune-share-session-v1/<小端>-to-<大端>`——
+  派生出**两把方向密钥**，杜绝 AEAD nonce 复用。
+- **载荷加密**：nonce 是 12 字节递增计数器（64 位大端放在后 8 字节），接收端要求严格递增；
+  AAD 是 1 字节帧类型（类型字节明文、载荷密文）。密封格式 `nonce || ciphertext || mac`，
+  28 字节开销已并入 8 MiB 帧上限推算。
+- **失败即断**：解密或验签失败走 `_fail` 断链，不回落明文；发送侧加密失败同样断链。
+  握手期的密文帧先进 `_pending`，会话密钥就位后再派发；`_session` 先于 `_open` 就位，
+  不存在「通道开了但没钥匙」的窗口。入站连接的明文 HELLO 回包赶在放开密文通道之前。
+
+测试：`test/services/mesh_session_crypto_test.dart` 五类——密封字节确实是密文（不含明文探针、
+长度 = 明文 + 28）、真实连接端到端回环、篡改密文一字节即断链（不投递）、8 × 1 MB 多帧大块按序
+完整到达、旧版缺临时公钥的 hello 拒收（证明用旧材料也算，拒绝是结构性的）。
 ## 相关文档
 
 - 国内音乐方案的评估结论：不做逆向接口、不内置商业曲库（评估稿未随本版发布）

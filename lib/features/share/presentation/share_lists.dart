@@ -1,11 +1,15 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/share/application/share_session_controller.dart';
+import 'package:tune/features/share/domain/share_item.dart';
 import 'package:tune/features/share/domain/share_provenance.dart';
 import 'package:tune/features/share/domain/share_session_state.dart';
 import 'package:tune/features/share/presentation/share_pane.dart';
+import 'package:tune/shared/ui/meta_badge.dart';
+import 'package:tune/shared/ui/track_fact.dart';
 
 /// 「我要分享的」：本机文件 + 一句缘起声明。
 class ShareLocalItemsSection extends ConsumerWidget {
@@ -34,9 +38,13 @@ class ShareLocalItemsSection extends ConsumerWidget {
               _Row(
                 title: item.name,
                 subtitle: _provenanceLabel(context, item.provenance),
+                badge: _AiMark(item: item),
                 action: TextButton(
-                  onPressed: () {
-                    controller.revokeLocal(item.contentId);
+                  onPressed: () async {
+                    await controller.revokeLocal(item.contentId);
+                    if (!context.mounted) {
+                      return;
+                    }
                     _toast(context, context.loc.shareRevoked);
                   },
                   child: Text(context.loc.shareRevoke),
@@ -121,6 +129,7 @@ class ShareRoomItemsSection extends ConsumerWidget {
                   _Row(
                     title: remote.item.name,
                     subtitle: remote.ownerName,
+                    badge: _AiMark(item: remote.item),
                     trailing: _progressOf(remote.item.contentId),
                     action: TextButton(
                       onPressed: () => controller.receive(remote.item),
@@ -197,6 +206,7 @@ class ShareInboxSection extends ConsumerWidget {
                   _Row(
                     title: entry.item.name,
                     subtitle: entry.fromName,
+                    badge: _AiMark(item: entry.item),
                     action: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -233,12 +243,16 @@ class _Row extends StatelessWidget {
   const _Row({
     required this.title,
     required this.subtitle,
+    this.badge,
     this.trailing,
     this.action,
   });
 
   final String title;
   final String subtitle;
+
+  /// 行首的事实标记（如 AI 生成），排在动作之前。
+  final Widget? badge;
   final Widget? trailing;
   final Widget? action;
 
@@ -258,10 +272,72 @@ class _Row extends StatelessWidget {
               ],
             ),
           ),
+          ?badge,
           ?trailing,
           ?action,
         ],
       ),
+    );
+  }
+}
+
+/// AI 生成事实的行内标记。
+///
+/// 只在条目声明为生成合成内容时出现：图标说“哪一类事实”，tooltip 说“依据哪条
+/// 办法”，点开给出模型与生成时间两行。标识写在文件元数据与音频流里，界面只负责
+/// 把它说清楚，不提供任何去除入口（《标识办法》第四条）。
+class _AiMark extends StatelessWidget {
+  const _AiMark({required this.item});
+
+  final ShareItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final disclosure = item.aiDisclosure;
+    if (!disclosure.isSynthetic) {
+      return const SizedBox.shrink();
+    }
+    final producer = (disclosure.providerName != null &&
+            disclosure.providerName!.trim().isNotEmpty)
+        ? disclosure.providerName!
+        : (disclosure.providerCode?.trim().isNotEmpty == true
+            ? disclosure.providerCode!
+            : '-');
+    return MetaBadge(
+      icon: Icons.auto_awesome,
+      tone: FactTone.tertiary,
+      tooltip: context.loc.shareAiLabelTooltip(producer),
+      onTap: () => _showDetails(context, producer),
+    );
+  }
+
+  Future<void> _showDetails(BuildContext context, String producer) {
+    final locale = Localizations.localeOf(context);
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        final loc = dialogContext.loc;
+        final generatedAt = DateFormat.yMMMd(locale.toString()).add_Hm().format(
+          item.createdAt.toLocal(),
+        );
+        return AlertDialog(
+          title: Text(loc.shareAiGenerated),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${loc.shareAiGenerator}: $producer'),
+              Text('${loc.shareAiGeneratedAt}: $generatedAt'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(loc.shareAiClose),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -156,7 +156,7 @@ void main() {
     final path = received.inbox.single.path;
     expect(await File(path).exists(), isTrue);
 
-    host.revoke(item.contentId);
+    await host.revoke(item.contentId);
 
     final after = await _waitFor(guest, (state) => state.remoteItems.isEmpty);
     expect(after.remoteItems, isEmpty);

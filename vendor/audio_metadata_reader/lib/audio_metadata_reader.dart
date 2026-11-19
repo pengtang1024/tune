@@ -10,7 +10,7 @@
 library audio_metadata_reader;
 
 export "src/parsers/tags/tag_parser.dart" show AudioMetadata, Picture;
-export 'src/metadata/base.dart' show PictureType;
+export 'src/metadata/base.dart' show ParserTag, PictureType;
 export 'src/constants/constant.dart' show supportedFileExtensions;
 export 'src/utils/metadata_parser_exception.dart'
     show MetadataParserException, NoMetadataParserException;
