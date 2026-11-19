@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:cryptography/cryptography.dart';
 import 'package:tune/features/share/domain/share_admission.dart';
 import 'package:tune/features/share/domain/share_item.dart';
 import 'package:tune/features/share/domain/share_session_state.dart';
@@ -14,6 +15,7 @@ import '../../../data/services/mesh/mesh_peer.dart';
 import '../../../data/services/mesh/mesh_protocol.dart';
 import '../../../data/services/mesh/mesh_reachability.dart';
 import '../../../data/services/mesh/mesh_room.dart';
+import '../../../data/services/mesh/mesh_session_crypto.dart';
 import '../../../data/services/mesh/mesh_transfer.dart';
 import '../../../data/services/mesh/room_invite.dart';
 import '../data/share_copy.dart';
@@ -282,22 +284,38 @@ class ShareSession {
   Future<MeshPeer> _connect(String host, int port) async {
     final socket =
         await Socket.connect(host, port, timeout: MeshRoom.dialTimeout);
-    return MeshPeer.dial(socket, roomKey: roomKey, localHello: _hello());
+    return _dialPeer(socket);
   }
 
   /// `MeshRoom.joined` 只报进来的连接，拨出去的这条要自己登记。
   Future<void> _dial(String host, int peerPort) async {
     final socket = await Socket.connect(host, peerPort, timeout: MeshRoom.dialTimeout);
-    final peer = await MeshPeer.dial(socket, roomKey: roomKey, localHello: _hello());
+    final peer = await _dialPeer(socket);
     await _onPeer(peer);
   }
 
-  MeshHello _hello() => MeshHello.create(
-    roomKey: roomKey,
-    displayName: displayName,
-    identityId: identity.peerId,
-    listenPort: _room.port,
-  );
+  /// 每条拨出的连接都配一对新的临时密钥：hello 里的公钥就是这一对的。
+  Future<MeshPeer> _dialPeer(Socket socket) async {
+    final hand = await _newHandshake();
+    return MeshPeer.dial(
+      socket,
+      roomKey: roomKey,
+      localHello: hand.hello,
+      ephemeralKeyPair: hand.ephemeral,
+    );
+  }
+
+  Future<({MeshHello hello, SimpleKeyPair ephemeral})> _newHandshake() async {
+    final ephemeral = await MeshSessionCrypto.newKeyPair();
+    final hello = MeshHello.create(
+      roomKey: roomKey,
+      displayName: displayName,
+      identityId: identity.peerId,
+      listenPort: _room.port,
+      ephemeralPubHex: await MeshSessionCrypto.pubKeyHex(ephemeral),
+    );
+    return (hello: hello, ephemeral: ephemeral);
+  }
 
   Future<void> _onPeer(MeshPeer peer) async {
     if (peer.identityId.isEmpty) {

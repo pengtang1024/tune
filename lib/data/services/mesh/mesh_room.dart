@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cryptography/cryptography.dart';
+
 import 'mesh_messages.dart';
 import 'mesh_peer.dart';
 import 'mesh_protocol.dart';
+import 'mesh_session_crypto.dart';
 
 /// 房间打不开 / 拒绝入房时抛的错。
 class MeshRoomException implements Exception {
@@ -117,10 +120,12 @@ class MeshRoom {
     }
     socket.setOption(SocketOption.tcpNoDelay, true);
     try {
+      final hand = await _newHandshake();
       final peer = await MeshPeer.dial(
         socket,
         roomKey: roomKey,
-        localHello: _newHello(),
+        localHello: hand.hello,
+        ephemeralKeyPair: hand.ephemeral,
       );
       _register(peer);
       return peer;
@@ -181,10 +186,12 @@ class MeshRoom {
 
   Future<void> _accept(Socket socket) async {
     try {
+      final hand = await _newHandshake();
       final peer = await MeshPeer.accept(
         socket,
         roomKey: roomKey,
-        localHello: _newHello(),
+        localHello: hand.hello,
+        ephemeralKeyPair: hand.ephemeral,
       );
       _register(peer);
     } on Object {
@@ -221,11 +228,16 @@ class MeshRoom {
     }
   }
 
-  /// 每条连接都用新的 peerId 与 nonce，复用等于把重放窗口留着。
-  MeshHello _newHello() => MeshHello.create(
-    roomKey: roomKey,
-    displayName: displayName,
-    identityId: identityId,
-    listenPort: port,
-  );
+  /// 每条连接都用新的 peerId、nonce 与临时密钥对，复用等于把重放窗口留着。
+  Future<({MeshHello hello, SimpleKeyPair ephemeral})> _newHandshake() async {
+    final ephemeral = await MeshSessionCrypto.newKeyPair();
+    final hello = MeshHello.create(
+      roomKey: roomKey,
+      displayName: displayName,
+      identityId: identityId,
+      listenPort: port,
+      ephemeralPubHex: await MeshSessionCrypto.pubKeyHex(ephemeral),
+    );
+    return (hello: hello, ephemeral: ephemeral);
+  }
 }

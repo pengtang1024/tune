@@ -5,14 +5,17 @@ import '../../../features/share/domain/share_item.dart';
 import 'mesh_crypto.dart';
 import 'mesh_identity.dart';
 import 'mesh_protocol.dart';
+import 'mesh_session_crypto.dart';
 
-/// 入房握手。`proof` 是用房间密钥对 `peerId + nonce` 算的 HMAC。
+/// 入房握手。`proof` 是用房间密钥对 `peerId + nonce + ephemeralPubKey` 算的
+/// HMAC——临时公钥绑进证明材料，中间人换掉它就过不了验证。
 class MeshHello {
   const MeshHello({
     required this.roomId,
     required this.peerId,
     required this.nonce,
     required this.proof,
+    required this.ephemeralPubKey,
     required this.displayName,
     this.identityId = '',
     this.listenPort = 0,
@@ -22,6 +25,12 @@ class MeshHello {
   final String peerId;
   final String nonce;
   final String proof;
+
+  /// 本连接的 X25519 临时公钥（64 位小写十六进制，32 字节）。
+  ///
+  /// 证明覆盖此字段：双方用它协商会话密钥，第三方换掉公钥即验签失败。
+  final String ephemeralPubKey;
+
   final String displayName;
 
   /// 对端的稳定身份号（`MeshIdentity.peerId`）；老版本没有时为空。
@@ -30,9 +39,10 @@ class MeshHello {
   /// 对端监听的端口，用来把星形补成全互联；0 表示不知道。
   final int listenPort;
 
-  /// 用本地房间密钥算一条自证。
+  /// 用本地房间密钥算一条自证；临时公钥一起绑进证明材料。
   static MeshHello create({
     required List<int> roomKey,
+    required String ephemeralPubHex,
     required String displayName,
     String identityId = '',
     int listenPort = 0,
@@ -44,12 +54,14 @@ class MeshHello {
       roomKey: roomKey,
       peerId: peerId,
       nonce: utf8.encode(helloNonce),
+      ephemeralPubKey: _unhex(ephemeralPubHex),
     );
     return MeshHello(
       roomId: MeshCrypto.roomIdOf(roomKey),
       peerId: peerId,
       nonce: helloNonce,
       proof: _hex(proof),
+      ephemeralPubKey: ephemeralPubHex,
       displayName: displayName,
       identityId: identityId,
       listenPort: listenPort,
@@ -65,6 +77,7 @@ class MeshHello {
       roomKey: roomKey,
       peerId: peerId,
       nonce: utf8.encode(nonce),
+      ephemeralPubKey: _unhex(ephemeralPubKey),
     );
     return MeshCrypto.constantTimeEquals(expected, _unhex(proof));
   }
@@ -74,6 +87,7 @@ class MeshHello {
     'peerId': peerId,
     'nonce': nonce,
     'proof': proof,
+    'ephemeralPubKey': ephemeralPubKey,
     'displayName': displayName,
     'identityId': identityId,
     'listenPort': listenPort,
@@ -84,11 +98,15 @@ class MeshHello {
     final peerId = json['peerId'];
     final nonce = json['nonce'];
     final proof = json['proof'];
+    final ephemeralPubKey = json['ephemeralPubKey'];
     final displayName = json['displayName'];
     if (roomId is! String ||
         peerId is! String ||
         nonce is! String ||
         proof is! String ||
+        ephemeralPubKey is! String ||
+        // 临时公钥必须正好 32 字节；内容对不对由证明验证兜底。
+        _unhex(ephemeralPubKey).length != MeshSessionCrypto.pubKeyBytes ||
         displayName is! String) {
       return null;
     }
@@ -97,6 +115,7 @@ class MeshHello {
       peerId: peerId,
       nonce: nonce,
       proof: proof,
+      ephemeralPubKey: ephemeralPubKey,
       displayName: displayName,
       identityId: json['identityId'] is String ? json['identityId']! as String : '',
       listenPort: json['listenPort'] is int ? json['listenPort']! as int : 0,

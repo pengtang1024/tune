@@ -7,9 +7,9 @@ import 'package:crypto/crypto.dart';
 
 /// mesh 层用到的全部密码学原语。
 ///
-/// M0 只有对称的一层：房间密钥派生的证明、内容寻址、常量时间比较。
-/// 非对称身份与分块加密（Ed25519 / X25519 / ChaCha20-Poly1305）留到 M1，
-/// 届时在这里补 `MeshIdentity` 与 `MeshCipher`，别在调用点各自造一套。
+/// 对称的一层：房间密钥派生的证明、内容寻址、常量时间比较。
+/// 非对称身份在 `mesh_identity.dart`（Ed25519），会话加密在
+/// `mesh_session_crypto.dart`（X25519 + ChaCha20-Poly1305）——别在调用点各自造一套。
 abstract final class MeshCrypto {
   /// 房间密钥长度。32 字节够长，也刚好能塞进邀请码。
   static const int roomKeyBytes = 32;
@@ -33,9 +33,12 @@ abstract final class MeshCrypto {
     required List<int> roomKey,
     required String peerId,
     required List<int> nonce,
+    required List<int> ephemeralPubKey,
   }) {
     final mac = Hmac(sha256, roomKey);
-    return Uint8List.fromList(mac.convert(<int>[...utf8.encode(peerId), ...nonce]).bytes);
+    return Uint8List.fromList(
+      mac.convert(<int>[...utf8.encode(peerId), ...nonce, ...ephemeralPubKey]).bytes,
+    );
   }
 
   /// 房间标识由房间密钥派生，邀请码因此只需要带密钥。
