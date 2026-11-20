@@ -73,7 +73,7 @@ Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。
 
 ## 技术栈
 
-- Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router
+- Flutter 3 / Dart 3.8+ · Riverpod 3 · go_router
 - just_audio；**Linux 与 Windows 都走** just_audio_media_kit + media_kit_libs_linux / media_kit_libs_windows_audio + 系统 libmpv（Windows 后端会携带自定义请求头）
 - SQLite（`sqlite3` + `sqlite3_flutter_libs`）· dio · `window_manager` · `dbus`
 - `audio_service`（Android 后台播放 / 通知 / 锁屏）· `permission_handler`（Android 运行时权限）· `sherpa_onnx`（Android 本地 ASR）

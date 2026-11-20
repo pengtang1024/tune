@@ -99,9 +99,9 @@ bootstrap 序列：
 | `FavoritesState` | — | `ids: Set<String>`；`contains`、`count` |
 | `MusicSourcesController` | `musicSourcesControllerProvider`（AsyncNotifierProvider） | `build`：加载配置、规范化权重、读健康历史 |
 | `MusicSourcesState` | — | `sources`、`lastScanAt`、`healthHistory`；`byId` / `enabled` / `hasEnabledRemote` |
-| `SettingsController` | `settingsControllerProvider`（StateNotifierProvider） | 构造时从偏好存储读主题/语言/扫描路径/全部开关 |
+| `SettingsController` | `settingsControllerProvider`（StateNotifierProvider，来自 flutter_riverpod/legacy） | 构造时从偏好存储读主题/语言/扫描路径/全部开关 |
 | `SettingsState` | — | 主题、语言、扫描路径、播放行为、健康度权重、智能歌词配置 |
-| `DiscoveryController` | `discoveryControllerProvider`（AutoDisposeAsyncNotifierProvider） | `build` 汇总库/喜欢/反馈/队列/健康度后 `_compute` |
+| `DiscoveryController` | `discoveryControllerProvider`（AsyncNotifierProvider.autoDispose） | `build` 汇总库/喜欢/反馈/队列/健康度后 `_compute` |
 | `OnlineSearchController` | search/application | 跨音源搜索、防抖、分页 |
 
 ## 推荐引擎
