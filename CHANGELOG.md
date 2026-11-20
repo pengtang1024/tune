@@ -2,6 +2,20 @@
 
 本文件从「音源类型化」这次改动开始记。之前的变化跟着 git tag 走。
 
+## [1.48.2] - 2026-11-20
+
+### 变更
+
+- 归档《国内音乐方案评估（合法合规前提）》到 `docs/domestic-music-sources.md`：2026-11-16 对平台政策、判例与同类工具结局的核对结果，含 P0（中文电台 + 公版老唱片）到 P2 的路线分级与三条红线；文档索引的「快照」一节已登记。
+- `docs/local-components.md` 补一节「为什么 `fpcalc` 只登记 Linux」：一份 `LocalComponentSpec` 只有一个归档与一份文件表，chromaprint 的 Linux/Windows/macOS 产物形态不同，本轮只登记验证过的 Linux tar.gz，其余平台退回 `AcoustIdLookup.findFpcalc()` 的 PATH 探测，找不到就是「没查」，闸门不把它当清白证明。
+- `lib/data/services/components/local_component_registry.dart` 给 `fingerprintRuntime` 补口径注释（chromaprint 1.5.1 静态包、校验值取自上游 release 原始产物）。
+- `test/services/local_component_registry_test.dart` 增加断言：fpcalc 只在 Linux 提供、产物字节数 2752946、sha256 长度 64、URL 指向上游 `acoustid/chromaprint` v1.5.1。
+
+### 其它
+
+- 无用户可见的界面或播放行为变化；主工作树里未接线的音乐库分栏视图/拆专辑探索已归档到分支 `wip/library-split-2026-11`，不进本次发布。
+
+
 ## [1.48.1] - 2026-11-20
 
 ### 变更
