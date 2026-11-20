@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/domain/models/song.dart';
@@ -52,10 +53,17 @@ void main() {
     streamUrl: 'https://example.com/a.mp3',
   );
 
-  Widget app(Widget home, {List<Override> overrides = const []}) {
+  Widget app(
+    Widget home, {
+    List<Override> overrides = const [],
+    bool stubTranslation = true,
+  }) {
     return ProviderScope(
       overrides: [
-        translatedTextProvider.overrideWith((ref, request) async => null),
+        // riverpod 3 不允许同一 family 在同一个容器里被覆盖两次，所以要让某个用例
+        // 自己替换译文时，关掉这里的默认桩，而不是把两条覆盖叠在一起。
+        if (stubTranslation)
+          translatedTextProvider.overrideWith((ref, request) async => null),
         ...overrides,
       ],
       child: MaterialApp(
@@ -73,9 +81,14 @@ void main() {
     WidgetTester tester, {
     Song track = song,
     List<Override> overrides = const [],
+    bool stubTranslation = true,
   }) async {
     await tester.pumpWidget(
-      app(TrackMeta(song: track, index: 0), overrides: overrides),
+      app(
+        TrackMeta(song: track, index: 0),
+        overrides: overrides,
+        stubTranslation: stubTranslation,
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -327,6 +340,7 @@ void main() {
   ) async {
     await openSheet(
       tester,
+      stubTranslation: false,
       overrides: [
         translatedTextProvider.overrideWith((ref, request) async {
           return request.text == song.description ? '一段译好的简介。' : null;

@@ -88,8 +88,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane>
       libraryControllerProvider.select(
         (value) => (
           value.hasValue,
-          value.valueOrNull?.isScanning ?? false,
-          value.valueOrNull?.isLoading ?? false,
+          value.value?.isScanning ?? false,
+          value.value?.isLoading ?? false,
         ),
       ),
     );

@@ -29,7 +29,7 @@ typedef _LibrarySnapshot = ({
 });
 
 final discoveryControllerProvider =
-    AutoDisposeAsyncNotifierProvider<DiscoveryController, DiscoveryState>(
+    AsyncNotifierProvider.autoDispose<DiscoveryController, DiscoveryState>(
       DiscoveryController.new,
     );
 
@@ -38,7 +38,7 @@ final discoveryControllerProvider =
 /// The sections are a projection of the library, the hearts and the feedback
 /// store. They are not a second copy of any of those: a change in the inputs
 /// rebuilds the projection, and leaving the page drops it.
-class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
+class DiscoveryController extends AsyncNotifier<DiscoveryState> {
   DiscoveryFeedbackStore? _feedbackStore;
   DiscoveryArtistFeedbackStore? _artistFeedbackStore;
   Map<String, DateTime> _feedback = const {};
@@ -169,7 +169,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
 
     try {
       final sources =
-          ref.read(musicSourcesControllerProvider).valueOrNull?.sources ??
+          ref.read(musicSourcesControllerProvider).value?.sources ??
           const [];
       final remote = sources
           .where((source) => source.enabled && !source.isLocal)
@@ -183,7 +183,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
 
       final known = {
         for (final song
-            in ref.read(libraryControllerProvider).valueOrNull?.songs ??
+            in ref.read(libraryControllerProvider).value?.songs ??
                 const <Song>[])
           song.uri,
       };
@@ -246,7 +246,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
 
   void _setFinding(Set<String> next) {
     _finding = Set.unmodifiable(next);
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current != null && !_disposed) {
       state = AsyncData(current.copyWith(findingArtists: _finding));
     }
@@ -471,13 +471,13 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
       isLoading: value.isLoading,
       hasValue: value.hasValue,
       hasError: value.hasError,
-      songs: value.valueOrNull?.songs ?? const <Song>[],
-      total: value.valueOrNull?.total ?? 0,
+      songs: value.value?.songs ?? const <Song>[],
+      total: value.value?.total ?? 0,
     );
   }
 
   static String _sourceOrderKeyOf(AsyncValue<MusicSourcesState> value) {
-    final list = value.valueOrNull?.sources;
+    final list = value.value?.sources;
     if (list == null || list.isEmpty) return '';
     return list.map((source) => source.id).join('\u0000');
   }

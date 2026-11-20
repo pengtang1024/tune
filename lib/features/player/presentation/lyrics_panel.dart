@@ -88,7 +88,7 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
       );
     }
 
-    final answer = lyrics.valueOrNull;
+    final answer = lyrics.value;
     // The answer of the track that plays, not the one of the track before it.
     final current = answer != null && answer.songId == song.id ? answer : null;
     final run = ref.watch(smartLyricsControllerProvider);
@@ -96,10 +96,10 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
     if (current != null && current.hasLyrics) {
       final document = current.document!;
       final flags =
-          ref.watch(songMarksProvider(song.id)).valueOrNull ??
+          ref.watch(songMarksProvider(song.id)).value ??
           SmartLyricsSongFlags.empty;
       final contrast =
-          ref.watch(songContrastProvider(song)).valueOrNull ??
+          ref.watch(songContrastProvider(song)).value ??
           SmartSongContrast.empty;
       final marks = ref.read(smartLyricsMarksControllerProvider);
       // A sheet with a contrast under its lines reads taller — the cells
@@ -284,15 +284,16 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
 
   /// Lets the reader bring the lyrics of the track from a file.
   Future<void> _chooseFile(Song song) async {
-    final result = await FilePicker.platform.pickFiles(
+    // file_picker 13 起 FilePicker 的静态方法直接返回文件列表，取消时是空列表；
+    // 字节要自己读（旧 API 的 withData 已并入 PlatformFile.readAsBytes）。
+    final files = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: const ['lrc', 'txt'],
-      withData: true,
     );
-    if (result == null || result.files.isEmpty) return;
+    if (files.isEmpty) return;
 
-    final bytes = result.files.single.bytes;
-    if (bytes == null) return;
+    final bytes = await files.single.readAsBytes();
+    if (bytes.isEmpty) return;
 
     final attached = await ref
         .read(lyricsControllerProvider.notifier)
@@ -462,7 +463,7 @@ class _MarkRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final marks = ref.read(smartLyricsMarksControllerProvider);
     final contrast =
-        ref.watch(songContrastProvider(song)).valueOrNull ??
+        ref.watch(songContrastProvider(song)).value ??
         SmartSongContrast.empty;
     final hasAssist = ref.watch(smartLyricsAssistProvider) != null;
     final contrastController = ref.read(smartLyricsContrastControllerProvider);

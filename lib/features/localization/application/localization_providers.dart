@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:tune/utils/logger.dart';
 import 'package:tune/data/services/translation/anthropic_translation_engine.dart';
 import 'package:tune/data/services/translation/gemini_translation_engine.dart';
@@ -94,7 +95,7 @@ final translationAvailabilityProvider = Provider<TranslationAvailability>((
 
   if (backendId == LocalizationConfig.localBackendId) {
     final ready = ref.watch(localTranslationReadyProvider);
-    return ready.valueOrNull == true
+    return ready.value == true
         ? TranslationAvailability.available
         : TranslationAvailability.localNotInstalled;
   }

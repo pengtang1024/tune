@@ -40,9 +40,10 @@ mixin SettingsPaneActions<T extends ConsumerStatefulWidget> on ConsumerState<T> 
       ref.read(defaultPlayerServiceProvider).isSupported;
 
   Future<void> pickDirectory() async {
-    final path = await FilePicker.platform.getDirectoryPath(
+    final picked = await FilePicker.pickDirectory(
       dialogTitle: context.loc.settingsChooseFolder,
     );
+    final path = picked?.toFilePath();
     if (path == null || !mounted) return;
 
     await ref.read(settingsControllerProvider.notifier).addScanPath(path);
@@ -58,9 +59,10 @@ mixin SettingsPaneActions<T extends ConsumerStatefulWidget> on ConsumerState<T> 
       await _pickSafLibraryFolder();
       return;
     }
-    final path = await FilePicker.platform.getDirectoryPath(
+    final picked = await FilePicker.pickDirectory(
       dialogTitle: context.loc.settingsChangeLibraryFolder,
     );
+    final path = picked?.toFilePath();
     if (path == null || !mounted) return;
 
     await ref.read(settingsControllerProvider.notifier).setLibraryFolder(path);
@@ -105,7 +107,7 @@ mixin SettingsPaneActions<T extends ConsumerStatefulWidget> on ConsumerState<T> 
         .read(libraryControllerProvider.notifier)
         .scan(settings.effectiveScanPaths);
     if (!mounted) return;
-    final state = ref.read(libraryControllerProvider).valueOrNull;
+    final state = ref.read(libraryControllerProvider).value;
     showSettingsMessage(
       state?.errorMessage ??
           state?.statusMessage ??
@@ -158,7 +160,7 @@ mixin SettingsPaneActions<T extends ConsumerStatefulWidget> on ConsumerState<T> 
 
     await ref.read(libraryControllerProvider.notifier).clearLibrary();
     if (!mounted) return;
-    final state = ref.read(libraryControllerProvider).valueOrNull;
+    final state = ref.read(libraryControllerProvider).value;
     showSettingsMessage(
       state?.errorMessage ?? context.loc.settingsLibraryCleared,
     );

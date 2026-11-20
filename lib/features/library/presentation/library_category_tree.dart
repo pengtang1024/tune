@@ -42,7 +42,7 @@ class LibraryCategoryTree extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final facets =
-        ref.watch(libraryFacetsProvider).valueOrNull ?? LibraryFacets.empty;
+        ref.watch(libraryFacetsProvider).value ?? LibraryFacets.empty;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 160),
       width: expanded ? 168 : 48,

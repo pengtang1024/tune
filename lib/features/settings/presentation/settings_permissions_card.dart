@@ -23,7 +23,7 @@ class SettingsPermissionsCard extends ConsumerWidget {
     final state = ref.watch(mobilePermissionsControllerProvider);
     final controller = ref.read(mobilePermissionsControllerProvider.notifier);
 
-    final value = state.valueOrNull;
+    final value = state.value;
     if (value == null) {
       return Text(
         context.loc.settingsPermissionsDescription,

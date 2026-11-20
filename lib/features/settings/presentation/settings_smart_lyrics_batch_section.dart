@@ -32,7 +32,7 @@ class SmartLyricsBatchSection extends ConsumerWidget {
     final strings = context.loc;
     final failed = progress.running
         ? 0
-        : counts.valueOrNull?[SmartLyricsTaskStatus.failed] ?? 0;
+        : counts.value?[SmartLyricsTaskStatus.failed] ?? 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,7 +186,7 @@ class SmartLyricsBatchSection extends ConsumerWidget {
     if (progress.pausedForBudget) {
       return strings.settingsSmartLyricsBudgetPaused(progress.cloudBudget ?? 0);
     }
-    final account = counts.valueOrNull ?? const {};
+    final account = counts.value ?? const {};
     return strings.settingsSmartLyricsBatchIdle(
       account[SmartLyricsTaskStatus.pending] ?? 0,
       account[SmartLyricsTaskStatus.done] ?? 0,

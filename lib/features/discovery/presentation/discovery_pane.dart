@@ -29,13 +29,13 @@ class DiscoveryPane extends ConsumerWidget {
     final discovery = ref.watch(discoveryControllerProvider);
     final librarySongs = ref.watch(
       libraryControllerProvider.select(
-        (value) => value.valueOrNull?.songs ?? const <Song>[],
+        (value) => value.value?.songs ?? const <Song>[],
       ),
     );
     final favorites = ref.watch(favoritesControllerProvider);
     final sources = ref.watch(
       musicSourcesControllerProvider.select(
-        (value) => value.valueOrNull?.sources ?? const [],
+        (value) => value.value?.sources ?? const [],
       ),
     );
     final playback = ref.watch(
@@ -50,7 +50,7 @@ class DiscoveryPane extends ConsumerWidget {
       settingsControllerProvider.select((value) => value.useListeningHistory),
     );
     final sourceLabels = sourceLabelsOf(context.loc, sources);
-    final state = discovery.valueOrNull;
+    final state = discovery.value;
     final actions = DiscoveryActions(ref);
 
     return Column(

@@ -169,7 +169,7 @@ void main() {
       '[00:12.00]Chosen line'.codeUnits,
     );
 
-    final state = container.read(lyricsControllerProvider).valueOrNull!;
+    final state = container.read(lyricsControllerProvider).value!;
     expect(state.hasLyrics, isTrue);
     expect(state.document!.lines.first.text, 'Chosen line');
     expect(paths.stored[1], '[00:12.00]Chosen line');
@@ -186,7 +186,7 @@ void main() {
 
     await container.read(lyricsControllerProvider.notifier).attach(first, []);
 
-    final state = container.read(lyricsControllerProvider).valueOrNull!;
+    final state = container.read(lyricsControllerProvider).value!;
     expect(state.invalid, isTrue);
     expect(state.hasLyrics, isFalse);
     expect(paths.stored.containsKey(1), isFalse);
@@ -206,7 +206,7 @@ void main() {
       '[00:12.00]Chosen line'.codeUnits,
     );
 
-    final state = container.read(lyricsControllerProvider).valueOrNull!;
+    final state = container.read(lyricsControllerProvider).value!;
     expect(state.hasLyrics, isTrue);
     expect(state.document!.lines.first.text, 'Chosen line');
   });
@@ -252,7 +252,7 @@ Future<LyricsState> _settled(ProviderContainer container) async {
   } catch (_) {
     // The request failed: the state carries the failure.
   }
-  return container.read(lyricsControllerProvider).valueOrNull ??
+  return container.read(lyricsControllerProvider).value ??
       const LyricsState();
 }
 

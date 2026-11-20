@@ -25,7 +25,7 @@ class _BatchController extends LocalComponentsController {
     attempts.add(id);
     if (failIds.contains(id)) return false;
     state = AsyncData({
-      ...?state.valueOrNull,
+      ...?state.value,
       id: const LocalComponentState(
         LocalComponentPhase.ready,
         installedBytes: 1024,
@@ -155,7 +155,7 @@ void main() {
       reason: 'cancelling does not start anything and keeps what finished',
     );
     expect(
-      controller.state.valueOrNull?[runtime.id]?.phase,
+      controller.state.value?[runtime.id]?.phase,
       LocalComponentPhase.downloading,
       reason: 'the component map is untouched; only its token was stopped',
     );

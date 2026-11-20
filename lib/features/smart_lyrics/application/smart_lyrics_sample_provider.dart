@@ -21,7 +21,7 @@ final smartLyricsSampleProvider = FutureProvider<SmartLyricsSampleAccount>((
   ref,
 ) async {
   ref.watch(
-    libraryControllerProvider.select((state) => state.valueOrNull?.songs),
+    libraryControllerProvider.select((state) => state.value?.songs),
   );
   return ref.watch(smartLyricsSampleStoreProvider).read();
 });

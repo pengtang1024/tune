@@ -311,11 +311,11 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
 
   /// Reads the cover of an episode, falling back to the podcast cover.
   static String? _artworkUrl(XmlElement item, String? podcastArtwork) {
-    final image = _first(item.findElements('image', namespace: '*'));
+    final image = _first(item.findElements('image', namespaceUri: '*'));
     final href = SourceSongFactory.normalizeUrl(image?.getAttribute('href'));
     if (href != null) return href;
 
-    final thumbnail = _first(item.findElements('thumbnail', namespace: '*'));
+    final thumbnail = _first(item.findElements('thumbnail', namespaceUri: '*'));
     final thumbnailUrl = SourceSongFactory.normalizeUrl(
       thumbnail?.getAttribute('url'),
     );
@@ -328,7 +328,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
   static String? _channelArtwork(XmlElement? channel) {
     if (channel == null) return null;
 
-    final image = _first(channel.findElements('image', namespace: '*'));
+    final image = _first(channel.findElements('image', namespaceUri: '*'));
     final href = SourceSongFactory.normalizeUrl(image?.getAttribute('href'));
     if (href != null) return href;
 
@@ -353,7 +353,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     String fallback = '',
   }) {
     for (final element in elements) {
-      final match = _first(element.findElements(name, namespace: '*'));
+      final match = _first(element.findElements(name, namespaceUri: '*'));
       final text = match?.innerText.trim() ?? '';
       if (text.isNotEmpty) return text;
     }

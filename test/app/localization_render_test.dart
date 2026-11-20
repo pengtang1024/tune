@@ -470,7 +470,7 @@ class FakeLibraryController extends LibraryController {
 
   @override
   Future<void> setQuery(String query) async {
-    state = AsyncData((state.valueOrNull ?? seed).copyWith(query: query));
+    state = AsyncData((state.value ?? seed).copyWith(query: query));
   }
 }
 

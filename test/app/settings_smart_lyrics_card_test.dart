@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/components/local_component.dart';
 import 'package:tune/data/services/components/local_component_registry.dart';
@@ -52,7 +53,7 @@ class _FakeComponentsController extends LocalComponentsController {
   Future<bool> download(String id) async {
     downloaded.add(id);
     state = AsyncData({
-      ...?state.valueOrNull,
+      ...?state.value,
       id: const LocalComponentState(
         LocalComponentPhase.ready,
         installedBytes: 1024 * 1024,
