@@ -73,7 +73,7 @@ The shots are rendered by `tool/layout_shots_test.dart` at 1280×800 from the re
 
 ## Stack
 
-- Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router
+- Flutter 3 / Dart 3.8+ · Riverpod 3 · go_router
 - just_audio; **both Linux and Windows** use just_audio_media_kit + media_kit_libs_linux / media_kit_libs_windows_audio + system libmpv (the Windows backend carries custom request headers)
 - SQLite (`sqlite3` + `sqlite3_flutter_libs`) · dio · `window_manager` · `dbus`
 - `audio_service` (Android background playback / notification / lock screen) · `permission_handler` (Android runtime permissions) · `sherpa_onnx` (Android local ASR)
