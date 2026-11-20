@@ -11,7 +11,7 @@
 
 Tune is a compact local and online music player built with Flutter. The shell has a navigation rail (discover, library, liked, sources, settings), a content area, and a player dock at the bottom; the play queue is a non-modal side panel opened from the dock or the now playing page, not a navigation destination; it dims the page content while the dock and sidebar stay usable.
 
-- **Current version**: `1.48.0+97` (codename `Pocket`, 2026-11-17). Version and build number live in [pubspec.yaml](pubspec.yaml) and `lib/config/app_version.dart`; the published manifest is the root [version.json](version.json).
+- **Current version**: `1.48.1+98` (codename `Pocket`, 2026-11-20). Version and build number live in [pubspec.yaml](pubspec.yaml) and `lib/config/app_version.dart`; the published manifest is the root [version.json](version.json).
 - **Primary target**: Linux desktop. Windows / Android / iOS keep an engineering entry point; macOS and Web have been removed.
 - **Source and docs**: [AGENTS.md](AGENTS.md) is the documentation map; design notes live in [docs/](docs/), a code-structure tour in [wiki/](wiki/), and the requirements entry point is [需求/README.md](需求/README.md). When something does not work, start with [Troubleshooting](docs/troubleshooting.md).
 
@@ -73,7 +73,7 @@ The shots are rendered by `tool/layout_shots_test.dart` at 1280×800 from the re
 
 ## Stack
 
-- Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router
+- Flutter 3 / Dart 3.8+ · Riverpod 3 · go_router
 - just_audio; **both Linux and Windows** use just_audio_media_kit + media_kit_libs_linux / media_kit_libs_windows_audio + system libmpv (the Windows backend carries custom request headers)
 - SQLite (`sqlite3` + `sqlite3_flutter_libs`) · dio · `window_manager` · `dbus`
 - `audio_service` (Android background playback / notification / lock screen) · `permission_handler` (Android runtime permissions) · `sherpa_onnx` (Android local ASR)

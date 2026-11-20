@@ -46,8 +46,8 @@ class LibraryEmptyState extends ConsumerWidget {
     final scan = ref.watch(
       libraryControllerProvider.select(
         (value) => (
-          value.valueOrNull?.isScanning ?? false,
-          value.valueOrNull?.statusMessage,
+          value.value?.isScanning ?? false,
+          value.value?.statusMessage,
         ),
       ),
     );

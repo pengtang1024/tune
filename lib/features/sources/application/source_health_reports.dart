@@ -75,12 +75,12 @@ final sourceHealthReportsProvider = Provider<Map<String, SourceHealthReport>>((
   ref,
 ) {
   final sources = ref.watch(
-    musicSourcesControllerProvider.select((value) => value.valueOrNull),
+    musicSourcesControllerProvider.select((value) => value.value),
   );
   if (sources == null || sources.sources.isEmpty) return const {};
   final library = ref.watch(
     libraryControllerProvider.select((value) {
-      final state = value.valueOrNull;
+      final state = value.value;
       return (
         songs: state?.songs ?? const <Song>[],
         facts: state?.sourceFacts ?? const <String, SourceFactCounts>{},

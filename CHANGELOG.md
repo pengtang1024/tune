@@ -2,6 +2,19 @@
 
 本文件从「音源类型化」这次改动开始记。之前的变化跟着 git tag 走。
 
+## [1.48.1] - 2026-11-20
+
+### 变更
+
+- **依赖整组升级。** riverpod 2.6 → 3.5、go_router 16 → 18、file_picker 10 → 13、xml 6 → 7、permission_handler 12 → 13，image / archive / dbus / cupertino_icons 跟随升级；状态管理迁到 riverpod 3 的写法（`AsyncNotifierProvider.autoDispose`、`AsyncValue.value`，`StateNotifierProvider` 等旧接口从 `flutter_riverpod/legacy.dart` 取）。
+- 选择歌词文件、选择音乐库目录与分享列表的文件选择改走 file_picker 13 的静态接口（`pickFiles` / `pickFile` / `pickDirectory`，取消返回空列表）。
+- 播客与 LibriVox 的 RSS 解析改走 xml 7 的 `namespaceUri`。
+
+### 文档与工程
+
+- 技术栈与依赖文档对齐 riverpod 3 / file_picker 13 / xml 7：AGENTS.md、README、README_en、wiki 的控制器写法与版本表一并更新。
+- CI 的 actions/checkout 4 → 7；dependabot 不再自动提 window_manager——0.6 起换成 nativeapi，构建钩子要 GTK3 / X11 / Xi 的开发包，留到升级 Flutter 那一轮一起做，这一版仍停在 0.5.2。
+
 ## [1.48.0] - 2026-11-19
 
 ### 新增

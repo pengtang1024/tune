@@ -304,7 +304,7 @@ class MusicSourcesController extends AsyncNotifier<MusicSourcesState> {
   }
 
   MusicSourcesState get _current =>
-      state.valueOrNull ?? const MusicSourcesState();
+      state.value ?? const MusicSourcesState();
 
   Future<void> setEnabled(String sourceId, bool enabled) {
     return _update(sourceId, (config) => config.copyWith(enabled: enabled));

@@ -19,10 +19,10 @@ class LibraryScanStatusBar extends ConsumerWidget {
     final scan = ref.watch(
       libraryControllerProvider.select(
         (value) => (
-          value.valueOrNull?.isScanning ?? false,
-          value.valueOrNull?.scanProgress ?? 0,
-          value.valueOrNull?.statusMessage,
-          value.valueOrNull?.errorMessage,
+          value.value?.isScanning ?? false,
+          value.value?.scanProgress ?? 0,
+          value.value?.statusMessage,
+          value.value?.errorMessage,
         ),
       ),
     );

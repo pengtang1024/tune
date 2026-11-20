@@ -10,13 +10,13 @@ import 'package:tune/features/sources/application/music_sources_controller.dart'
 import 'package:tune/utils/logger.dart';
 
 final onlineSearchControllerProvider =
-    AutoDisposeAsyncNotifierProvider<OnlineSearchController, OnlineSearchState>(
+    AsyncNotifierProvider.autoDispose<OnlineSearchController, OnlineSearchState>(
       OnlineSearchController.new,
     );
 
 /// Owns transient online search results. It never mutates the library cache.
 class OnlineSearchController
-    extends AutoDisposeAsyncNotifier<OnlineSearchState> {
+    extends AsyncNotifier<OnlineSearchState> {
   int _generation = 0;
   bool _disposed = false;
 
@@ -36,7 +36,7 @@ class OnlineSearchController
     }
 
     final sources =
-        ref.read(musicSourcesControllerProvider).valueOrNull?.sources ??
+        ref.read(musicSourcesControllerProvider).value?.sources ??
         const <MusicSourceConfig>[];
     final remoteSources = sources
         .where((source) => source.enabled && !source.isLocal)
@@ -51,7 +51,7 @@ class OnlineSearchController
       return;
     }
 
-    final autoSave = state.valueOrNull?.autoSave ?? false;
+    final autoSave = state.value?.autoSave ?? false;
     state = AsyncData(
       OnlineSearchState(
         query: query,
@@ -69,7 +69,7 @@ class OnlineSearchController
             query: query,
             onProgress: (sourceId, progress) {
               if (_disposed || generation != _generation) return;
-              final current = state.valueOrNull;
+              final current = state.value;
               if (current == null || !current.isSearching) return;
               state = AsyncData(
                 current.copyWith(
@@ -117,7 +117,7 @@ class OnlineSearchController
   /// A source without pages answers with the window it already gave, so the
   /// button reports that there is nothing more instead of repeating it.
   Future<void> loadMore(String sourceId) async {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null || current.isSearching || current.loadingMore != null) {
       return;
     }
@@ -125,7 +125,7 @@ class OnlineSearchController
     if (result == null || result.songs.isEmpty) return;
 
     final sources =
-        ref.read(musicSourcesControllerProvider).valueOrNull?.sources ??
+        ref.read(musicSourcesControllerProvider).value?.sources ??
         const <MusicSourceConfig>[];
     MusicSourceConfig? source;
     for (final candidate in sources) {
@@ -209,7 +209,7 @@ class OnlineSearchController
 
   /// Turns the automatic save of the results on or off.
   void setAutoSave(bool value) {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null || current.autoSave == value) return;
     state = AsyncData(current.copyWith(autoSave: value));
   }

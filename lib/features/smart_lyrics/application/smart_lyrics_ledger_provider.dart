@@ -21,7 +21,7 @@ final smartLyricsLedgerStoreProvider = Provider<SmartLyricsLedgerStore>(
 /// count is one query over the rows.
 final smartLyricsLedgerProvider = FutureProvider<SmartLyricsLedger>((ref) async {
   ref.watch(
-    libraryControllerProvider.select((state) => state.valueOrNull?.songs),
+    libraryControllerProvider.select((state) => state.value?.songs),
   );
   return ref.watch(smartLyricsLedgerStoreProvider).read();
 });

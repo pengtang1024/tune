@@ -1,6 +1,6 @@
 # 依赖关系
 
-> 状态：设计（已实施） · 适用版本 1.48.0 · 最后核对 2026-11-16
+> 状态：设计（已实施） · 适用版本 1.48.1 · 最后核对 2026-11-20
 
 ## 内部依赖方向
 
@@ -34,26 +34,26 @@ Desktop：PlaybackController ─→ DesktopIntegrationController ─→ MPRIS / 
 
 | 依赖 | 版本 | 用途 |
 | --- | --- | --- |
-| `flutter_riverpod` / `riverpod` | ^2.6.1 | 状态管理 |
-| `go_router` | ^16.1.0 | 路由；ShellRoute + CustomTransitionPage |
+| `flutter_riverpod` / `riverpod` | ^3.5.0 | 状态管理（`StateNotifierProvider` 等旧接口从 `flutter_riverpod/legacy.dart` 取） |
+| `go_router` | ^18.1.4 | 路由；ShellRoute + CustomTransitionPage |
 | `just_audio` | ^0.10.4 | 音频播放抽象 |
 | `just_audio_media_kit` + `media_kit_libs_linux` + `media_kit_libs_windows_audio` | ^2.1.0 / ^1.2.1 / ^1.0.9 | Linux 与 Windows 播放后端（media_kit + 系统 libmpv；Windows 也走 media_kit，自定义请求头随音频请求发出，不使用 just_audio_windows） |
 | `audio_session` | ^0.2.3 | 音频会话 |
-| `dbus` | ^0.7.15 | MPRIS、托盘、单实例（file_picker 牵制 0.7 线） |
-| `window_manager` | ^0.5.0 | 桌面窗口管理 |
+| `dbus` | ^0.8.0 | MPRIS、托盘、单实例 |
+| `window_manager` | ^0.5.2 | 桌面窗口管理 |
 | `sqlite3` + `sqlite3_flutter_libs` | ^3.8.0 / ^0.6.0 | 音乐库索引、队列、喜欢、智能歌词账本 |
 | `shared_preferences` | ^2.5.3 | 仅旧数据迁移 |
 | `dio` | ^5.4.0 | 网络请求（音源、下载、封面、更新） |
-| `xml` | ^6.6.1 | 播客 RSS 解析 |
+| `xml` | ^7.1.0 | 播客 RSS 解析 |
 | `crypto` | ^3.0.7 | Subsonic token 签名 |
 | `charset` | ^2.0.1 | 读取其它编码的歌词文件 |
-| `audio_metadata_reader` | ^1.4.2（vendor 覆盖） | 本地音频元数据；上游 `Buffer.read` 无界分配，补丁见 `vendor/audio_metadata_reader/VENDORED.md` |
+| `audio_metadata_reader` | ^1.8.1（vendor 覆盖） | 本地音频元数据；上游 `Buffer.read` 无界分配，补丁见 `vendor/audio_metadata_reader/VENDORED.md` |
 | `path` / `path_provider` | ^1.9.0 / ^2.1.3 | 路径处理与平台目录 |
-| `file_picker` | ^10.3.1 | 文件选择 |
+| `file_picker` | ^13.4.0 | 文件选择 |
 | `audio_service` | ^0.18.19 | Android 后台播放、通知与锁屏媒体控制 |
-| `permission_handler` | ^12.0.3 | Android 运行时权限（通知、媒体读取） |
+| `permission_handler` | ^13.0.2 | Android 运行时权限（通知、媒体读取） |
 | `sherpa_onnx` | ^2.0.1 | Android 本地 ASR（SenseVoice，FFI） |
-| `archive` | ^4.6.0 | 解压可选本地组件（翻译运行时等） |
+| `archive` | ^4.7.1 | 解压可选本地组件（翻译运行时等） |
 | `flutter_localizations` + `intl` | sdk / ^0.20.2 | 本地化（gen-l10n，产物入库） |
 | `logger` | ^2.6.1 | 日志（`Log` 封装为 debug/info/error 三级） |
 | `cupertino_icons` | ^1.0.8 | 图标 |

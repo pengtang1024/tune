@@ -150,7 +150,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     // 电台与音效没有组，停在那里只会是空页。
     ref.listen<String?>(
       libraryControllerProvider.select(
-        (value) => value.valueOrNull?.filter.kinds.join(','),
+        (value) => value.value?.filter.kinds.join(','),
       ),
       (previous, next) {
         if (previous == null || previous == next) return;
@@ -158,7 +158,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       },
     );
     ref.listen<String?>(
-      libraryControllerProvider.select((value) => value.valueOrNull?.query),
+      libraryControllerProvider.select((value) => value.value?.query),
       (previous, next) {
         if (next == null || next == _searchController.text) return;
         _searchController.value = TextEditingValue(
@@ -187,7 +187,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     final settings = ref.watch(settingsControllerProvider);
     final sourceConfigs = ref.watch(
       musicSourcesControllerProvider.select(
-        (value) => value.valueOrNull?.sources ?? const [],
+        (value) => value.value?.sources ?? const [],
       ),
     );
     // The page needs the order of the sources, not the whole health report:
@@ -801,7 +801,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// a name still has a row); when storage cannot read that album's tracks the
   /// click keeps the reader where they are.
   Future<void> _openAlbumOfSong(Song song) async {
-    final library = ref.read(libraryControllerProvider).valueOrNull;
+    final library = ref.read(libraryControllerProvider).value;
     if (library == null) return;
     // The row the list shows is grouped by album and source; read the group
     // off the same list the reader is looking at so the click lands on it.
@@ -860,7 +860,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         .setFilter(
           ref
                   .read(libraryControllerProvider)
-                  .valueOrNull
+                  .value
                   ?.filter
                   .copyWith(kinds: {kind}) ??
               LibraryFilter.empty.copyWith(kinds: {kind}),
@@ -948,7 +948,7 @@ typedef _LibrarySlice = ({
 });
 
 _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
-  final state = value.valueOrNull;
+  final state = value.value;
   if (state == null) return null;
   return (
     songs: state.songs,
@@ -989,8 +989,8 @@ class _LibraryPathsFooter extends ConsumerWidget {
     final scan = ref.watch(
       libraryControllerProvider.select(
         (value) => (
-          value.valueOrNull?.isScanning ?? false,
-          value.valueOrNull?.errorMessage,
+          value.value?.isScanning ?? false,
+          value.value?.errorMessage,
         ),
       ),
     );

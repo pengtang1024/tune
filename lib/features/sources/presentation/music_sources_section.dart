@@ -40,7 +40,7 @@ class MusicSourcesSection extends ConsumerWidget {
     final sourcesAsync = ref.watch(musicSourcesControllerProvider);
     final library = ref.watch(
       libraryControllerProvider.select((value) {
-        final state = value.valueOrNull;
+        final state = value.value;
         return (
           scanning: state?.isScanning ?? false,
           loading: state?.isLoading ?? false,
@@ -55,10 +55,10 @@ class MusicSourcesSection extends ConsumerWidget {
 
     final sources = localizedSources(
       context.loc,
-      sourcesAsync.valueOrNull?.sources ?? const <MusicSourceConfig>[],
+      sourcesAsync.value?.sources ?? const <MusicSourceConfig>[],
     );
     final lastScanAt =
-        sourcesAsync.valueOrNull?.lastScanAt ?? const <String, DateTime>{};
+        sourcesAsync.value?.lastScanAt ?? const <String, DateTime>{};
     final sourceService = ref.watch(musicSourceServiceProvider);
     final health = ref.watch(sourceHealthReportsProvider);
     final groups = _groupSources(sources, sourceService, health);
@@ -218,7 +218,7 @@ class MusicSourcesSection extends ConsumerWidget {
         .scan(settings.effectiveScanPaths);
     if (!context.mounted) return;
 
-    final state = ref.read(libraryControllerProvider).valueOrNull;
+    final state = ref.read(libraryControllerProvider).value;
     final message =
         state?.errorMessage ??
         state?.statusMessage ??
@@ -719,7 +719,7 @@ class _ScanProgressBar extends ConsumerWidget {
     final theme = Theme.of(context);
     final progress = ref.watch(
       libraryControllerProvider.select(
-        (value) => value.valueOrNull?.scanProgress ?? 0.0,
+        (value) => value.value?.scanProgress ?? 0.0,
       ),
     );
 

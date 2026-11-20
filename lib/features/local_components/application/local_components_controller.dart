@@ -81,7 +81,7 @@ class LocalComponentsController
   Future<bool> download(String id) async {
     final spec = LocalComponentRegistry.byId(id);
     final components = await ref.read(localComponentsProvider.future);
-    final before = state.valueOrNull?[id];
+    final before = state.value?[id];
     if (before != null && before.busy) return false;
 
     final token = CancelToken();
@@ -100,7 +100,7 @@ class LocalComponentsController
         spec,
         cancelToken: token,
         onProgress: (received, total) {
-          final current = state.valueOrNull?[id];
+          final current = state.value?[id];
           if (current == null ||
               current.phase != LocalComponentPhase.downloading) {
             return;
@@ -160,7 +160,7 @@ class LocalComponentsController
   Future<void> remove(String id) async {
     final spec = LocalComponentRegistry.byId(id);
     final components = await ref.read(localComponentsProvider.future);
-    final before = state.valueOrNull?[id];
+    final before = state.value?[id];
     if (before == null || before.busy || !before.canDelete) return;
     try {
       await components.installer.remove(spec);
@@ -191,7 +191,7 @@ class LocalComponentsController
   /// Installs the components in order, skipping what is already usable.
   Future<void> installComponents(List<LocalComponentSpec> specs) async {
     for (final spec in specs) {
-      final current = state.valueOrNull?[spec.id];
+      final current = state.value?[spec.id];
       if (current == null || current.usable) continue;
       final installed = await download(spec.id);
       if (!installed) return;
@@ -202,7 +202,7 @@ class LocalComponentsController
   /// already finished stays.
   void cancelFeature(LocalFeatureSpec feature, LocalFeatureTier tier) {
     for (final spec in tier.components) {
-      final phase = state.valueOrNull?[spec.id]?.phase;
+      final phase = state.value?[spec.id]?.phase;
       if (phase == LocalComponentPhase.downloading ||
           phase == LocalComponentPhase.verifying) {
         cancel(spec.id);
@@ -218,7 +218,7 @@ class LocalComponentsController
   /// Deletes every downloaded copy among [specs]; system copies stay.
   Future<void> removeComponents(List<LocalComponentSpec> specs) async {
     for (final spec in specs) {
-      final current = state.valueOrNull?[spec.id];
+      final current = state.value?[spec.id];
       if (current == null || current.busy || !current.canDelete) continue;
       await remove(spec.id);
     }
@@ -232,7 +232,7 @@ class LocalComponentsController
   }
 
   void _put(String id, LocalComponentState value) {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null) return;
     state = AsyncData({...current, id: value});
   }
@@ -243,14 +243,14 @@ class LocalComponentsController
 final localComponentStateProvider =
     Provider.family<LocalComponentState, String>((ref, id) {
       final states = ref.watch(localComponentsControllerProvider);
-      return states.valueOrNull?[id] ??
+      return states.value?[id] ??
           const LocalComponentState(LocalComponentPhase.checking);
     });
 
 /// The translation model the reader is actually using: the tier they picked
 /// when it is usable, otherwise the first usable one in fallback order.
 final activeTranslationModelProvider = Provider<LocalComponentSpec>((ref) {
-  final states = ref.watch(localComponentsControllerProvider).valueOrNull;
+  final states = ref.watch(localComponentsControllerProvider).value;
   final tier = ref.watch(
     settingsControllerProvider.select(
       (settings) => settings.localization.localTier,

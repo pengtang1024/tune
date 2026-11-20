@@ -68,7 +68,7 @@
 ## 0. 项目快照
 
 - 产品：紧凑的桌面音乐播放器（Flutter）。壳层是左侧导航（发现 / 音乐库 / 喜欢 / 音源 / 设置）+ 右侧内容区 + 底部播放条；播放队列是底栏和正在播放页打开的非模态侧栏，不是一级导航页；它只遮住内容区，底栏和侧栏仍可用。
-- 技术栈：Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router · just_audio（Linux/Windows 走 just_audio_media_kit + media_kit_libs_*）· dio · SQLite（sqlite3 + sqlite3_flutter_libs）· shared_preferences（仅旧数据迁移）· audio_service · permission_handler · sherpa_onnx · gen-l10n。
+- 技术栈：Flutter 3 / Dart 3.8+ · Riverpod 3 · go_router · just_audio（Linux/Windows 走 just_audio_media_kit + media_kit_libs_*）· dio · SQLite（sqlite3 + sqlite3_flutter_libs）· shared_preferences（仅旧数据迁移）· audio_service · permission_handler · sherpa_onnx · gen-l10n。
 - 验收平台：Linux 桌面优先；Windows / Android / iOS 保留工程入口，但不是 v1 验收目标。**macOS 与 Web 不再支持**，平台工程入口与相关代码已移除。
 - 需求文档：`需求/README.md` 是入口，那里列的五份是现行权威：`紧凑播放器重构方案.md`（架构现状与验收）、`音源设计.md`（音源扩展）、`队列模型方案.md`（队列模型）、`桌面集成方案.md`（桌面集成）、`多语言设计.md`（文案规则）。
 - **旧稿在 [`需求/历史/`](需求/历史/README.md)**：2025 年 12 月那版的架构、框架、功能、账号、ai 架构、旧配色、旧界面风格、默认配置、功能规范都在那里。它们描述的是当时的目录与调色板，**只当历史读，不作规范**。

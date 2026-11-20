@@ -40,7 +40,7 @@ class _FakeLibraryController extends LibraryController {
       LibraryState(songs: songs, total: songs.length);
 
   void pushProgress(double progress) {
-    final current = state.valueOrNull!;
+    final current = state.value!;
     state = AsyncData(
       current.copyWith(
         scanStatus: LibraryScanStatus.scanning,

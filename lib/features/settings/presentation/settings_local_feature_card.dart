@@ -49,10 +49,10 @@ class _SettingsLocalFeatureCardState
     if (tiers.isEmpty) return const SizedBox.shrink();
 
     final states =
-        ref.watch(localComponentsControllerProvider).valueOrNull ??
+        ref.watch(localComponentsControllerProvider).value ??
         const <String, LocalComponentState>{};
     final settings = ref.watch(settingsControllerProvider);
-    final profile = ref.watch(machineProfileProvider).valueOrNull;
+    final profile = ref.watch(machineProfileProvider).value;
     final recommendation = profile == null
         ? null
         : recommendFeature(
@@ -346,7 +346,7 @@ class _SettingsLocalFeatureCardState
   Future<void> _installBundled(LocalFeatureTier tier) async {
     final controller = ref.read(localComponentsControllerProvider.notifier);
     final states =
-        ref.read(localComponentsControllerProvider).valueOrNull ??
+        ref.read(localComponentsControllerProvider).value ??
         const <String, LocalComponentState>{};
     for (final spec in tier.components) {
       if (states[spec.id]?.phase == LocalComponentPhase.ready) continue;

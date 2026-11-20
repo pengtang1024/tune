@@ -701,13 +701,13 @@ RecommendationEngine
 
 ### 7.4 控制器
 
-`DiscoveryController` 用 `AutoDisposeAsyncNotifier<DiscoveryState>`，
-与在线搜索的临时面板同一模式：
+`DiscoveryController` 用 `AsyncNotifierProvider.autoDispose`（riverpod 3 里
+`AutoDisposeAsyncNotifier` 已并入 `AsyncNotifier`），与在线搜索的临时面板同一模式：
 
 | 关注点 | 做法 |
 | --- | --- |
 | `build` | 读取 `LibraryController` 的 `(isLoading, hasValue, songs)`、`FavoritesState.ids`、来源 id 顺序、播放队列身份、播放记录开关与两个存储，构建画像并计算分段。 |
-| 订阅粒度 | 用 `select` 只订阅需要的切片，避免扫描进度每变一次就重算：`ref.watch(libraryControllerProvider.select((v) => (v.isLoading, v.valueOrNull?.songs)))`。 |
+| 订阅粒度 | 用 `select` 只订阅需要的切片，避免扫描进度每变一次就重算：`ref.watch(libraryControllerProvider.select((v) => (v.isLoading, v.value?.songs)))`。 |
 | 来源顺序 | 不 watch 整个 `MusicSourcesController`；只 select 来源 id 的当前顺序（配置里已按 `weight` 排好）传给引擎，来源名由 presentation 取。 |
 | 反馈写入 | 写入后立即重算并更新状态；撤销同理。 |
 | 读盘 | 反馈在 controller 生命周期内只读一次盘；播放记录在打开开关、刷新或重算时重新读取，因为观察器在页面外写入。喜欢切换导致的重算不重复读反馈。 |

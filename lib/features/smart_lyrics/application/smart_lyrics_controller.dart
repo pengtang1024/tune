@@ -163,7 +163,7 @@ SmartLyricsService _buildSmartLyricsService(Ref ref) {
   final funasrReady = ref.watch(
     localComponentsControllerProvider.select(
       (states) =>
-          states.valueOrNull?[LocalComponentRegistry.funasrNanoModel.id]
+          states.value?[LocalComponentRegistry.funasrNanoModel.id]
               ?.usable ??
           false,
     ),

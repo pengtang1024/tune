@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.48.0",
-  "build": 97,
-  "released_at": "2026-11-19T03:28:25Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.48.0",
-  "notes": "### 新增\n\n- **AI 标识写进文件本身。** 生成物分享出去之前，分享副本会带上四条隐式标识（AI_GENERATED / GENERATOR / CONTENT_ID / PRODUCER）：FLAC 与 MP3 直接写元数据，MP4 家族与 ogg/opus 经 ffmpeg 写入，每次写入都回读核对；WAV 这类放不下定制键的容器如实报告「不支持」，不假装写过。GB 45438—2025 的音频标识要求从此不只停在清单 JSON 里。\n- **分享副本前置提示音。** 发布生成物时自动生成带 1.2 秒节奏提示音的副本（音频流不重编码，副本落在 outbox 并按源编号分目录），对方收到的是「一听就知道是 AI」的文件；带语音的版本留待素材就绪后替换。\n- **传输加密落地。** mesh 房间里每条连接端到端加密：双方各出 X25519 临时密钥对，HKDF-SHA256 派生双方向密钥，ChaCha20-Poly1305 加密分块载荷；临时公钥绑进房间证明防中间人换钥，篡改密文一字节即断链，旧版明文 hello 一律拒收——不回落明文。\n- **凭字节标识放行。** 别人分享的 AI 副本不再要求本机台账命中：收端读到容器里的四条标识齐全就放行（新增准入结果 admitted_from_label），台账命中仍然是最强凭证；缺标识或标识不全照旧拒收。\n- **撤销对原始件也生效。** 撤销一个 AI 副本时，产生它的原始条目一并进黑名单并从房间拿掉，防止把原始文件再传回来；关闭房间时清空全部暂存副本。\n\n### 变更\n\n- 「AI 生成」徽标（MetaBadge）挂到分享列表的行上，点开能看到生成者与生成时间；撤销按钮改为异步，撤销时先写黑名单再广播。\n- 随包的 audio_metadata_reader 补齐写侧：FLAC Vorbis comment、ID3v2 TXXX 与 MP4 自定义键可以写回文件。\n\n### 文档与工程\n\n- docs/ai-music-sharing.md：§7 补三处实现位置，§8.1 目录与实际文件对齐，§10 M1 行标注标识写入补齐时间，新增 §13.2 实施记录。\n- 新增 share_label_writer / share_copy / admission 标识放行 / AI 副本端到端四组测试，share 相关用例 198 条全绿。\n- docs/ai-music-sharing.md：§5.2/§5.3 改为加密已落地口径，§10 M1 行补会话加密，模块表新增 mesh_session_crypto.dart，新增 §13.3 会话加密实施记录；测试口径更新为共 106 条。\n- 新增 mesh_session_crypto 会话加密测试五例（密封是密文、端到端回环、篡改断链、大块多帧完整、旧版 hello 拒收），test/services 与 test/features 全量 1249 条通过。",
+  "version": "1.48.1",
+  "build": 98,
+  "released_at": "2026-11-20T07:15:43Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.48.1",
+  "notes": "### 变更\n\n- **依赖整组升级。** riverpod 2.6 → 3.5、go_router 16 → 18、file_picker 10 → 13、xml 6 → 7、permission_handler 12 → 13，image / archive / dbus / cupertino_icons 跟随升级；状态管理迁到 riverpod 3 的写法（`AsyncNotifierProvider.autoDispose`、`AsyncValue.value`，`StateNotifierProvider` 等旧接口从 `flutter_riverpod/legacy.dart` 取）。\n- 选择歌词文件、选择音乐库目录与分享列表的文件选择改走 file_picker 13 的静态接口（`pickFiles` / `pickFile` / `pickDirectory`，取消返回空列表）。\n- 播客与 LibriVox 的 RSS 解析改走 xml 7 的 `namespaceUri`。\n\n### 文档与工程\n\n- 技术栈与依赖文档对齐 riverpod 3 / file_picker 13 / xml 7：AGENTS.md、README、README_en、wiki 的控制器写法与版本表一并更新。\n- CI 的 actions/checkout 4 → 7；dependabot 不再自动提 window_manager——0.6 起换成 nativeapi，构建钩子要 GTK3 / X11 / Xi 的开发包，留到升级 Flutter 那一轮一起做，这一版仍停在 0.5.2。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.48.0/tune-linux-x64-1.48.0.tar.gz",
-      "size": 53824962,
-      "sha256": "6f337114bf3fcf38cc0b196e90f6cae568173eb6eb9698661d66e4947f10147c"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.48.1/tune-linux-x64-1.48.1.tar.gz",
+      "size": 53854498,
+      "sha256": "98c0edbd4751a111deabee4638c55052b0027ab613e76c9d87b62dd51d9a7587"
     }
   }
 }

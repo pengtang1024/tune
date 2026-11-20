@@ -15,6 +15,14 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(deps)"
+    ignore:
+      # window_manager 0.6 起换成 nativeapi 实现，构建钩子要 GTK3 / X11 / Xi 的开发包，
+      # 而 CI 刻意不装这些（见 .github/workflows/ci.yml 顶部说明）；0.7 还要
+      # Flutter >=3.50，而 CI 钉在 3.47.7。这条要跟「升级 Flutter + CI 补系统依赖 +
+      # 迁到 native 接口」一起做，删这条之前先看 docs/oss-maintenance.md 的升级口径。
+      - dependency-name: "window_manager"
+        versions:
+          - ">=0.6.0"
     groups:
       # 所有 flutter / dart 依赖合成一个 PR，避免一次几十个 PR 刷屏。
       # 组内某个包升不动时，Dependabot 会把它单独拆出来（若配了 exclude-patterns）或整组失败，需人工处理。

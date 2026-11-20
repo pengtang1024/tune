@@ -47,11 +47,11 @@ class LibraryFilterPanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final filter = ref.watch(
       libraryControllerProvider.select(
-        (value) => value.valueOrNull?.filter ?? LibraryFilter.empty,
+        (value) => value.value?.filter ?? LibraryFilter.empty,
       ),
     );
     final facets =
-        ref.watch(libraryFacetsProvider).valueOrNull ?? LibraryFacets.empty;
+        ref.watch(libraryFacetsProvider).value ?? LibraryFacets.empty;
     final theme = Theme.of(context);
 
     void setFilter(LibraryFilter next) {

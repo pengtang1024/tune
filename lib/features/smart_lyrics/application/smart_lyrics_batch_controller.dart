@@ -25,7 +25,7 @@ final smartLyricsTaskStoreProvider = Provider<SmartLyricsTaskStore>(
 /// count follows the identity of the library window like the ledger does.
 final smartLyricsNewMissingProvider = FutureProvider<int>((ref) async {
   ref.watch(
-    libraryControllerProvider.select((state) => state.valueOrNull?.songs),
+    libraryControllerProvider.select((state) => state.value?.songs),
   );
   return ref.watch(smartLyricsTaskStoreProvider).newMissing();
 });
@@ -37,7 +37,7 @@ final smartLyricsBatchCountsProvider = FutureProvider<
   Map<SmartLyricsTaskStatus, int>
 >((ref) async {
   ref.watch(
-    libraryControllerProvider.select((state) => state.valueOrNull?.songs),
+    libraryControllerProvider.select((state) => state.value?.songs),
   );
   return ref.watch(smartLyricsTaskStoreProvider).counts();
 });

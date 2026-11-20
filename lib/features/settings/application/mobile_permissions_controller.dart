@@ -52,7 +52,7 @@ class MobilePermissionsController
   Future<MobilePermissionStatus> request(MobilePermission permission) async {
     final service = ref.read(mobilePermissionsServiceProvider);
     final status = await service.request(permission);
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current != null) {
       state = AsyncData(switch (permission) {
         MobilePermission.notifications => current.copyWith(

@@ -30,7 +30,7 @@ final lyricsMemoryProvider = Provider<LyricsMemory>((ref) => LyricsMemory());
 /// when the line changes and not on every tick of the clock.
 final activeLyricLineProvider = Provider<int>((ref) {
   final document = ref.watch(
-    lyricsControllerProvider.select((state) => state.valueOrNull?.document),
+    lyricsControllerProvider.select((state) => state.value?.document),
   );
   if (document == null) return -1;
 
@@ -72,7 +72,7 @@ class LyricsState {
 /// The lyrics are fetched only when the reader opens them, so a scan never
 /// pays for them. The text of a track is kept for the session, because a
 /// plugin answers the same question with the same sheet.
-class LyricsController extends AutoDisposeAsyncNotifier<LyricsState> {
+class LyricsController extends AsyncNotifier<LyricsState> {
   /// Every answer the reader brings in gets a new number.
   ///
   /// A request that is still on its way sees the number change and drops its

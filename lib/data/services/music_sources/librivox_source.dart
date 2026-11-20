@@ -425,13 +425,13 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
     final url = SourceSongFactory.normalizeUrl(enclosure?.getAttribute('url'));
     if (url != null) return url;
 
-    final media = _first(item.findElements('content', namespace: '*'));
+    final media = _first(item.findElements('content', namespaceUri: '*'));
     return SourceSongFactory.normalizeUrl(media?.getAttribute('url'));
   }
 
   /// The cover of a chapter, which is the cover of the book it belongs to.
   static String? _artworkOf(XmlElement item, XmlElement? channel) {
-    final image = _first(item.findElements('image', namespace: '*'));
+    final image = _first(item.findElements('image', namespaceUri: '*'));
     final href = SourceSongFactory.normalizeUrl(image?.getAttribute('href'));
     if (href != null) return href;
 
@@ -442,7 +442,7 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
   static String? _channelArtwork(XmlElement? channel) {
     if (channel == null) return null;
 
-    final image = _first(channel.findElements('image', namespace: '*'));
+    final image = _first(channel.findElements('image', namespaceUri: '*'));
     final href = SourceSongFactory.normalizeUrl(image?.getAttribute('href'));
     if (href != null) return href;
 
@@ -490,7 +490,7 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
     String fallback = '',
   }) {
     for (final element in elements) {
-      final match = _first(element.findElements(name, namespace: '*'));
+      final match = _first(element.findElements(name, namespaceUri: '*'));
       final text = match?.innerText.trim() ?? '';
       if (text.isNotEmpty) return text;
     }

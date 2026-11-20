@@ -69,7 +69,7 @@ class _ShareLookupSectionState extends ConsumerState<ShareLookupSection> {
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
-              if (status.valueOrNull == ShareLookupStatus.missingFpcalc)
+              if (status.value == ShareLookupStatus.missingFpcalc)
                 TextButton(
                   onPressed: _installing ? null : () => _install(context),
                   child: Text(
@@ -90,7 +90,7 @@ class _ShareLookupSectionState extends ConsumerState<ShareLookupSection> {
     AsyncValue<ShareLookupStatus> status,
   ) {
     final loc = context.loc;
-    return switch (status.valueOrNull) {
+    return switch (status.value) {
       ShareLookupStatus.ready => loc.shareLookupReady,
       ShareLookupStatus.missingKey => loc.shareLookupMissingKey,
       ShareLookupStatus.missingFpcalc => loc.shareLookupMissingFpcalc,

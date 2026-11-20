@@ -59,11 +59,8 @@ class ShareLocalItemsSection extends ConsumerWidget {
     BuildContext context,
     ShareSessionController controller,
   ) async {
-    final picked = await FilePicker.platform.pickFiles(
-      type: FileType.audio,
-      allowMultiple: false,
-    );
-    final path = picked?.files.singleOrNull?.path;
+    final picked = await FilePicker.pickFile(type: FileType.audio);
+    final path = picked?.path;
     if (path == null || !context.mounted) {
       return;
     }
