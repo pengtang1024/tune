@@ -161,7 +161,7 @@ class _SettingsTranslationVendorsDialogState
 
   Future<void> _downloadLocalComponents(LocalComponentSpec model) async {
     final controller = ref.read(localComponentsControllerProvider.notifier);
-    final states = ref.read(localComponentsControllerProvider).valueOrNull;
+    final states = ref.read(localComponentsControllerProvider).value;
     for (final spec in [LocalComponentRegistry.translationRuntime, model]) {
       final current = states?[spec.id];
       if (current == null || current.usable || current.busy) continue;
@@ -509,7 +509,7 @@ class _VendorDetail extends ConsumerWidget {
               baseUrl: baseUrl,
               apiKey: apiKey,
               model: model,
-              models: models?.valueOrNull ?? const <String>[],
+              models: models?.value ?? const <String>[],
               modelsLoading: models?.isLoading ?? false,
               modelsFailed: models?.hasError ?? false,
               balance: balance?.value,

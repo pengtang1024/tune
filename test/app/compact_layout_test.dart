@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
@@ -1508,13 +1509,13 @@ class FakeLibraryController extends LibraryController {
 
   @override
   Future<void> setQuery(String query) async {
-    state = AsyncData((state.valueOrNull ?? seed).copyWith(query: query));
+    state = AsyncData((state.value ?? seed).copyWith(query: query));
   }
 
   @override
   Future<void> setSourceFilter(String? sourceId) async {
     state = AsyncData(
-      (state.valueOrNull ?? seed).copyWith(
+      (state.value ?? seed).copyWith(
         filter: LibraryFilter(
           sources: sourceId == null ? const {} : {sourceId},
         ),

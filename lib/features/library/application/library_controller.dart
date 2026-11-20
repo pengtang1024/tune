@@ -161,7 +161,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     },
   );
 
-  LibraryState get _current => state.valueOrNull ?? LibraryState.initial;
+  LibraryState get _current => state.value ?? LibraryState.initial;
 
   /// Reads the next window of the library.
   ///
@@ -209,7 +209,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     for (var offset = 0; offset < total; offset += batch) {
       if (_disposed) return;
       final songs = offset == 0 && total <= windowSize
-          ? state.valueOrNull?.songs ?? const <Song>[]
+          ? state.value?.songs ?? const <Song>[]
           : await _storage.page(offset: offset, limit: batch);
       if (songs.isEmpty) break;
       try {
@@ -640,7 +640,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   }
 
   void _saveView() {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null) return;
     unawaited(
       _storage.saveView(
@@ -832,7 +832,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 final libraryFacetsProvider = FutureProvider.autoDispose<LibraryFacets>((ref) async {
   final filter = ref.watch(
     libraryControllerProvider.select(
-      (value) => value.valueOrNull?.filter ?? LibraryFilter.empty,
+      (value) => value.value?.filter ?? LibraryFilter.empty,
     ),
   );
   return ref.read(libraryControllerProvider.notifier).facets(filter);

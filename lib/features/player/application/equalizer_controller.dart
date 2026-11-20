@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:tune/data/services/audio_equalizer_backend.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/equalizer_settings.dart';

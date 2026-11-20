@@ -473,7 +473,7 @@ class FakeMusicSourcesController extends MusicSourcesController {
   @override
   Future<void> setEnabled(String sourceId, bool enabled) async {
     enabledChanges.add(enabled);
-    final current = state.valueOrNull ?? seed;
+    final current = state.value ?? seed;
     state = AsyncData(
       current.copyWith(
         sources: [
@@ -491,7 +491,7 @@ class FakeMusicSourcesController extends MusicSourcesController {
     String? name,
   }) async {
     settingsChanges[sourceId] = Map.of(settings);
-    final current = state.valueOrNull ?? seed;
+    final current = state.value ?? seed;
     state = AsyncData(
       current.copyWith(
         sources: [

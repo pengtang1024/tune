@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/music_scanner_config.dart';

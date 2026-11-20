@@ -65,7 +65,7 @@ class _FavoritesPaneState extends ConsumerState<FavoritesPane> {
     final library = ref.watch(
       libraryControllerProvider.select(
         (value) => (
-          songs: value.valueOrNull?.songs ?? const <Song>[],
+          songs: value.value?.songs ?? const <Song>[],
           loaded: value.hasValue,
           loading: value.isLoading && !value.hasValue,
           error: value.hasError && !value.hasValue ? value.error : null,
@@ -87,7 +87,7 @@ class _FavoritesPaneState extends ConsumerState<FavoritesPane> {
       context.loc,
       ref.watch(
         musicSourcesControllerProvider.select(
-          (value) => value.valueOrNull?.sources ?? const [],
+          (value) => value.value?.sources ?? const [],
         ),
       ),
     );

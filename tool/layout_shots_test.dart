@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show FontLoader;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
@@ -484,7 +485,7 @@ class _FakeLibraryController extends LibraryController {
 
   @override
   Future<void> setQuery(String query) async {
-    state = AsyncData((state.valueOrNull ?? seed).copyWith(query: query));
+    state = AsyncData((state.value ?? seed).copyWith(query: query));
   }
 
   /// The tracks of an album, served from the fixture.

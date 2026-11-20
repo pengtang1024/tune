@@ -70,13 +70,13 @@ Future<void> main(List<String> arguments) async {
         if (!settings.hideUnhealthySources) return const <String>{};
         final sources = ref
             .watch(musicSourcesControllerProvider)
-            .valueOrNull;
+            .value;
         if (sources == null || sources.sources.isEmpty) {
           return const <String>{};
         }
         final reports = ref.watch(sourceHealthReportsProvider);
         if (reports.isEmpty) return const <String>{};
-        final state = ref.watch(libraryControllerProvider).valueOrNull;
+        final state = ref.watch(libraryControllerProvider).value;
         return SourceVisibility(
           threshold: settings.healthGateThreshold,
           alwaysVisible: settings.alwaysVisibleSources,

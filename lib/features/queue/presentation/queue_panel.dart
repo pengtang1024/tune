@@ -94,7 +94,7 @@ class _QueuePanelState extends ConsumerState<QueuePanel> {
       context.loc,
       ref.watch(
         musicSourcesControllerProvider.select(
-          (value) => value.valueOrNull?.sources ?? const [],
+          (value) => value.value?.sources ?? const [],
         ),
       ),
     );

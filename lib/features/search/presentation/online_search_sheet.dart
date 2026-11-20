@@ -65,10 +65,10 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final search = ref.watch(onlineSearchControllerProvider).valueOrNull;
+    final search = ref.watch(onlineSearchControllerProvider).value;
     final sources = localizedSources(
       context.loc,
-      ref.watch(musicSourcesControllerProvider).valueOrNull?.sources ??
+      ref.watch(musicSourcesControllerProvider).value?.sources ??
           const <MusicSourceConfig>[],
     );
     final sourceLabels = sourceLabelsOf(context.loc, sources);

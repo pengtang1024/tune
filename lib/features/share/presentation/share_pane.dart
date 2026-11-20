@@ -20,7 +20,7 @@ class SharePane extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(shareSessionProvider);
     final session = ref.read(shareSessionProvider.notifier);
-    final state = async.valueOrNull ?? ShareSessionState.idle;
+    final state = async.value ?? ShareSessionState.idle;
     return Scrollbar(
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(

@@ -41,7 +41,7 @@ class _FakeLibraryController extends LibraryController {
   @override
   Future<void> setFilter(LibraryFilter filter) async {
     lastFilter = filter;
-    final current = state.valueOrNull ?? LibraryState(songs: songs);
+    final current = state.value ?? LibraryState(songs: songs);
     final narrowed = filter.kinds.isEmpty
         ? songs
         : songs.where((s) => filter.kinds.contains(contentKindOf(s))).toList();
