@@ -115,6 +115,9 @@ class LocalComponentRegistry {
     platforms: {AppPlatform.linux, AppPlatform.windows},
   );
 
+  /// 音频指纹用的 `fpcalc`（chromaprint 1.5.1，静态发布包，校验值取自
+  /// 上游 release 原始产物）。分享的 AcoustID 查重靠它算指纹；没有它时查重
+  /// 返回「没查」，闸门不会把它当清白证明（docs/ai-music-sharing.md §13）。
   static const LocalComponentSpec fingerprintRuntime = LocalComponentSpec(
     id: 'share-fingerprint-runtime',
     kind: LocalComponentKind.runtime,
