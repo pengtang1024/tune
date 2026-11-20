@@ -44,8 +44,8 @@
 | 歌词第二票 | `lyrics-sherpa-runtime`（sherpa-onnx）、`lyrics-sensevoice-model` |
 | 歌词可选第三家族 | `lyrics-funasr-nano-model`（Fun-ASR-Nano，复用上面的 sherpa-onnx 运行时） |
 | 歌词（Android） | `lyrics-whisper-onnx-model-small`（whisper-small 的 ONNX int8 encoder/decoder/tokens，供应用内 FFI） |
-| 分享查重 | `share-fingerprint-runtime`（chromaprint `fpcalc` 1.5.1，Linux x86_64） |
 | 转码 | `ffmpeg`（GPL-2.0-or-later 构建，由本项目自己发布） |
+| 分享查重 | `share-fingerprint-runtime`（chromaprint 的 `fpcalc` 1.5.1，上游 release 原始产物；只登记 Linux 的 tar.gz，见下） |
 
 运行时与模型分开下载、分开校验、分开删除。翻译模型按默认、低配、高质量三档并列；引擎取第一个可用的档位，下载仍从默认档开始。SenseVoice 体积大且权重协议需单独确认，只在读者点击时下载，不进默认安装。
 
@@ -353,6 +353,15 @@ Windows 目前三个功能的二进制都是 linux-x64 构建，因此整卡不�
 1. SenseVoice（585 MB）随歌词每一档主安装一起装，因为它就是默认的两票之一；入口下载量如实包含它。
 2. 删除功能项时连未选中的档位一起删，弹窗写明总占用；系统自带副本不动。
 3. 跨平台按实际能力显示：Linux 三项齐全，Android 只有歌词，Windows 等装不了的平台连分区都不出现。
+
+### 为什么 `fpcalc` 只登记 Linux
+
+一条 `LocalComponentSpec` 只有一个 `archive` 和一份 `files`——`platforms` 只决定「哪些系统
+看得到」，并不按系统挑产物。chromaprint 的 Linux 是 tar.gz、Windows 是 zip、macOS 又是
+tar.gz，塞进同一份规格要么把 zip 当 tar.gz 解，要么给规格加一层「按平台的文件」，两条都
+不是本轮该动的结构。所以这里只登记验证过的 Linux 产物；Windows/macOS 上查重退回到
+`AcoustIdLookup.findFpcalc()` 的 PATH 探测（`~/.local/bin`、`~/bin`、系统 PATH），
+找不到就是「没查」，闸门不会把它当清白证明。
 
 ## 相关文档
 
