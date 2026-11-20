@@ -41,6 +41,25 @@ void main() {
       LocalComponentRegistry.ffmpeg.supports(AppPlatform.android),
       isFalse,
     );
+    expect(
+      LocalComponentRegistry.fingerprintRuntime.supports(AppPlatform.android),
+      isFalse,
+    );
+  });
+
+  test('fpcalc 的下载产物带着可核对的字节数与 sha256', () {
+    final spec = LocalComponentRegistry.fingerprintRuntime;
+
+    expect(spec.executable, 'fpcalc');
+    expect(spec.supports(AppPlatform.linux), isTrue);
+    expect(spec.files, hasLength(1));
+    final file = spec.files.single;
+    expect(file.bytes, 2752946);
+    expect(file.sha256, hasLength(64));
+    expect(
+      file.url,
+      contains('acoustid/chromaprint/releases/download/v1.5.1/'),
+    );
   });
 
   test('the model folders the phone reads stay available on Android', () {
